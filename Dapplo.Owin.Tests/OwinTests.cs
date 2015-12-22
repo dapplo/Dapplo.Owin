@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using Dapplo.Addons.Implementation;
 using Dapplo.Config.Ini;
+using Dapplo.HttpExtensions;
 
 namespace Dapplo.Owin.Tests
 {
@@ -16,8 +17,9 @@ namespace Dapplo.Owin.Tests
 			var bootstrapper = new ApplicationBootstrapper(ApplicationName);
 			var iniConfig = new IniConfig(ApplicationName, "test");
 			bootstrapper.IniConfig = iniConfig;
+			var owinConfig = await iniConfig.RegisterAndGetAsync<IOwinConfiguration>();
 
-			bootstrapper.Add(".", "Dapplo.*.dll");
+			bootstrapper.Add(typeof(OwinStartupTest));
 			// Add test project, without having a direct reference
 #if DEBUG
 			bootstrapper.Add(@"..\..\..\Dapplo.Owin\bin\Debug", "Dapplo.*.dll");
@@ -31,6 +33,11 @@ namespace Dapplo.Owin.Tests
 			bootstrapper.Run();
 			// Test startup
 			await bootstrapper.StartupAsync();
+
+			// Test request
+			var testUri = new Uri($"http://{owinConfig.Host}:{owinConfig.Port}/Test");
+			var result = await testUri.GetAsStringAsync();
+			Assert.AreEqual("Dapplo", result);
 
 			// Test shutdown
 			await bootstrapper.ShutdownAsync();

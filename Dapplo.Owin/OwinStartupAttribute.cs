@@ -4,7 +4,7 @@ using System.ComponentModel.Composition;
 
 namespace Dapplo.Owin
 {
-	[MetadataAttribute, AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+	[MetadataAttribute, AttributeUsage(AttributeTargets.Class)]
 	public class OwinStartupAttribute : ModuleAttribute, IOwinStartupMetadata
 	{
 		public OwinStartupAttribute() : base(typeof(IOwinStartup))

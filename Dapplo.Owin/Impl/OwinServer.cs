@@ -1,13 +1,13 @@
-﻿using Dapplo.Addons;
-using Microsoft.Owin.Hosting;
-using System;
-using System.Linq;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapplo.Addons;
+using Microsoft.Owin.Hosting;
 
-namespace Dapplo.Owin
+namespace Dapplo.Owin.Impl
 {
 	/// <summary>
 	/// This class will start an OwinService as a Startup-Action and will shut it down when the shutdown action is called.
@@ -28,6 +28,7 @@ namespace Dapplo.Owin
 		private IEnumerable<Lazy<IOwinStartup, IOwinStartupMetadata>> OwinStartups
 		{
 			get;
+			// ReSharper disable once UnusedAutoPropertyAccessor.Local
 			set;
 		}
 
@@ -46,19 +47,12 @@ namespace Dapplo.Owin
 
 		private void StartWebApp()
 		{
-			_webApp = WebApp.Start($"http://{OwinConfiguration.Host}:{OwinConfiguration.Port}", (appBuilder) =>
+			_webApp = WebApp.Start($"http://{OwinConfiguration.Host}:{OwinConfiguration.Port}", appBuilder =>
 			{
 				var orderedOwinStartups = from export in OwinStartups orderby export.Metadata.StartupOrder ascending select export;
 				foreach (var owinStartup in orderedOwinStartups)
 				{
-					try
-					{
-						owinStartup.Value.Configuration(appBuilder);
-					}
-					catch
-					{
-						// Nothing
-					}
+					owinStartup.Value.Configuration(appBuilder);
 				}
 			});
 		}
