@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>$id$</id>
+        <version>$version$</version>
+        <authors>$author$</authors>
+        <licenseUrl>https://en.wikipedia.org/wiki/GNU_General_Public_License</licenseUrl>
+        <projectUrl>http://www.dapplo.net/blocks/Dapplo.Owin.html</projectUrl>
+        <iconUrl>http://www.dapplo.net/favicon.ico</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Dapplo.Owin takes care of bootstrapping Owin</description>
+		<summary>A library with code to use Owin with multiple configurations in your application.</summary>
+        <language>en-us</language>
+		<copyright>Dapplo</copyright>
+		<tags>Owin</tags>
+		<dependencies>
+			<dependency id="Dapplo.Config" version="0.2.3" />
+			<dependency id="Dapplo.Config" version="0.1.126" />
+			<dependency id="Dapplo.LogFacade" version="0.1.3" />
+		</dependencies>
+		<frameworkAssemblies>
+			<frameworkAssembly assemblyName="System.ComponentModel.Composition" targetFramework="net45" />
+		</frameworkAssemblies>
+	</metadata>
+</package>

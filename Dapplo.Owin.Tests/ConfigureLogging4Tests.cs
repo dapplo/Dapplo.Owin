@@ -21,37 +21,23 @@
 	along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Addons;
-using System;
-using System.ComponentModel.Composition;
 
-namespace Dapplo.Owin
+using Dapplo.LogFacade;
+using Dapplo.LogFacade.Loggers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace Dapplo.Owin.Tests
 {
-	[MetadataAttribute, AttributeUsage(AttributeTargets.Class)]
-	public class OwinStartupAttribute : ModuleAttribute, IOwinStartupMetadata
+	/// <summary>
+	/// This initializes the logger for all tests
+	/// </summary>
+	[TestClass]
+	public class ConfigureLogging4Tests
 	{
-		public OwinStartupAttribute() : base(typeof(IOwinStartup))
+		[AssemblyInitialize]
+		public static void ConfigureLogging(TestContext context)
 		{
-
+			LogSettings.Logger = new TraceLogger { Level = LogLevel.Verbose };
 		}
-
-		/// <summary>
-		/// Use a specific contract name for the IOwinStartup
-		/// </summary>
-		/// <param name="contractName"></param>
-		public OwinStartupAttribute(string contractName) : base(contractName, typeof(IOwinStartup))
-		{
-
-		}
-
-		/// <summary>
-		/// Here the order of the startup action can be specified, starting with low values and ending with high.
-		/// With this a cheap form of "dependency" management is made.
-		/// </summary>
-		public int StartupOrder
-		{
-			get;
-			set;
-		} = 1;
 	}
 }

@@ -23,35 +23,18 @@
 
 using Dapplo.Addons;
 using System;
-using System.ComponentModel.Composition;
 
 namespace Dapplo.Owin
 {
-	[MetadataAttribute, AttributeUsage(AttributeTargets.Class)]
-	public class OwinStartupAttribute : ModuleAttribute, IOwinStartupMetadata
+	/// <summary>
+	/// The IOwinServer is the public interface for the "server".
+	/// This can e.b. be used to place the OwinServer in the IServiceLocator, is currently not done automatically
+	/// </summary>
+	public interface IOwinServer : IStartupAction, IShutdownAction
 	{
-		public OwinStartupAttribute() : base(typeof(IOwinStartup))
-		{
-
-		}
-
-		/// <summary>
-		/// Use a specific contract name for the IOwinStartup
-		/// </summary>
-		/// <param name="contractName"></param>
-		public OwinStartupAttribute(string contractName) : base(contractName, typeof(IOwinStartup))
-		{
-
-		}
-
-		/// <summary>
-		/// Here the order of the startup action can be specified, starting with low values and ending with high.
-		/// With this a cheap form of "dependency" management is made.
-		/// </summary>
-		public int StartupOrder
+		Uri ListeningOn
 		{
 			get;
-			set;
-		} = 1;
+		}
 	}
 }
