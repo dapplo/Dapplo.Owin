@@ -1,4 +1,7 @@
-# Dapplo.Owin
+Dapplo.Owin
+=====================
+Work in progress
+
 A Dapplo module to "bootstrap" Owin and have modules adding to the configuration instead of a single "Startup" class.
 
 Example:
@@ -6,12 +9,13 @@ Example:
 	[OwinStartup]
 	public class OwinStartupTest : IOwinStartup
 	{
-		public void Configuration(IAppBuilder appBuilder)
+		public void Configuration(IOwinServer server, IAppBuilder appBuilder)
 		{
 			appBuilder.Use(async (owinContext, next) =>
 			{
-				await owinContext.Response.WriteAsync("Dapplo");
 				owinContext.Response.StatusCode = 200;
+				owinContext.Response.ContentType = "text/plain";
+				await owinContext.Response.WriteAsync("Dapplo");
 				await next();
 			});
 		}
