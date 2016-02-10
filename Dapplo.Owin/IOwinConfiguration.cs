@@ -27,11 +27,6 @@ using System.Runtime.Serialization;
 
 namespace Dapplo.Owin
 {
-	public enum Dificulty
-	{
-		Easy,
-		Hard
-	}
 	[IniSection("Owin")]
 	public interface IOwinConfiguration : IIniSection
 	{
