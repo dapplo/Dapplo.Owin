@@ -21,7 +21,7 @@
 	along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Addons.Implementation;
+using Dapplo.Addons.Bootstrapper;
 using Dapplo.Config.Ini;
 using Dapplo.HttpExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -42,7 +42,7 @@ namespace Dapplo.Owin.Tests
 				var iniConfig = new IniConfig(ApplicationName, "test");
 				var owinConfig = await iniConfig.RegisterAndGetAsync<IOwinConfiguration>();
 
-				bootstrapper.Add(typeof(OwinStartupTest));
+				bootstrapper.Add(typeof(OwinConfigurationTest));
 
 				// Add owin server project, without having a direct reference.
 #if DEBUG

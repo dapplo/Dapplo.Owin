@@ -21,20 +21,30 @@
 	along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System.ComponentModel;
+using Dapplo.LogFacade;
+using Microsoft.Owin;
+using System.Threading.Tasks;
 
-namespace Dapplo.Owin
+namespace Dapplo.Owin.Tests
 {
 	/// <summary>
-	/// Meta-data belonging to the OwinStartupAttribute, which makes it possible to specify type-safe meta-data.
+	/// The "test" Middleware, it returns "Dapplo" for EVERY request
 	/// </summary>
-	public interface IOwinStartupMetadata
+	public class TestMiddleware : OwinMiddleware
 	{
-		[DefaultValue(1)]
-		int StartupOrder
+		private static readonly LogSource Log = new LogSource();
+
+		public TestMiddleware(OwinMiddleware next) : base(next)
 		{
-			get;
 		}
 
+		public override async Task Invoke(IOwinContext owinContext)
+		{
+			Log.Debug().WriteLine("Http method: {0}, path: {1}", owinContext.Request.Method, owinContext.Request.Path);
+			owinContext.Response.StatusCode = 200;
+			owinContext.Response.ContentType = "text/plain";
+			await owinContext.Response.WriteAsync("Dapplo");
+			await Next.Invoke(owinContext);
+		}
 	}
 }

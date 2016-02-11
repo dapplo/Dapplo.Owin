@@ -27,6 +27,9 @@ using System.Runtime.Serialization;
 
 namespace Dapplo.Owin
 {
+	/// <summary>
+	/// The Owin configuration container, this can be stored with Dapplo.Config
+	/// </summary>
 	[IniSection("Owin")]
 	public interface IOwinConfiguration : IIniSection
 	{

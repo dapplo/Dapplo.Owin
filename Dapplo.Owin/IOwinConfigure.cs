@@ -29,8 +29,8 @@ namespace Dapplo.Owin
 	/// <summary>
 	/// The IOwinStartup describes Owin modules that add functionality to an Owin server, like SignalR or a file-servers
 	/// </summary>
-	public interface IOwinStartup : IModule
+	public interface IOwinConfigure : IModule
 	{
-		void Configuration(IOwinServer server, IAppBuilder appBuilder);
+		void ConfigureOwin(IOwinServer server, IAppBuilder appBuilder);
 	}
 }

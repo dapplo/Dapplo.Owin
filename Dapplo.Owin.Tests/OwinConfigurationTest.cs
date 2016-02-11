@@ -26,22 +26,15 @@ using Owin;
 
 namespace Dapplo.Owin.Tests
 {
-	[OwinStartup]
-	public class OwinStartupTest : IOwinStartup
+	[OwinConfiguration]
+	public class OwinConfigurationTest : IOwinConfigure
 	{
 		private static readonly LogSource Log = new LogSource();
 
-		public void Configuration(IOwinServer server, IAppBuilder appBuilder)
+		public void ConfigureOwin(IOwinServer server, IAppBuilder appBuilder)
 		{
 			Log.Debug().WriteLine("Configuring test middleware in the Owin pipeline");
-			appBuilder.Use(async (owinContext, next) =>
-			{
-				Log.Debug().WriteLine("Http method: {0}, path: {1}", owinContext.Request.Method, owinContext.Request.Path);
-				owinContext.Response.StatusCode = 200;
-				owinContext.Response.ContentType = "text/plain";
-				await owinContext.Response.WriteAsync("Dapplo");
-				await next();
-			});
+			appBuilder.Use(typeof(TestMiddleware));
 		}
 	}
 }

@@ -21,37 +21,20 @@
 	along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/>.
  */
 
-using Dapplo.Addons;
-using System;
-using System.ComponentModel.Composition;
+using System.ComponentModel;
 
 namespace Dapplo.Owin
 {
-	[MetadataAttribute, AttributeUsage(AttributeTargets.Class)]
-	public class OwinStartupAttribute : ModuleAttribute, IOwinStartupMetadata
+	/// <summary>
+	/// Meta-data belonging to the OwinStartupAttribute, which makes it possible to specify type-safe meta-data.
+	/// </summary>
+	public interface IOwinConfigureMetadata
 	{
-		public OwinStartupAttribute() : base(typeof(IOwinStartup))
-		{
-
-		}
-
-		/// <summary>
-		/// Use a specific contract name for the IOwinStartup
-		/// </summary>
-		/// <param name="contractName"></param>
-		public OwinStartupAttribute(string contractName) : base(contractName, typeof(IOwinStartup))
-		{
-
-		}
-
-		/// <summary>
-		/// Here the order of the startup action can be specified, starting with low values and ending with high.
-		/// With this a cheap form of "dependency" management is made.
-		/// </summary>
-		public int StartupOrder
+		[DefaultValue(1)]
+		int StartupOrder
 		{
 			get;
-			set;
-		} = 1;
+		}
+
 	}
 }

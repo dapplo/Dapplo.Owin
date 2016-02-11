@@ -28,13 +28,25 @@ namespace Dapplo.Owin
 {
 	/// <summary>
 	/// The IOwinServer is the public interface for the "server".
-	/// This can e.b. be used to place the OwinServer in the IServiceLocator, is currently not done automatically
+	/// This is also available via the Dapplo.Addons IServiceLocator, and can be imported
 	/// </summary>
 	public interface IOwinServer : IStartupAction, IShutdownAction
 	{
+		/// <summary>
+		/// The Uri where Owin is listening on
+		/// </summary>
 		Uri ListeningOn
 		{
 			get;
 		}
+
+		/// <summary>
+		/// Is the server running?
+		/// </summary>
+		bool IsListening
+		{
+			get;
+		}
+
 	}
 }

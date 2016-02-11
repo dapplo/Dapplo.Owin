@@ -59,7 +59,7 @@ namespace Dapplo.Owin.Implementation
 		}
 
 		[ImportMany]
-		private IEnumerable<Lazy<IOwinStartup, IOwinStartupMetadata>> OwinStartups
+		private IEnumerable<Lazy<IOwinConfigure, IOwinConfigureMetadata>> OwinStartups
 		{
 			get;
 			// ReSharper disable once UnusedAutoPropertyAccessor.Local
@@ -76,26 +76,34 @@ namespace Dapplo.Owin.Implementation
 		}
 
 		/// <summary>
+		/// Is the server running?
+		/// </summary>
+		public bool IsListening
+		{
+			get;
+			private set;
+		}
+
+		/// <summary>
 		/// Stop the WebApp
 		/// </summary>
-		/// <param name="cancellationToken">unused</param>
+		/// <param name="cancellationToken">CancellationToken</param>
 		/// <returns>Task</returns>
-		public Task ShutdownAsync(CancellationToken cancellationToken = default(CancellationToken))
+		public async Task ShutdownAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
-			StopWebApp();
-			return Task.FromResult(true);
+			Log.Verbose().WriteLine("Stopping the Owin Server on {0}", ListeningOn);
+			await Task.Run(() => StopWebApp(), cancellationToken);
 		}
 
 		/// <summary>
 		/// Start the WebApp
 		/// </summary>
-		/// <param name="cancellationToken">unused</param>
+		/// <param name="cancellationToken">CancellationToken</param>
 		/// <returns>Task</returns>
-		public Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
+		public async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			ServiceLocator.Export<IOwinServer>(this);
-			StartWebApp();
-            return Task.FromResult(true);
+			await Task.Run(() => StartWebApp(), cancellationToken);
 		}
 
 		/// <summary>
@@ -116,13 +124,15 @@ namespace Dapplo.Owin.Implementation
 				var orderedOwinStartups = from export in OwinStartups orderby export.Metadata.StartupOrder ascending select export;
 				foreach (var owinStartup in orderedOwinStartups)
 				{
-					owinStartup.Value.Configuration(this, appBuilder);
+					owinStartup.Value.ConfigureOwin(this, appBuilder);
 				}
 			});
+			IsListening = true;
 		}
 
 		private void StopWebApp()
 		{
+			IsListening = false;
 			_webApp?.Dispose();
 			_webApp = null;
 		}
