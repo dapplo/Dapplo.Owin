@@ -21,51 +21,58 @@
 	along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using Dapplo.Addons;
 using Dapplo.Addons.Bootstrapper;
 using Dapplo.Config.Ini;
 using Dapplo.HttpExtensions;
 using Dapplo.LogFacade;
 using Dapplo.Owin.Tests.support;
+using System;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Dapplo.Owin.Tests
 {
-	public class OwinTests
+	public class OwinTests : IDisposable 
 	{
 		private const string ApplicationName = "DapploOwin";
+		private readonly ApplicationBootstrapper _bootstrapper;
 
 		public OwinTests(ITestOutputHelper testOutputHelper)
 		{
 			XUnitLogger.RegisterLogger(testOutputHelper, LogLevel.Verbose);
+			_bootstrapper = new ApplicationBootstrapper(ApplicationName);
 		}
 
-		[Fact]
-		public async Task TestStartup()
+		public void Dispose()
 		{
-			using (var bootstrapper = new ApplicationBootstrapper(ApplicationName))
-			{
-				var iniConfig = new IniConfig(ApplicationName, "test");
-				var owinConfig = await iniConfig.RegisterAndGetAsync<IOwinConfiguration>();
+			_bootstrapper?.Dispose();
+		}
 
-				bootstrapper.Add(typeof(OwinConfigurationTest));
 
-				// Add owin server project, without having a direct reference.
+		[Fact]
+		public async Task TestStartupAsync()
+		{
+			var iniConfig = new IniConfig(ApplicationName, "test");
+			var owinConfig = await iniConfig.RegisterAndGetAsync<IOwinConfiguration>();
+
+			_bootstrapper.Add(typeof(OwinConfigurationTest));
+
+			// Add owin server project, without having a direct reference.
 #if DEBUG
-				bootstrapper.Add(@"..\..\..\Dapplo.Owin\bin\Debug", "Dapplo.*.dll");
+			_bootstrapper.Add(@"..\..\..\Dapplo.Owin\bin\Debug", "Dapplo.*.dll");
 #else
-				bootstrapper.Add(@"..\..\..\Dapplo.Owin\bin\Release", "Dapplo.*.dll");
+			bootstrapper.Add(@"..\..\..\Dapplo.Owin\bin\Release", "Dapplo.*.dll");
 #endif
-				// Start the composition
-				await bootstrapper.RunAsync();
+			// Start the composition
+			await _bootstrapper.RunAsync();
 
-				var owinServer = bootstrapper.GetExport<IOwinServer>().Value;
-				// Test request, we need to build the url
-				var testUri = owinServer.ListeningOn.AppendSegments("Test");
-				var result = await testUri.GetAsAsync<string>();
-				Assert.Equal("Dapplo", result);
-			}
+			var owinServer = _bootstrapper.GetExport<IOwinServer>().Value;
+			// Test request, we need to build the url
+			var testUri = owinServer.ListeningOn.AppendSegments("Test");
+			var result = await testUri.GetAsAsync<string>();
+			Assert.Equal("Dapplo", result);
 		}
 	}
 }

@@ -111,6 +111,13 @@ namespace Dapplo.Owin.Implementation
 		/// </summary>
 		private void StartWebApp()
 		{
+			var orderedOwinStartups = from export in OwinStartups orderby export.Metadata.StartupOrder ascending select export;
+			if (orderedOwinStartups.Count() == 0)
+			{
+				Log.Info().WriteLine("No OwinStartups to start.");
+				return;
+			}
+
 			// If there is no port given, find a free one and store this in the configuration
 			if (OwinConfiguration.Port == 0)
 			{
@@ -121,7 +128,6 @@ namespace Dapplo.Owin.Implementation
 
 			_webApp = WebApp.Start(ListeningOn.AbsoluteUri, appBuilder =>
 			{
-				var orderedOwinStartups = from export in OwinStartups orderby export.Metadata.StartupOrder ascending select export;
 				foreach (var owinStartup in orderedOwinStartups)
 				{
 					owinStartup.Value.ConfigureOwin(this, appBuilder);
