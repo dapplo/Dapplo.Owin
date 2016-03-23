@@ -101,7 +101,6 @@ namespace Dapplo.Owin.Tests.support
 			{
 				throw new ArgumentNullException(nameof(testOutputHelper), "Couldn't find a ITestOutputHelper in the CallContext");
 			}
-			Console.WriteLine(string.Format($"{logInfo} - {messageTemplate}", logParameters));
 			testOutputHelper.WriteLine($"{logInfo} - {messageTemplate}", logParameters);
 		}
 
@@ -112,11 +111,8 @@ namespace Dapplo.Owin.Tests.support
 			{
 				throw new ArgumentNullException(nameof(testOutputHelper), "Couldn't find a ITestOutputHelper in the CallContext");
 			}
-			Console.WriteLine(string.Format($"{logInfo} - {messageTemplate}", logParameters));
 			testOutputHelper.WriteLine($"{logInfo} - {messageTemplate}", logParameters);
-			Console.WriteLine(exception.ToString());
 			testOutputHelper.WriteLine(exception.ToString());
 		}
 	}
-
 }
