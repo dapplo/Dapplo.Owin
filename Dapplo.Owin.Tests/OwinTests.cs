@@ -24,17 +24,24 @@
 using Dapplo.Addons.Bootstrapper;
 using Dapplo.Config.Ini;
 using Dapplo.HttpExtensions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+using Dapplo.LogFacade;
+using Dapplo.Owin.Tests.support;
 using System.Threading.Tasks;
+using Xunit;
+using Xunit.Abstractions;
+
 namespace Dapplo.Owin.Tests
 {
-	[TestClass]
 	public class OwinTests
 	{
 		private const string ApplicationName = "DapploOwin";
 
-		[TestMethod]
+		public OwinTests(ITestOutputHelper testOutputHelper)
+		{
+			XUnitLogger.RegisterLogger(testOutputHelper, LogLevel.Verbose);
+		}
+
+		[Fact]
 		public async Task TestStartup()
 		{
 			using (var bootstrapper = new ApplicationBootstrapper(ApplicationName))
@@ -57,7 +64,7 @@ namespace Dapplo.Owin.Tests
 				// Test request, we need to build the url
 				var testUri = owinServer.ListeningOn.AppendSegments("Test");
 				var result = await testUri.GetAsAsync<string>();
-				Assert.AreEqual("Dapplo", result);
+				Assert.Equal("Dapplo", result);
 			}
 		}
 	}
