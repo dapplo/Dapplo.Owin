@@ -132,7 +132,7 @@ namespace Dapplo.Owin.Implementation
 		private void StartWebApp()
 		{
 			var orderedOwinStartups = from export in OwinStartups orderby export.Metadata.StartupOrder ascending select export;
-			if (orderedOwinStartups.Count() == 0)
+			if (!orderedOwinStartups.Any())
 			{
 				Log.Info().WriteLine("No OwinStartups to start.");
 				return;

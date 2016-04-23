@@ -26,7 +26,7 @@ using Dapplo.Addons.Bootstrapper;
 using Dapplo.Config.Ini;
 using Dapplo.HttpExtensions;
 using Dapplo.LogFacade;
-using Dapplo.Owin.Tests.support;
+using Dapplo.Owin.Tests.Logger;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -49,7 +49,7 @@ namespace Dapplo.Owin.Tests
 			using (var bootstrapper = new ApplicationBootstrapper(ApplicationName))
 			{
 				var iniConfig = new IniConfig(ApplicationName, "test");
-				var owinConfig = await iniConfig.RegisterAndGetAsync<IOwinConfiguration>();
+				await iniConfig.RegisterAndGetAsync<IOwinConfiguration>();
 
 				bootstrapper.Add(typeof (OwinConfigurationTest));
 
