@@ -50,12 +50,15 @@ namespace Dapplo.Owin.Implementation
 		private IOwinConfiguration OwinConfiguration { get; set; }
 
 		[ImportMany]
-		private IEnumerable<Lazy<IOwinConfigure, IOwinConfigureMetadata>> OwinStartups { get;
+		private IEnumerable<Lazy<IOwinConfigure, IOwinConfigureMetadata>> OwinStartups
+		{
+			get;
 			// ReSharper disable once UnusedAutoPropertyAccessor.Local
-			set; }
+			set;
+		}
 
 		[Import]
-		private IServiceLocator ServiceLocator { get; set; }
+		private IServiceExporter ServiceExporter { get; set; }
 
 		/// <summary>
 		///     The server is listening on the following Uri
@@ -85,7 +88,7 @@ namespace Dapplo.Owin.Implementation
 		/// <returns>Task</returns>
 		public async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
-			ServiceLocator.Export<IOwinServer>(this);
+			ServiceExporter.Export<IOwinServer>(this);
 			await Task.Run(() => StartWebApp(), cancellationToken);
 		}
 
