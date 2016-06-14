@@ -26,9 +26,9 @@ using Dapplo.Addons.Bootstrapper;
 using Dapplo.Config.Ini;
 using Dapplo.HttpExtensions;
 using Dapplo.LogFacade;
-using Dapplo.Owin.Tests.Logger;
 using Xunit;
 using Xunit.Abstractions;
+using Dapplo.Log.XUnit;
 
 #endregion
 
@@ -40,7 +40,7 @@ namespace Dapplo.Owin.Tests
 
 		public OwinTests(ITestOutputHelper testOutputHelper)
 		{
-			XUnitLogger.RegisterLogger(testOutputHelper, LogLevel.Verbose);
+			XUnitLogger.RegisterLogger(testOutputHelper, LogLevels.Verbose);
 		}
 
 		[Fact]
