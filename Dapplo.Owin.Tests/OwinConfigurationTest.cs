@@ -21,7 +21,7 @@
 
 #region using
 
-using Dapplo.LogFacade;
+using Dapplo.Log.Facade;
 using Owin;
 
 #endregion

@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 using Dapplo.Addons.Bootstrapper;
 using Dapplo.Config.Ini;
 using Dapplo.HttpExtensions;
-using Dapplo.LogFacade;
+using Dapplo.Log.Facade;
 using Xunit;
 using Xunit.Abstractions;
 using Dapplo.Log.XUnit;
@@ -40,7 +40,7 @@ namespace Dapplo.Owin.Tests
 
 		public OwinTests(ITestOutputHelper testOutputHelper)
 		{
-			XUnitLogger.RegisterLogger(testOutputHelper, LogLevels.Verbose);
+			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
 		}
 
 		[Fact]

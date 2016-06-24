@@ -14,7 +14,7 @@
 		<copyright>Dapplo</copyright>
 		<tags>Owin</tags>
 		<frameworkAssemblies>
-			<frameworkAssembly assemblyName="System.ComponentModel.Composition" targetFramework="net451" />
+			<frameworkAssembly assemblyName="System.ComponentModel.Composition" targetFramework="net45" />
 		</frameworkAssemblies>
 	</metadata>
 </package>
