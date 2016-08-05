@@ -55,10 +55,11 @@ namespace Dapplo.Owin.Tests
 
 				// Add owin server project, without having a direct reference.
 #if DEBUG
-				bootstrapper.Add(@"..\..\..\Dapplo.Owin\bin\Debug", "Dapplo.*.dll");
+				bootstrapper.AddScanDirectory(@"..\..\..\Dapplo.Owin\bin\Debug");
 #else
-				bootstrapper.Add(@"..\..\..\Dapplo.Owin\bin\Release", "Dapplo.*.dll");
+				bootstrapper.AddScanDirectory(@"..\..\..\Dapplo.Owin\bin\Release");
 #endif
+				bootstrapper.FindAndLoadAssemblies("Dapplo*");
 				// Start the composition
 				await bootstrapper.RunAsync();
 
