@@ -32,8 +32,8 @@
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapplo.Addons, Version=0.3.88.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapplo.Addons.0.3.88\lib\net45\Dapplo.Addons.dll</HintPath>
+    <Reference Include="Dapplo.Addons, Version=0.3.89.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapplo.Addons.0.3.89\lib\net45\Dapplo.Addons.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Dapplo.Config, Version=0.4.2.0, Culture=neutral, processorArchitecture=MSIL">
@@ -71,11 +71,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IOwinServer.cs" />
-    <Compile Include="IOwinConfigure.cs" />
-    <Compile Include="IOwinConfigureMetadata.cs" />
+    <Compile Include="IOwinModule.cs" />
+    <Compile Include="IOwinModuleMetadata.cs" />
     <Compile Include="Implementation\OwinServer.cs" />
     <Compile Include="IOwinConfiguration.cs" />
-    <Compile Include="OwinConfigurationAttribute.cs" />
+    <Compile Include="SimpleOwinModule.cs" />
+    <Compile Include="OwinModuleAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

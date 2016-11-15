@@ -21,18 +21,21 @@
 
 #region using
 
-using Dapplo.Addons;
-using Owin;
+using System.ComponentModel;
 
 #endregion
 
 namespace Dapplo.Owin
 {
 	/// <summary>
-	///     The IOwinStartup describes Owin modules that add functionality to an Owin server, like SignalR or a file-servers
+	///     Meta-data belonging to the OwinModuleAttribute, which makes it possible to specify type-safe meta-data.
 	/// </summary>
-	public interface IOwinConfigure : IModule
+	public interface IOwinModuleMetadata
 	{
-		void ConfigureOwin(IOwinServer server, IAppBuilder appBuilder);
+		[DefaultValue(1)]
+		int StartupOrder { get; }
+
+		[DefaultValue(1)]
+		int ShutdownOrder { get; }
 	}
 }

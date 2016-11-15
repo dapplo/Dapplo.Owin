@@ -35,12 +35,12 @@ namespace Dapplo.Owin
 	///     This attribute will make sure it's available via MEF (dependency injection)
 	/// </summary>
 	[MetadataAttribute, AttributeUsage(AttributeTargets.Class)]
-	public class OwinConfigurationAttribute : ModuleAttribute, IOwinConfigureMetadata
+	public class OwinModuleAttribute : ModuleAttribute, IOwinModuleMetadata
 	{
 		/// <summary>
 		///     Default constructor calls the ModuleAttribute with the interface type so it can be imported accordingly
 		/// </summary>
-		public OwinConfigurationAttribute() : base(typeof (IOwinConfigure))
+		public OwinModuleAttribute() : base(typeof (IOwinModule))
 		{
 		}
 
@@ -49,13 +49,18 @@ namespace Dapplo.Owin
 		///     Calls the ModuleAttribute constructor with contractName and the interface type so it can be imported accordingly
 		/// </summary>
 		/// <param name="contractName"></param>
-		public OwinConfigurationAttribute(string contractName) : base(contractName, typeof (IOwinConfigure))
+		public OwinModuleAttribute(string contractName) : base(contractName, typeof (IOwinModule))
 		{
 		}
 
 		/// <summary>
-		///     Here the order of the IOwinConfigure "processing" can be specified, starting with low values and ending with high.
+		///     Here the order of the IOwinModule Initialize can be specified, starting with low values and ending with high.
 		/// </summary>
 		public int StartupOrder { get; set; } = 1;
+
+		/// <summary>
+		///     Here the order of the IOwinModule Deinitialize can be specified, starting with low values and ending with high.
+		/// </summary>
+		public int ShutdownOrder { get; set;  } = 1;
 	}
 }

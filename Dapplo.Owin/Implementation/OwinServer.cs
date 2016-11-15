@@ -50,7 +50,7 @@ namespace Dapplo.Owin.Implementation
 		private IOwinConfiguration OwinConfiguration { get; set; }
 
 		[ImportMany]
-		private IEnumerable<Lazy<IOwinConfigure, IOwinConfigureMetadata>> OwinStartups
+		private IEnumerable<Lazy<IOwinModule, IOwinModuleMetadata>> OwinModules
 		{
 			get;
 			// ReSharper disable once UnusedAutoPropertyAccessor.Local
@@ -78,7 +78,24 @@ namespace Dapplo.Owin.Implementation
 		public async Task ShutdownAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			Log.Verbose().WriteLine("Stopping the Owin Server on {0}", ListeningOn);
-			await Task.Run(() => StopWebApp(), cancellationToken);
+			var owinModules = from export in OwinModules orderby export.Metadata.ShutdownOrder ascending select export;
+			if (!owinModules.Any())
+			{
+				Log.Info().WriteLine("No OwinModules to start.");
+				return;
+			}
+			foreach (var owinModule in owinModules)
+			{
+				if (cancellationToken.IsCancellationRequested)
+				{
+					break;
+				}
+				Log.Debug().WriteLine("Stopping OwinModule {0}", owinModule.Value.GetType());
+				await owinModule.Value.DeinitializeAsync(this, cancellationToken);
+			}
+			IsListening = false;
+			_webApp?.Dispose();
+			_webApp = null;
 		}
 
 		/// <summary>
@@ -89,7 +106,36 @@ namespace Dapplo.Owin.Implementation
 		public async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			ServiceExporter.Export<IOwinServer>(this);
-			await Task.Run(() => StartWebApp(), cancellationToken);
+			var owinModules = from export in OwinModules orderby export.Metadata.StartupOrder ascending select export;
+			if (!owinModules.Any())
+			{
+				Log.Info().WriteLine("No OwinModules to start.");
+				return;
+			}
+
+			// If there is no port given, find a free one and store this in the configuration
+			if (OwinConfiguration.Port == 0)
+			{
+				OwinConfiguration.Port = GetFreeListenerPort(new[] { 0 });
+			}
+			ListeningOn = new Uri($"http://{OwinConfiguration.Hostname}:{OwinConfiguration.Port}");
+			Log.Info().WriteLine("Starting WebApp on {0}", ListeningOn.AbsoluteUri);
+
+			foreach (var owinModule in owinModules)
+			{
+				Log.Debug().WriteLine("Intializing OwinModule {0}", owinModule.Value.GetType());
+				await owinModule.Value.InitializeAsync(this, cancellationToken);
+			}
+
+			_webApp = WebApp.Start(ListeningOn.AbsoluteUri, appBuilder =>
+			{
+				foreach (var owinModule in owinModules)
+				{
+					Log.Debug().WriteLine("configuring OwinModule {0}", owinModule.Value.GetType());
+					owinModule.Value.Configure(this, appBuilder);
+				}
+			});
+			IsListening = true;
 		}
 
 		/// <summary>
@@ -127,43 +173,6 @@ namespace Dapplo.Owin.Implementation
 			var message = $"No free ports in the range {possiblePorts} found!";
 			Log.Warn().WriteLine(message);
 			throw new ApplicationException(message);
-		}
-
-		/// <summary>
-		///     The actual starting of the WebApp is done here
-		/// </summary>
-		private void StartWebApp()
-		{
-			var orderedOwinStartups = from export in OwinStartups orderby export.Metadata.StartupOrder ascending select export;
-			if (!orderedOwinStartups.Any())
-			{
-				Log.Info().WriteLine("No OwinStartups to start.");
-				return;
-			}
-
-			// If there is no port given, find a free one and store this in the configuration
-			if (OwinConfiguration.Port == 0)
-			{
-				OwinConfiguration.Port = GetFreeListenerPort(new[] {0});
-			}
-			ListeningOn = new Uri($"http://{OwinConfiguration.Hostname}:{OwinConfiguration.Port}");
-			Log.Info().WriteLine("Starting WebApp on {0}", ListeningOn.AbsoluteUri);
-
-			_webApp = WebApp.Start(ListeningOn.AbsoluteUri, appBuilder =>
-			{
-				foreach (var owinStartup in orderedOwinStartups)
-				{
-					owinStartup.Value.ConfigureOwin(this, appBuilder);
-				}
-			});
-			IsListening = true;
-		}
-
-		private void StopWebApp()
-		{
-			IsListening = false;
-			_webApp?.Dispose();
-			_webApp = null;
 		}
 	}
 }

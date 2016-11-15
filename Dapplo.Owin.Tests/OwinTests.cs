@@ -64,6 +64,7 @@ namespace Dapplo.Owin.Tests
 				await bootstrapper.RunAsync();
 
 				var owinServer = bootstrapper.GetExport<IOwinServer>().Value;
+				Assert.True(owinServer.IsListening, "Server not running!");
 				// Test request, we need to build the url
 				var testUri = owinServer.ListeningOn.AppendSegments("Test");
 				var result = await testUri.GetAsAsync<string>();

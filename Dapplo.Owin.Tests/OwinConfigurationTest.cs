@@ -28,12 +28,11 @@ using Owin;
 
 namespace Dapplo.Owin.Tests
 {
-	[OwinConfiguration]
-	public class OwinConfigurationTest : IOwinConfigure
+	public class OwinConfigurationTest : SimpleOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
 
-		public void ConfigureOwin(IOwinServer server, IAppBuilder appBuilder)
+		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 		{
 			Log.Debug().WriteLine("Configuring test middleware in the Owin pipeline");
 			appBuilder.Use(typeof (TestMiddleware));

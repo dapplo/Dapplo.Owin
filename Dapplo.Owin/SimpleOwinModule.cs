@@ -21,18 +21,34 @@
 
 #region using
 
-using System.ComponentModel;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Owin;
 
 #endregion
 
 namespace Dapplo.Owin
 {
-	/// <summary>
-	///     Meta-data belonging to the OwinStartupAttribute, which makes it possible to specify type-safe meta-data.
-	/// </summary>
-	public interface IOwinConfigureMetadata
+	[OwinModule]
+	public abstract class SimpleOwinModule : IOwinModule
 	{
-		[DefaultValue(1)]
-		int StartupOrder { get; }
+		/// <summary>
+		/// Do nothing
+		/// </summary>
+		public Task InitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			return Task.FromResult(true);
+		}
+
+		public abstract void Configure(IOwinServer server, IAppBuilder appBuilder);
+
+		/// <summary>
+		/// Do nothing
+		/// </summary>
+		public Task DeinitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			return Task.FromResult(true);
+		}
 	}
 }
