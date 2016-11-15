@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 using Dapplo.Addons.Bootstrapper;
 using Dapplo.Config.Ini;
 using Dapplo.HttpExtensions;
-using Dapplo.Log.Facade;
+using Dapplo.Log;
 using Xunit;
 using Xunit.Abstractions;
 using Dapplo.Log.XUnit;

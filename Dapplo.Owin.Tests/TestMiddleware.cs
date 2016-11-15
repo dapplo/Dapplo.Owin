@@ -22,7 +22,7 @@
 #region using
 
 using System.Threading.Tasks;
-using Dapplo.Log.Facade;
+using Dapplo.Log;
 using Microsoft.Owin;
 
 #endregion
