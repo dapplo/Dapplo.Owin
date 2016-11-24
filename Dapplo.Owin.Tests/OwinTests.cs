@@ -49,7 +49,7 @@ namespace Dapplo.Owin.Tests
 			using (var bootstrapper = new ApplicationBootstrapper(ApplicationName))
 			{
 				var iniConfig = new IniConfig(ApplicationName, "test");
-				await iniConfig.RegisterAndGetAsync<IOwinConfiguration>();
+				await iniConfig.RegisterAndGetAsync<IMyTestConfiguration>();
 
 				bootstrapper.Add(typeof (OwinConfigurationTest));
 

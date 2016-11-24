@@ -19,25 +19,12 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
-using System.ComponentModel;
-using System.Runtime.Serialization;
 using Dapplo.Config.Ini;
 
-#endregion
-
-namespace Dapplo.Owin
+namespace Dapplo.Owin.Tests
 {
-	/// <summary>
-	///     The Owin configuration container, this can be stored with Dapplo.Config
-	/// </summary>
-	public interface IOwinConfiguration : IIniSubSection
+	[IniSection("Core")]
+	public interface IMyTestConfiguration : IIniSection, IOwinConfiguration
 	{
-		[DefaultValue("localhost"), Description("Host for Owin to accept request on."), DataMember(EmitDefaultValue = true)]
-		string Hostname { get; set; }
-
-		[DefaultValue(8080), Description("Port for Owin to accept request on."), DataMember(EmitDefaultValue = true)]
-		int Port { get; set; }
 	}
 }
