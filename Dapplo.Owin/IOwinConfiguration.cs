@@ -23,7 +23,7 @@
 
 using System.ComponentModel;
 using System.Runtime.Serialization;
-using Dapplo.Config.Ini;
+using Dapplo.Ini;
 
 #endregion
 

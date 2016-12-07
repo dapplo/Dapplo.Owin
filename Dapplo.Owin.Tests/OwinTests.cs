@@ -23,7 +23,8 @@
 
 using System.Threading.Tasks;
 using Dapplo.Addons.Bootstrapper;
-using Dapplo.Config.Ini;
+using Dapplo.Addons.Bootstrapper.ExportProviders;
+using Dapplo.Ini;
 using Dapplo.HttpExtensions;
 using Dapplo.Log;
 using Xunit;
@@ -48,10 +49,14 @@ namespace Dapplo.Owin.Tests
 		{
 			using (var bootstrapper = new ApplicationBootstrapper(ApplicationName))
 			{
-				var iniConfig = new IniConfig(ApplicationName, "test");
-				await iniConfig.RegisterAndGetAsync<IMyTestConfiguration>();
-
 				bootstrapper.Add(typeof (OwinConfigurationTest));
+
+				// Make sure IniConfig can resolve and find IMyTestConfiguration
+				var iniConfig = new IniConfig(ApplicationName, ApplicationName);
+				// TODO: Find a solution where register is not needed?
+				await iniConfig.RegisterAndGetAsync<IMyTestConfiguration>();
+				var exportProvider = new ServiceProviderExportProvider(iniConfig, bootstrapper);
+				bootstrapper.ExportProviders.Add(exportProvider);
 
 				// Add owin server project, without having a direct reference.
 #if DEBUG
