@@ -32,7 +32,7 @@ namespace Dapplo.Owin
 	///     The IOwinServer is the public interface for the "server".
 	///     This is also available via the Dapplo.Addons IServiceLocator, and can be imported
 	/// </summary>
-	public interface IOwinServer : IStartupAction, IShutdownAction
+	public interface IOwinServer : IAsyncStartupAction, IAsyncShutdownAction
 	{
 		/// <summary>
 		///     Is the server running?
