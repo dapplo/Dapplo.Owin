@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2016 Dapplo
+//  Copyright (C) 2015-2017 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -57,7 +57,7 @@ namespace Dapplo.Owin
 		/// <summary>
 		/// Specify if an error page should be shown
 		/// </summary>
-		[Description("Show an error page when something happens"), DefaultValue(false)]
+		[Description("Show an error page when something happens"), DefaultValue(false), DataMember(EmitDefaultValue = true)]
 		bool UseErrorPage { get; set; }
 
 		/// <summary>
@@ -70,7 +70,7 @@ namespace Dapplo.Owin
 		/// <summary>
 		/// Specify what AuthenticationScheme is used, default is none
 		/// </summary>
-		[Description("The Authentication scheme for Owin"), DefaultValue(AuthenticationSchemes.None)]
+		[Description("The Authentication scheme for Owin"), DefaultValue(AuthenticationSchemes.None), DataMember(EmitDefaultValue = true)]
 		AuthenticationSchemes AuthenticationScheme { get; set; }
 	}
 }

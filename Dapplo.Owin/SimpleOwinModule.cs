@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2016 Dapplo
+//  Copyright (C) 2015-2017 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -33,7 +33,6 @@ namespace Dapplo.Owin
 	/// <summary>
 	/// A base implementation for an Owin module
 	/// </summary>
-	[OwinModule]
 	public abstract class SimpleOwinModule : IOwinModule
 	{
 		/// <summary>

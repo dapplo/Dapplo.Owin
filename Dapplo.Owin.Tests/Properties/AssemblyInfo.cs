@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2016 Dapplo
+//  Copyright (C) 2015-2017 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -35,7 +35,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Dapplo")]
 [assembly: AssemblyProduct("Dapplo.Owin.Tests")]
-[assembly: AssemblyCopyright("Copyright © Dapplo 2015-2016")]
+[assembly: AssemblyCopyright("Copyright © Dapplo 2015-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
