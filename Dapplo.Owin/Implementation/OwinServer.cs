@@ -40,7 +40,7 @@ namespace Dapplo.Owin.Implementation
 	/// <summary>
 	///     This class will start an OwinService as a Startup-Action and will shut it down when the shutdown action is called.
 	/// </summary>
-	[StartupAction, ShutdownAction]
+	[StartupAction, ShutdownAction, Export(typeof(IOwinServer))]
 	public class OwinServer : IOwinServer
 	{
 		private static readonly LogSource Log = new LogSource();
@@ -105,7 +105,6 @@ namespace Dapplo.Owin.Implementation
 		/// <returns>Task</returns>
 		public async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
-			ServiceExporter.Export<IOwinServer>(this);
 			var owinModules = from export in OwinModules orderby export.Metadata.StartupOrder ascending select export;
 			if (!owinModules.Any())
 			{

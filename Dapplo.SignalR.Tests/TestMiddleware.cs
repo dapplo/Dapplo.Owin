@@ -21,41 +21,32 @@
 
 #region using
 
-using System;
-using System.Threading;
 using System.Threading.Tasks;
-using Owin;
+using Dapplo.Log;
+using Microsoft.Owin;
 
 #endregion
 
-namespace Dapplo.Owin
+namespace Dapplo.SignalR.Tests
 {
 	/// <summary>
-	/// A base implementation for an Owin module, don't forget to mark you
+	///     The "test" Middleware, it returns "Dapplo" for EVERY request
 	/// </summary>
-	public abstract class SimpleOwinModule : IOwinModule
+	public class TestMiddleware : OwinMiddleware
 	{
-		/// <summary>
-		/// A default implementation, which does nothing
-		/// </summary>
-		public virtual Task InitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken))
+		private static readonly LogSource Log = new LogSource();
+
+		public TestMiddleware(OwinMiddleware next) : base(next)
 		{
-			return Task.FromResult(true);
 		}
 
-		/// <summary>
-		/// Implement this to configure Owin
-		/// </summary>
-		/// <param name="server">IOwinServer</param>
-		/// <param name="appBuilder">IAppBuilder</param>
-		public abstract void Configure(IOwinServer server, IAppBuilder appBuilder);
-
-		/// <summary>
-		/// A default implementation, which does nothing
-		/// </summary>
-		public virtual Task DeinitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken))
+		public override async Task Invoke(IOwinContext owinContext)
 		{
-			return Task.FromResult(true);
+			Log.Debug().WriteLine("Http method: {0}, path: {1}", owinContext.Request.Method, owinContext.Request.Path);
+			owinContext.Response.StatusCode = 200;
+			owinContext.Response.ContentType = "text/plain";
+			await owinContext.Response.WriteAsync("Dapplo");
+			await Next.Invoke(owinContext);
 		}
 	}
 }

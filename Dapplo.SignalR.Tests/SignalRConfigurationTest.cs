@@ -21,41 +21,24 @@
 
 #region using
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using Dapplo.Log;
+using Dapplo.Owin;
 using Owin;
 
 #endregion
 
-namespace Dapplo.Owin
+namespace Dapplo.SignalR.Tests
 {
-	/// <summary>
-	/// A base implementation for an Owin module, don't forget to mark you
-	/// </summary>
-	public abstract class SimpleOwinModule : IOwinModule
+	[OwinModule]
+	public class SignalRConfigurationTest : DefaultOwinModule
 	{
-		/// <summary>
-		/// A default implementation, which does nothing
-		/// </summary>
-		public virtual Task InitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken))
-		{
-			return Task.FromResult(true);
-		}
+		private static readonly LogSource Log = new LogSource();
 
-		/// <summary>
-		/// Implement this to configure Owin
-		/// </summary>
-		/// <param name="server">IOwinServer</param>
-		/// <param name="appBuilder">IAppBuilder</param>
-		public abstract void Configure(IOwinServer server, IAppBuilder appBuilder);
-
-		/// <summary>
-		/// A default implementation, which does nothing
-		/// </summary>
-		public virtual Task DeinitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken))
+		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 		{
-			return Task.FromResult(true);
+			Log.Debug().WriteLine("Configuring test middleware in the Owin pipeline");
+			appBuilder.Use(typeof (TestMiddleware));
+			base.Configure(server, appBuilder);
 		}
 	}
 }

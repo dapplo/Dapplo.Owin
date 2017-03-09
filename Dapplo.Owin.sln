@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Owin.Tests", "Dapplo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.SignalR", "Dapplo.SignalR\Dapplo.SignalR.csproj", "{2A62B445-866B-492E-806D-9B8339CE0EC3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.SignalR.Tests", "Dapplo.SignalR.Tests\Dapplo.SignalR.Tests.csproj", "{0FBFBA8B-2088-484A-B078-82E01D98F1A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{2A62B445-866B-492E-806D-9B8339CE0EC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A62B445-866B-492E-806D-9B8339CE0EC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A62B445-866B-492E-806D-9B8339CE0EC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FBFBA8B-2088-484A-B078-82E01D98F1A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FBFBA8B-2088-484A-B078-82E01D98F1A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FBFBA8B-2088-484A-B078-82E01D98F1A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FBFBA8B-2088-484A-B078-82E01D98F1A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

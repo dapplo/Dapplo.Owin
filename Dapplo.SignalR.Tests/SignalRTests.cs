@@ -24,22 +24,23 @@
 using System.Threading.Tasks;
 using Dapplo.Addons.Bootstrapper;
 using Dapplo.Addons.Bootstrapper.ExportProviders;
-using Dapplo.Ini;
 using Dapplo.HttpExtensions;
+using Dapplo.Ini;
 using Dapplo.Log;
+using Dapplo.Log.XUnit;
+using Dapplo.Owin;
 using Xunit;
 using Xunit.Abstractions;
-using Dapplo.Log.XUnit;
 
 #endregion
 
-namespace Dapplo.Owin.Tests
+namespace Dapplo.SignalR.Tests
 {
-	public class OwinTests
+	public class SignalRTests
 	{
-		private const string ApplicationName = "DapploOwin";
+		private const string ApplicationName = "DapploSignalR";
 
-		public OwinTests(ITestOutputHelper testOutputHelper)
+		public SignalRTests(ITestOutputHelper testOutputHelper)
 		{
 			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
 		}
@@ -49,7 +50,7 @@ namespace Dapplo.Owin.Tests
 		{
 			using (var bootstrapper = new ApplicationBootstrapper(ApplicationName))
 			{
-				bootstrapper.Add(typeof (OwinConfigurationTest));
+				bootstrapper.Add(typeof (SignalRConfigurationTest));
 
 				// Make sure IniConfig can resolve and find IMyTestConfiguration
 				var iniConfig = new IniConfig(ApplicationName, ApplicationName);
@@ -58,8 +59,9 @@ namespace Dapplo.Owin.Tests
 				var exportProvider = new ServiceProviderExportProvider(iniConfig, bootstrapper);
 				bootstrapper.ExportProviders.Add(exportProvider);
 
-				// Normally one would add Dapplo.Owin, without having a direct reference:
+				// Normally one would add Dapplo.Owin and Dapplo.SignalR dlls, without having a direct reference:
 				// e.g.: bootstrapper.AddScanDirectory(@"..\..\..\Dapplo.Owin\bin\Debug");
+				// e.g.: bootstrapper.AddScanDirectory(@"..\..\..\Dapplo.SignalR\bin\Debug");
 				bootstrapper.FindAndLoadAssemblies("Dapplo*");
 				// Start the composition
 				await bootstrapper.RunAsync();
