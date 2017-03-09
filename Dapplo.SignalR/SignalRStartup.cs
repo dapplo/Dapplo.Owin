@@ -62,6 +62,8 @@ namespace Dapplo.SignalR
 		/// <param name="appBuilder"></param>
 		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 		{
+			Log.Verbose().WriteLine("Activating SignalR, EnableJavaEnableJavaScriptProxies={0}, EnableDetailedErrors={1}", SignalRConfiguration.EnableJavaEnableJavaScriptProxies, SignalRConfiguration.EnableDetailedErrors);
+
 			// Register the SignalRContractResolver, which solves camelCase issues
 			var settings = new JsonSerializerSettings
 			{

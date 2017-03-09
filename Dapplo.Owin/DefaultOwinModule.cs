@@ -29,8 +29,16 @@ namespace Dapplo.Owin
 		/// <param name="appBuilder">IAppBuilder</param>
 		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 		{
+			if (OwinConfiguration.EnableCors)
+			{
+				Log.Verbose().WriteLine("Enabling Cors");
+				// Enable CORS (allow cross domain requests)
+				appBuilder.UseCors(CorsOptions.AllowAll);
+			}
+
 			if (OwinConfiguration.UseErrorPage)
 			{
+				Log.Verbose().WriteLine("Using error page");
 				appBuilder.UseErrorPage();
 			}
 
@@ -52,6 +60,8 @@ namespace Dapplo.Owin
 
 			if (OwinConfiguration.EnableFileServer)
 			{
+				Log.Verbose().WriteLine("Activating file server");
+
 				//// Add the file server for the error pages
 				appBuilder.UseFileServer(new FileServerOptions
 				{
@@ -60,12 +70,6 @@ namespace Dapplo.Owin
 					FileSystem = new PhysicalFileSystem("Html"),
 					EnableDirectoryBrowsing = false
 				});
-			}
-
-			if (OwinConfiguration.EnableCors)
-			{
-				// Enable CORS (allow cross domain requests)
-				appBuilder.UseCors(CorsOptions.AllowAll);
 			}
 		}
 	}
