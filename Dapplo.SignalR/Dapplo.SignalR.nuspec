@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>$id$</id>
+        <version>$version$</version>
+        <authors>$author$</authors>
+        <licenseUrl>http://www.gnu.org/licenses/lgpl-3.0.html</licenseUrl>
+        <projectUrl>http://www.dapplo.net/blocks/Dapplo.SignalR.html</projectUrl>
+        <iconUrl>http://www.dapplo.net/favicon.ico</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Dapplo.SignalR takes care of bootstrapping SignalR, based on Dapplo.Owin</description>
+		<summary>A library to be able to use SignalR self hosting in your application, it also adds dependency injection to your hubs.</summary>
+        <language>en-us</language>
+		<copyright>Dapplo</copyright>
+		<tags>Owin SignalR</tags>
+		<frameworkAssemblies>
+			<frameworkAssembly assemblyName="System.ComponentModel.Composition" targetFramework="net45" />
+		</frameworkAssemblies>
+	</metadata>
+</package>

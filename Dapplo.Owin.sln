@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Owin", "Dapplo.Owin\Dapplo.Owin.csproj", "{C430A9E4-884F-4539-B3BA-CEC5BC44F256}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.Owin.Tests", "Dapplo.Owin.Tests\Dapplo.Owin.Tests.csproj", "{A6E01372-6A6A-4F3D-BF35-16E2C80B7721}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapplo.SignalR", "Dapplo.SignalR\Dapplo.SignalR.csproj", "{2A62B445-866B-492E-806D-9B8339CE0EC3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{A6E01372-6A6A-4F3D-BF35-16E2C80B7721}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6E01372-6A6A-4F3D-BF35-16E2C80B7721}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6E01372-6A6A-4F3D-BF35-16E2C80B7721}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A62B445-866B-492E-806D-9B8339CE0EC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A62B445-866B-492E-806D-9B8339CE0EC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A62B445-866B-492E-806D-9B8339CE0EC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A62B445-866B-492E-806D-9B8339CE0EC3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

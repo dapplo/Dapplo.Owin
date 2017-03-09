@@ -32,9 +32,15 @@ namespace Dapplo.Owin
 	/// </summary>
 	public interface IOwinModuleMetadata
 	{
+		/// <summary>
+		/// Order of the startup of your Owin Module
+		/// </summary>
 		[DefaultValue(1)]
 		int StartupOrder { get; }
 
+		/// <summary>
+		/// Order of the shutdown of your Owin Module
+		/// </summary>
 		[DefaultValue(1)]
 		int ShutdownOrder { get; }
 	}

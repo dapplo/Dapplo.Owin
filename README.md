@@ -6,10 +6,11 @@ Work in progress
 - Coverage: [![Coverage Status](https://coveralls.io/repos/github/dapplo/Dapplo.Owin/badge.svg?branch=master)](https://coveralls.io/github/dapplo/Dapplo.Owin?branch=master)
 - NuGet package: [![NuGet package](https://badge.fury.io/nu/Dapplo.Owin.svg)](https://badge.fury.io/nu/Dapplo.Owin)
 
-A Dapplo module to "bootstrap" Owin and have modules adding to the configuration instead of a single "Startup" class.
+Dapplo modules to "bootstrap" Owin and SignalR have modules adding to the configuration instead of a single "Startup" class.
 
-Example:
 
+An example to use Owin
+´´´
 	[OwinStartup]
 	public class OwinStartupTest : IOwinStartup
 	{
@@ -24,3 +25,6 @@ Example:
 			});
 		}
 	}
+´´´
+
+To use SignalR you will need to add Dapplo.SignalR to your Project and make sure the Dapplo Bootstrapper loads the right DLL's, more later.

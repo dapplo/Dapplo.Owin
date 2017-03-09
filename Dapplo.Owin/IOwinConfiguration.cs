@@ -22,6 +22,7 @@
 #region using
 
 using System.ComponentModel;
+using System.Net;
 using System.Runtime.Serialization;
 using Dapplo.Ini;
 
@@ -34,10 +35,42 @@ namespace Dapplo.Owin
 	/// </summary>
 	public interface IOwinConfiguration : IIniSubSection
 	{
+		/// <summary>
+		/// Hostname for Owin to accept request on, default is localhost
+		/// </summary>
 		[DefaultValue("localhost"), Description("Host for Owin to accept request on."), DataMember(EmitDefaultValue = true)]
 		string Hostname { get; set; }
 
+		/// <summary>
+		/// Port for owin to accept requests on, default is 8080
+		/// </summary>
 		[DefaultValue(8080), Description("Port for Owin to accept request on."), DataMember(EmitDefaultValue = true)]
 		int Port { get; set; }
+
+
+		/// <summary>
+		/// Enable serving of files from a html sub folder, this can be used to allow error pages.
+		/// </summary>
+		[Description("Enable serving of files from a html sub folder, this can be used to allow error pages"), DefaultValue(true)]
+		bool EnableFileServer { get; set; }
+
+		/// <summary>
+		/// Specify if an error page should be shown
+		/// </summary>
+		[Description("Show an error page when something happens"), DefaultValue(false)]
+		bool UseErrorPage { get; set; }
+
+		/// <summary>
+		/// Enable Cross Origin calls
+		/// </summary>
+		[Description("Set this to true to allow cross origin calls, this is needed when your html page is not served by the owin server.")]
+		[DefaultValue(true)]
+		bool EnableCors { get; set; }
+
+		/// <summary>
+		/// Specify what AuthenticationScheme is used, default is none
+		/// </summary>
+		[Description("The Authentication scheme for Owin"), DefaultValue(AuthenticationSchemes.None)]
+		AuthenticationSchemes AuthenticationScheme { get; set; }
 	}
 }

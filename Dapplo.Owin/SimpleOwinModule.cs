@@ -30,23 +30,31 @@ using Owin;
 
 namespace Dapplo.Owin
 {
+	/// <summary>
+	/// A base implementation for an Owin module
+	/// </summary>
 	[OwinModule]
 	public abstract class SimpleOwinModule : IOwinModule
 	{
 		/// <summary>
-		/// Do nothing
+		/// A default implementation, which does nothing
 		/// </summary>
-		public Task InitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken))
+		public virtual Task InitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			return Task.FromResult(true);
 		}
 
+		/// <summary>
+		/// Implement this to configure Owin
+		/// </summary>
+		/// <param name="server">IOwinServer</param>
+		/// <param name="appBuilder">IAppBuilder</param>
 		public abstract void Configure(IOwinServer server, IAppBuilder appBuilder);
 
 		/// <summary>
-		/// Do nothing
+		/// A default implementation, which does nothing
 		/// </summary>
-		public Task DeinitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken))
+		public virtual Task DeinitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			return Task.FromResult(true);
 		}
