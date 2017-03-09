@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Dapplo.SignalR")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A Signal R bootstrapper")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("ING-DiBa AG")]
+[assembly: AssemblyCompany("Dapplo")]
 [assembly: AssemblyProduct("Dapplo.SignalR")]
-[assembly: AssemblyCopyright("Copyright © ING-DiBa AG 2017")]
+[assembly: AssemblyCopyright("Copyright © Dapplo 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
