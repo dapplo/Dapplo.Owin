@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Composition;
+using System.Net;
 using Dapplo.Addons;
 using Dapplo.Log;
 using Microsoft.Owin;
@@ -29,6 +30,14 @@ namespace Dapplo.Owin
 		/// <param name="appBuilder">IAppBuilder</param>
 		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 		{
+			// Enable Authentication, if a scheme is set
+			if (OwinConfiguration.AuthenticationScheme != AuthenticationSchemes.None)
+			{
+				Log.Verbose().WriteLine("Setting AuthenticationScheme to {0}", OwinConfiguration.AuthenticationScheme);
+				var listener = (HttpListener)appBuilder.Properties[typeof(HttpListener).FullName];
+				listener.AuthenticationSchemes = OwinConfiguration.AuthenticationScheme;
+			}
+
 			if (OwinConfiguration.EnableCors)
 			{
 				Log.Verbose().WriteLine("Enabling Cors");
