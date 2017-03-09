@@ -31,8 +31,9 @@ using Owin;
 namespace Dapplo.Owin
 {
 	/// <summary>
-	/// A base implementation for an Owin module
+	/// A base implementation for an Owin module, don't forget to mark you
 	/// </summary>
+	[OwinModule]
 	public abstract class SimpleOwinModule : IOwinModule
 	{
 		/// <summary>
