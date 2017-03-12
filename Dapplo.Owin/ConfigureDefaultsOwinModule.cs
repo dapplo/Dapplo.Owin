@@ -67,19 +67,20 @@ namespace Dapplo.Owin
 				});
 			});
 
-			if (OwinConfiguration.EnableFileServer)
+			if (!OwinConfiguration.EnableFileServer)
 			{
-				Log.Verbose().WriteLine("Activating file server");
-
-				//// Add the file server for the error pages
-				appBuilder.UseFileServer(new FileServerOptions
-				{
-					EnableDefaultFiles = true,
-					RequestPath = new PathString("/html"),
-					FileSystem = new PhysicalFileSystem("Html"),
-					EnableDirectoryBrowsing = false
-				});
+				return;
 			}
+			Log.Verbose().WriteLine("Activating file server");
+
+			//// Add the file server for the error pages
+			appBuilder.UseFileServer(new FileServerOptions
+			{
+				EnableDefaultFiles = true,
+				RequestPath = new PathString("/html"),
+				FileSystem = new PhysicalFileSystem("Html"),
+				EnableDirectoryBrowsing = false
+			});
 		}
 	}
 }

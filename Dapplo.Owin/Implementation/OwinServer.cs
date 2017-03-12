@@ -78,7 +78,7 @@ namespace Dapplo.Owin.Implementation
 		public async Task ShutdownAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			Log.Verbose().WriteLine("Stopping the Owin Server on {0}", ListeningOn);
-			var owinModules = from export in OwinModules orderby export.Metadata.ShutdownOrder ascending select export;
+			var owinModules = OwinModules.OrderBy(export => export.Metadata.ShutdownOrder).Select(export => export.Value).Distinct().ToList();
 			if (!owinModules.Any())
 			{
 				Log.Info().WriteLine("No OwinModules to start.");
@@ -90,8 +90,8 @@ namespace Dapplo.Owin.Implementation
 				{
 					break;
 				}
-				Log.Debug().WriteLine("Stopping OwinModule {0}", owinModule.Value.GetType());
-				await owinModule.Value.DeinitializeAsync(this, cancellationToken).ConfigureAwait(false);
+				Log.Debug().WriteLine("Stopping OwinModule {0}", owinModule.GetType());
+				await owinModule.DeinitializeAsync(this, cancellationToken).ConfigureAwait(false);
 			}
 			IsListening = false;
 			_webApp?.Dispose();
@@ -104,7 +104,7 @@ namespace Dapplo.Owin.Implementation
 		/// <param name="cancellationToken">CancellationToken</param>
 		public async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
-			var owinModules = from export in OwinModules orderby export.Metadata.StartupOrder ascending select export;
+			var owinModules = OwinModules.OrderBy(export => export.Metadata.StartupOrder).Select(export => export.Value).Distinct().ToList();
 			if (!owinModules.Any())
 			{
 				Log.Info().WriteLine("No OwinModules to start.");
@@ -121,16 +121,20 @@ namespace Dapplo.Owin.Implementation
 
 			foreach (var owinModule in owinModules)
 			{
-				Log.Debug().WriteLine("Intializing OwinModule {0}", owinModule.Value.GetType());
-				await owinModule.Value.InitializeAsync(this, cancellationToken).ConfigureAwait(false);
+				if (cancellationToken.IsCancellationRequested)
+				{
+					break;
+				}
+				Log.Debug().WriteLine("Intializing OwinModule {0}", owinModule.GetType());
+				await owinModule.InitializeAsync(this, cancellationToken).ConfigureAwait(false);
 			}
 
 			_webApp = WebApp.Start(ListeningOn.AbsoluteUri, appBuilder =>
 			{
 				foreach (var owinModule in owinModules)
 				{
-					Log.Debug().WriteLine("configuring OwinModule {0}", owinModule.Value.GetType());
-					owinModule.Value.Configure(this, appBuilder);
+					Log.Debug().WriteLine("configuring OwinModule {0}", owinModule.GetType());
+					owinModule.Configure(this, appBuilder);
 				}
 			});
 			IsListening = true;
