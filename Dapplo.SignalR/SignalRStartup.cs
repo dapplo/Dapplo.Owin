@@ -76,7 +76,9 @@ namespace Dapplo.SignalR
 			appBuilder.MapSignalR(new HubConfiguration
 			{
 				EnableJavaScriptProxies = SignalRConfiguration.EnableJavaEnableJavaScriptProxies,
-				EnableDetailedErrors = SignalRConfiguration.EnableDetailedErrors
+				EnableDetailedErrors = SignalRConfiguration.EnableDetailedErrors,
+				// Needed to make sure we can start & stop it multiple times
+				Resolver = new DefaultDependencyResolver()
 			});
 
 			// Register our own IHubActivator, so we can use dependency injection

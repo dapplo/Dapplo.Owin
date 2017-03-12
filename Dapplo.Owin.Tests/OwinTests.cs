@@ -21,6 +21,9 @@
 
 #region using
 
+using System;
+using System.Net.Cache;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Dapplo.Addons.Bootstrapper;
 using Dapplo.Addons.Bootstrapper.ExportProviders;
@@ -42,34 +45,52 @@ namespace Dapplo.Owin.Tests
 		public OwinTests(ITestOutputHelper testOutputHelper)
 		{
 			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+			// Disable cache, otherwise the server seems to respond even if it isn't running
+			HttpExtensionsGlobals.HttpSettings.RequestCacheLevel = RequestCacheLevel.BypassCache;
 		}
 
 		[Fact]
-		public async Task TestStartupAsync()
+		public async Task TestStartupShutdownAsync()
 		{
 			using (var bootstrapper = new ApplicationBootstrapper(ApplicationName))
 			{
 				bootstrapper.Add(typeof (OwinConfigurationTest));
 
 				// Make sure IniConfig can resolve and find IMyTestConfiguration
-				var iniConfig = new IniConfig(ApplicationName, ApplicationName);
-				// TODO: Find a solution where register is not needed?
-				await iniConfig.RegisterAndGetAsync<IMyTestConfiguration>();
-				var exportProvider = new ServiceProviderExportProvider(iniConfig, bootstrapper);
-				bootstrapper.ExportProviders.Add(exportProvider);
+				using (var iniConfig = new IniConfig(ApplicationName, ApplicationName))
+				{
+					// TODO: Find a solution where register is not needed?
+					await iniConfig.RegisterAndGetAsync<IMyTestConfiguration>();
+					var exportProvider = new ServiceProviderExportProvider(iniConfig, bootstrapper);
+					bootstrapper.ExportProviders.Add(exportProvider);
 
-				// Normally one would add Dapplo.Owin, without having a direct reference:
-				// e.g.: bootstrapper.AddScanDirectory(@"..\..\..\Dapplo.Owin\bin\Debug");
-				bootstrapper.FindAndLoadAssemblies("Dapplo*");
-				// Start the composition
-				await bootstrapper.RunAsync();
+					// Normally one would add Dapplo.Owin, without having a direct reference:
+					// e.g.: bootstrapper.AddScanDirectory(@"..\..\..\Dapplo.Owin\bin\Debug");
+					bootstrapper.FindAndLoadAssemblies("Dapplo*");
+					// Start the composition
+					await bootstrapper.RunAsync();
+					var owinServer = bootstrapper.GetExport<IOwinServer>().Value;
+					Assert.True(owinServer.IsListening, "Server not running!");
+					// Test request, we need to build the url
+					var testUri = owinServer.ListeningOn.AppendSegments("Test");
 
-				var owinServer = bootstrapper.GetExport<IOwinServer>().Value;
-				Assert.True(owinServer.IsListening, "Server not running!");
-				// Test request, we need to build the url
-				var testUri = owinServer.ListeningOn.AppendSegments("Test");
-				var result = await testUri.GetAsAsync<string>();
-				Assert.Equal("Dapplo", result);
+					var result = await testUri.GetAsAsync<string>();
+					Assert.Equal("Dapplo", result);
+
+					await owinServer.ShutdownAsync();
+					Assert.False(owinServer.IsListening, "Server still running!");
+
+					await Assert.ThrowsAsync<HttpRequestException>(async () =>
+					{
+						result = await testUri.GetAsAsync<string>();
+					});
+
+					await owinServer.StartAsync();
+					Assert.True(owinServer.IsListening, "Server not running!");
+
+					await owinServer.ShutdownAsync();
+					Assert.False(owinServer.IsListening, "Server still running!");
+				}
 			}
 		}
 	}

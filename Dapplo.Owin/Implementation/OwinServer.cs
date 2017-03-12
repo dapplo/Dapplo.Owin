@@ -38,9 +38,10 @@ using Microsoft.Owin.Hosting;
 namespace Dapplo.Owin.Implementation
 {
 	/// <summary>
-	///     This class will start an OwinService as a Startup-Action and will shut it down when the shutdown action is called.
+	///     This class will can start an Owin server.
+	///  as a Startup-Action and will shut it down when the shutdown action is called.
 	/// </summary>
-	[StartupAction, ShutdownAction, Export(typeof(IOwinServer))]
+	[Export(typeof(IOwinServer))]
 	public class OwinServer : IOwinServer
 	{
 		private static readonly LogSource Log = new LogSource();
@@ -74,7 +75,6 @@ namespace Dapplo.Owin.Implementation
 		///     Stop the WebApp
 		/// </summary>
 		/// <param name="cancellationToken">CancellationToken</param>
-		/// <returns>Task</returns>
 		public async Task ShutdownAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			Log.Verbose().WriteLine("Stopping the Owin Server on {0}", ListeningOn);
@@ -91,7 +91,7 @@ namespace Dapplo.Owin.Implementation
 					break;
 				}
 				Log.Debug().WriteLine("Stopping OwinModule {0}", owinModule.Value.GetType());
-				await owinModule.Value.DeinitializeAsync(this, cancellationToken);
+				await owinModule.Value.DeinitializeAsync(this, cancellationToken).ConfigureAwait(false);
 			}
 			IsListening = false;
 			_webApp?.Dispose();
@@ -102,7 +102,6 @@ namespace Dapplo.Owin.Implementation
 		///     Start the WebApp
 		/// </summary>
 		/// <param name="cancellationToken">CancellationToken</param>
-		/// <returns>Task</returns>
 		public async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			var owinModules = from export in OwinModules orderby export.Metadata.StartupOrder ascending select export;
@@ -123,10 +122,10 @@ namespace Dapplo.Owin.Implementation
 			foreach (var owinModule in owinModules)
 			{
 				Log.Debug().WriteLine("Intializing OwinModule {0}", owinModule.Value.GetType());
-				await owinModule.Value.InitializeAsync(this, cancellationToken);
+				await owinModule.Value.InitializeAsync(this, cancellationToken).ConfigureAwait(false);
 			}
 
-			_webApp = WebApp.Start(ListeningOn.AbsoluteUri, appBuilder =>
+			var startOptions = new StartOptions
 			{
 				foreach (var owinModule in owinModules)
 				{

@@ -42,11 +42,10 @@ namespace Dapplo.Owin
 		string Hostname { get; set; }
 
 		/// <summary>
-		/// Port for owin to accept requests on, default is 8080
+		/// Port for owin to accept requests on, default is a random nummber greater than 10800
 		/// </summary>
-		[DefaultValue(8080), Description("Port for Owin to accept request on."), DataMember(EmitDefaultValue = true)]
+		[DefaultValue(0), Description("Port for Owin to accept request on, default is first free after 10800."), DataMember(EmitDefaultValue = true)]
 		int Port { get; set; }
-
 
 		/// <summary>
 		/// Enable serving of files from a html sub folder, this can be used to allow error pages.
