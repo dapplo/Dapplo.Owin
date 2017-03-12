@@ -131,7 +131,8 @@ namespace Dapplo.Owin.Implementation
 
 			_webApp = WebApp.Start(ListeningOn.AbsoluteUri, appBuilder =>
 			{
-				foreach (var owinModule in owinModules)
+				Log.Verbose().WriteLine("Starting WebApp.");
+				foreach (var owinModule in OwinModules.OrderBy(export => export.Metadata.StartupOrder).Select(export => export.Value).Distinct())
 				{
 					Log.Debug().WriteLine("configuring OwinModule {0}", owinModule.GetType());
 					owinModule.Configure(this, appBuilder);
