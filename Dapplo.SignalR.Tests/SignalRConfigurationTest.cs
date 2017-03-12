@@ -30,7 +30,7 @@ using Owin;
 namespace Dapplo.SignalR.Tests
 {
 	[OwinModule]
-	public class SignalRConfigurationTest : DefaultOwinModule
+	public class SignalRConfigurationTest : ConfigureDefaultsOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
 

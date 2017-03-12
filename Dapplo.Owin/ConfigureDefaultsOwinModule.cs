@@ -11,9 +11,9 @@ using Owin;
 namespace Dapplo.Owin
 {
 	/// <summary>
-	///     A generic Owin initialization
+	///     A Owin Module which configures some sensible defaults, depending on a configuration
 	/// </summary>
-	public abstract class DefaultOwinModule : SimpleOwinModule
+	public abstract class ConfigureDefaultsOwinModule : SimpleOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
 

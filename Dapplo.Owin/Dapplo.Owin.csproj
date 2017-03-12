@@ -88,7 +88,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DefaultOwinModule.cs" />
+    <Compile Include="ConfigureDefaultsOwinModule.cs" />
     <Compile Include="IOwinServer.cs" />
     <Compile Include="IOwinModule.cs" />
     <Compile Include="IOwinModuleMetadata.cs" />

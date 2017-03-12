@@ -29,7 +29,7 @@ using Owin;
 namespace Dapplo.Owin.Tests
 {
 	[OwinModule]
-	public class OwinConfigurationTest : DefaultOwinModule
+	public class OwinConfigurationTest : ConfigureDefaultsOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
 
