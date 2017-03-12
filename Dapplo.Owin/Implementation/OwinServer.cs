@@ -125,7 +125,7 @@ namespace Dapplo.Owin.Implementation
 				await owinModule.Value.InitializeAsync(this, cancellationToken).ConfigureAwait(false);
 			}
 
-			var startOptions = new StartOptions
+			_webApp = WebApp.Start(ListeningOn.AbsoluteUri, appBuilder =>
 			{
 				foreach (var owinModule in owinModules)
 				{
