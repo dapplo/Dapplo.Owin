@@ -36,6 +36,7 @@ using Dapplo.Log.XUnit;
 using Dapplo.Owin.Tests.Configuration;
 using Dapplo.Owin.Tests.Modules;
 using Dapplo.Owin.Tests.Owin;
+using Nito.AsyncEx;
 
 #endregion
 
@@ -45,6 +46,29 @@ namespace Dapplo.Owin.Tests
 	{
 		private const string ApplicationName = "DapploOwin";
 
+		private static readonly AsyncLazy<ApplicationBootstrapper> Bootstrapper = new AsyncLazy<ApplicationBootstrapper>(async () =>
+		{
+			var bootstrapper = new ApplicationBootstrapper(ApplicationName);
+
+			bootstrapper.Add(typeof(TestMiddlewareOwinModule));
+
+			// Make sure IniConfig can resolve and find IMyTestConfiguration
+			var iniConfig = new IniConfig(ApplicationName, ApplicationName);
+			// TODO: Find a solution where register is not needed?
+			await iniConfig.RegisterAndGetAsync<IMyTestConfiguration>();
+			var exportProvider = new ServiceProviderExportProvider(iniConfig, bootstrapper);
+			bootstrapper.ExportProviders.Add(exportProvider);
+
+			// Normally one would add Dapplo.Owin and Dapplo.SignalR dlls, without having a direct reference:
+			// e.g.: bootstrapper.AddScanDirectory(@"..\..\..\Dapplo.Owin\bin\Debug");
+			// e.g.: bootstrapper.AddScanDirectory(@"..\..\..\Dapplo.SignalR\bin\Debug");
+			bootstrapper.FindAndLoadAssemblies("Dapplo*");
+			// Start the composition
+			await bootstrapper.RunAsync();
+			return bootstrapper;
+		});
+
+
 		public OwinTests(ITestOutputHelper testOutputHelper)
 		{
 			LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
@@ -52,49 +76,37 @@ namespace Dapplo.Owin.Tests
 			HttpExtensionsGlobals.HttpSettings.RequestCacheLevel = RequestCacheLevel.BypassCache;
 		}
 
+		public void Dispose()
+		{
+			Bootstrapper.GetAwaiter().GetResult().Dispose();
+		}
+
 		[Fact]
 		public async Task TestStartupShutdownAsync()
 		{
-			using (var bootstrapper = new ApplicationBootstrapper(ApplicationName))
+			var bootstrapper = await Bootstrapper;
+
+			var owinServer = bootstrapper.GetExport<IOwinServer>().Value;
+			Assert.True(owinServer.IsListening, "Server not running!");
+			// Test request, we need to build the url
+			var testUri = owinServer.ListeningOn.AppendSegments("Test");
+
+			var result = await testUri.GetAsAsync<string>();
+			Assert.Equal("Dapplo", result);
+
+			await owinServer.ShutdownAsync();
+			Assert.False(owinServer.IsListening, "Server still running!");
+
+			await Assert.ThrowsAsync<HttpRequestException>(async () =>
 			{
-				bootstrapper.Add(typeof (TestMiddlewareOwinModule));
+				result = await testUri.GetAsAsync<string>();
+			});
 
-				// Make sure IniConfig can resolve and find IMyTestConfiguration
-				using (var iniConfig = new IniConfig(ApplicationName, ApplicationName))
-				{
-					// TODO: Find a solution where register is not needed?
-					await iniConfig.RegisterAndGetAsync<IMyTestConfiguration>();
-					var exportProvider = new ServiceProviderExportProvider(iniConfig, bootstrapper);
-					bootstrapper.ExportProviders.Add(exportProvider);
+			await owinServer.StartAsync();
+			Assert.True(owinServer.IsListening, "Server not running!");
 
-					// Normally one would add Dapplo.Owin, without having a direct reference:
-					// e.g.: bootstrapper.AddScanDirectory(@"..\..\..\Dapplo.Owin\bin\Debug");
-					bootstrapper.FindAndLoadAssemblies("Dapplo*");
-					// Start the composition
-					await bootstrapper.RunAsync();
-					var owinServer = bootstrapper.GetExport<IOwinServer>().Value;
-					Assert.True(owinServer.IsListening, "Server not running!");
-					// Test request, we need to build the url
-					var testUri = owinServer.ListeningOn.AppendSegments("Test");
-
-					var result = await testUri.GetAsAsync<string>();
-					Assert.Equal("Dapplo", result);
-
-					await owinServer.ShutdownAsync();
-					Assert.False(owinServer.IsListening, "Server still running!");
-
-					await Assert.ThrowsAsync<HttpRequestException>(async () =>
-					{
-						result = await testUri.GetAsAsync<string>();
-					});
-
-					await owinServer.StartAsync();
-					Assert.True(owinServer.IsListening, "Server not running!");
-
-					await owinServer.ShutdownAsync();
-					Assert.False(owinServer.IsListening, "Server still running!");
-				}
-			}
+			await owinServer.ShutdownAsync();
+			Assert.False(owinServer.IsListening, "Server still running!");
 		}
 	}
 }

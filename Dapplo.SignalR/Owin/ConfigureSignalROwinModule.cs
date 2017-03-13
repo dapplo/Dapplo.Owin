@@ -69,6 +69,8 @@ namespace Dapplo.SignalR.Owin
 		{
 			Log.Verbose().WriteLine("Activating SignalR, EnableJavaEnableJavaScriptProxies={0}, EnableDetailedErrors={1}, UseDummyPerformanceCounter={2}", SignalRConfiguration.EnableJavaEnableJavaScriptProxies, SignalRConfiguration.EnableDetailedErrors, SignalRConfiguration.UseDummyPerformanceCounter);
 
+			// Needed to make sure we can start & stop it multiple times
+			GlobalHost.DependencyResolver = new DefaultDependencyResolver();
 			if (HubActivator != null)
 			{
 				Log.Verbose().WriteLine("Overriding the DefaultHubActivator");
@@ -90,15 +92,17 @@ namespace Dapplo.SignalR.Owin
 			var serializer = JsonSerializer.Create(settings);
 			GlobalHost.DependencyResolver.Register(typeof(JsonSerializer), () => serializer);
 
-			// Add SignalR and enable detailed errors
-			appBuilder.MapSignalR(new HubConfiguration
+			// Add SignalR
+			var hubConfiguration = new HubConfiguration
 			{
 				EnableJavaScriptProxies = SignalRConfiguration.EnableJavaEnableJavaScriptProxies,
 				EnableDetailedErrors = SignalRConfiguration.EnableDetailedErrors,
-				// Needed to make sure we can start & stop it multiple times
-				Resolver = new DefaultDependencyResolver()
+				Resolver = GlobalHost.DependencyResolver
+			};
+			appBuilder.Map("/signalr", map =>
+			{
+				map.RunSignalR(hubConfiguration);
 			});
-
 		}
 	}
 }
