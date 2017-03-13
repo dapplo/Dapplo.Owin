@@ -19,12 +19,34 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using Dapplo.Ini;
+#region using
 
-namespace Dapplo.Owin.Tests
+using System.Threading.Tasks;
+using Dapplo.Log;
+using Microsoft.Owin;
+
+#endregion
+
+namespace Dapplo.Owin.Tests.Owin
 {
-	[IniSection("Core")]
-	public interface IMyTestConfiguration : IIniSection, IOwinConfiguration
+	/// <summary>
+	///     The "test" Middleware, it returns "Dapplo" for EVERY request
+	/// </summary>
+	public class TestMiddleware : OwinMiddleware
 	{
+		private static readonly LogSource Log = new LogSource();
+
+		public TestMiddleware(OwinMiddleware next) : base(next)
+		{
+		}
+
+		public override async Task Invoke(IOwinContext owinContext)
+		{
+			Log.Debug().WriteLine("Http method: {0}, path: {1}", owinContext.Request.Method, owinContext.Request.Path);
+			owinContext.Response.StatusCode = 200;
+			owinContext.Response.ContentType = "text/plain";
+			await owinContext.Response.WriteAsync("Dapplo");
+			await Next.Invoke(owinContext);
+		}
 	}
 }

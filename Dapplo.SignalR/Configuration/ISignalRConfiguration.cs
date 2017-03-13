@@ -31,7 +31,7 @@ using Dapplo.Ini;
 
 #endregion
 
-namespace Dapplo.SignalR
+namespace Dapplo.SignalR.Configuration
 {
 	/// <summary>
 	///     Settings for the SignalR configuration
@@ -59,5 +59,12 @@ namespace Dapplo.SignalR
 		[Description("Fix camel casing for SignalR")]
 		[DefaultValue(true)]
 		bool FixCamelCase { get; set; }
+
+		/// <summary>
+		///     Using a default performance counter can solve some known issues
+		/// </summary>
+		[Description("Use a dummy performance counter to solve some issues.")]
+		[DefaultValue(true), DataMember(EmitDefaultValue = false)]
+		bool UseDummyPerformanceCounter { get; set; }
 	}
 }

@@ -62,14 +62,8 @@
     <Reference Include="Microsoft.Owin.Diagnostics, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.Diagnostics.3.0.1\lib\net45\Microsoft.Owin.Diagnostics.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin.FileSystems, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.FileSystems.3.0.1\lib\net45\Microsoft.Owin.FileSystems.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Owin.Hosting, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.Hosting.3.0.1\lib\net45\Microsoft.Owin.Hosting.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.StaticFiles, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.StaticFiles.3.0.1\lib\net45\Microsoft.Owin.StaticFiles.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
@@ -88,14 +82,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConfigureDefaultsOwinModule.cs" />
+    <Compile Include="ConfigureOwinCors.cs" />
+    <Compile Include="ConfigureOwinErrorPage.cs" />
+    <Compile Include="ConfigureOwinAuthentication.cs" />
     <Compile Include="IOwinServer.cs" />
     <Compile Include="IOwinModule.cs" />
     <Compile Include="IOwinModuleMetadata.cs" />
     <Compile Include="Implementation\OwinServer.cs" />
-    <Compile Include="IOwinConfiguration.cs" />
-    <Compile Include="SimpleOwinStartStopAction.cs" />
-    <Compile Include="SimpleOwinModule.cs" />
+    <Compile Include="Configuration\IOwinConfiguration.cs" />
+    <Compile Include="BaseOwinServerStartupShutdownAction.cs" />
+    <Compile Include="BaseOwinModule.cs" />
     <Compile Include="OwinModuleAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

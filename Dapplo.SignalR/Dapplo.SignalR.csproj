@@ -58,9 +58,6 @@
     <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin.FileSystems, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.FileSystems.3.0.1\lib\net45\Microsoft.Owin.FileSystems.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Owin.Security, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.Security.3.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
     </Reference>
@@ -87,12 +84,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CamelCaseContractResolver.cs" />
-    <Compile Include="HubActivator.cs" />
-    <Compile Include="ISignalRConfiguration.cs" />
+    <Compile Include="Utils\CamelCaseContractResolver.cs" />
+    <Compile Include="Utils\DummyPerformanceCounterManager.cs" />
+    <Compile Include="Utils\HubActivator.cs" />
+    <Compile Include="Configuration\ISignalRConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SignalRContractResolver.cs" />
-    <Compile Include="ConfigureSignalROwinModule.cs" />
+    <Compile Include="Utils\SignalRContractResolver.cs" />
+    <Compile Include="Owin\ConfigureSignalROwinModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

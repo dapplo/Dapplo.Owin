@@ -33,6 +33,9 @@ using Dapplo.Log;
 using Xunit;
 using Xunit.Abstractions;
 using Dapplo.Log.XUnit;
+using Dapplo.Owin.Tests.Configuration;
+using Dapplo.Owin.Tests.Modules;
+using Dapplo.Owin.Tests.Owin;
 
 #endregion
 
@@ -54,7 +57,7 @@ namespace Dapplo.Owin.Tests
 		{
 			using (var bootstrapper = new ApplicationBootstrapper(ApplicationName))
 			{
-				bootstrapper.Add(typeof (OwinConfigurationTest));
+				bootstrapper.Add(typeof (TestMiddlewareOwinModule));
 
 				// Make sure IniConfig can resolve and find IMyTestConfiguration
 				using (var iniConfig = new IniConfig(ApplicationName, ApplicationName))

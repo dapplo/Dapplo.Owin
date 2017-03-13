@@ -19,34 +19,39 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
-using System.Threading.Tasks;
+using System.ComponentModel.Composition;
+using System.Net;
 using Dapplo.Log;
-using Microsoft.Owin;
+using Owin;
 
-#endregion
-
-namespace Dapplo.Owin.Tests
+namespace Dapplo.Owin
 {
 	/// <summary>
-	///     The "test" Middleware, it returns "Dapplo" for EVERY request
+	///     An Owin Module which configures the Authentication
 	/// </summary>
-	public class TestMiddleware : OwinMiddleware
+	[OwinModule(StartupOrder = int.MinValue)]
+	public class ConfigureOwinAuthentication : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
 
-		public TestMiddleware(OwinMiddleware next) : base(next)
-		{
-		}
+		[Import]
+		private IOwinConfiguration OwinConfiguration { get; set; }
 
-		public override async Task Invoke(IOwinContext owinContext)
+		/// <summary>
+		///     Configure the authentication scheme for Owin
+		/// </summary>
+		/// <param name="server">IOwinServer</param>
+		/// <param name="appBuilder">IAppBuilder</param>
+		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 		{
-			Log.Debug().WriteLine("Http method: {0}, path: {1}", owinContext.Request.Method, owinContext.Request.Path);
-			owinContext.Response.StatusCode = 200;
-			owinContext.Response.ContentType = "text/plain";
-			await owinContext.Response.WriteAsync("Dapplo");
-			await Next.Invoke(owinContext);
+			Log.Verbose().WriteLine("AuthenticationScheme is configured to {0}", OwinConfiguration.AuthenticationScheme);
+			// Enable Authentication, if a scheme is set
+			if (OwinConfiguration.AuthenticationScheme == AuthenticationSchemes.None)
+			{
+				return;
+			}
+			var listener = (HttpListener)appBuilder.Properties[typeof(HttpListener).FullName];
+			listener.AuthenticationSchemes = OwinConfiguration.AuthenticationScheme;
 		}
 	}
 }

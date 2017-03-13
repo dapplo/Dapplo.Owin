@@ -26,34 +26,39 @@
 #region Usings
 
 using System.ComponentModel.Composition;
-using Dapplo.Addons;
 using Dapplo.Log;
 using Dapplo.Owin;
+using Dapplo.SignalR.Configuration;
+using Dapplo.SignalR.Utils;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
+using Microsoft.AspNet.SignalR.Infrastructure;
 using Newtonsoft.Json;
 using Owin;
 
 #endregion
 
-namespace Dapplo.SignalR
+namespace Dapplo.SignalR.Owin
 {
 	/// <summary>
 	///     SignalR generic OWIN configuration
 	/// </summary>
 	[OwinModule(StartupOrder = int.MaxValue)]
-	public class ConfigureSignalROwinModule : SimpleOwinModule
+	public class ConfigureSignalROwinModule : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
 
+		/// <summary>
+		/// The configuration for SignalR
+		/// </summary>
 		[Import]
-		private ISignalRConfiguration SignalRConfiguration { get; set; }
+		protected ISignalRConfiguration SignalRConfiguration { get; set; }
 
+		/// <summary>
+		/// The IHubActivator which overrides the DefaultHubActivator
+		/// </summary>
 		[Import]
-		private IServiceLocator ServiceLocator { get; set; }
-
-		[Import]
-		private IHubActivator HubActivator { get; set; }
+		protected IHubActivator HubActivator { get; set; }
 
 		/// <summary>
 		///     Configure Owin for SignalR
@@ -62,7 +67,20 @@ namespace Dapplo.SignalR
 		/// <param name="appBuilder"></param>
 		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 		{
-			Log.Verbose().WriteLine("Activating SignalR, EnableJavaEnableJavaScriptProxies={0}, EnableDetailedErrors={1}", SignalRConfiguration.EnableJavaEnableJavaScriptProxies, SignalRConfiguration.EnableDetailedErrors);
+			Log.Verbose().WriteLine("Activating SignalR, EnableJavaEnableJavaScriptProxies={0}, EnableDetailedErrors={1}, UseDummyPerformanceCounter={2}", SignalRConfiguration.EnableJavaEnableJavaScriptProxies, SignalRConfiguration.EnableDetailedErrors, SignalRConfiguration.UseDummyPerformanceCounter);
+
+			if (HubActivator != null)
+			{
+				Log.Verbose().WriteLine("Overriding the DefaultHubActivator");
+				// Register our own IHubActivator, so we can use dependency injection
+				GlobalHost.DependencyResolver.Register(typeof(IHubActivator), () => HubActivator);
+			}
+
+			// Register a dummy IPerformanceCounterManager as a workaround
+			if (SignalRConfiguration.UseDummyPerformanceCounter)
+			{
+				GlobalHost.DependencyResolver.Register(typeof(IPerformanceCounterManager), () => new DummyPerformanceCounterManager());
+			}
 
 			// Register the SignalRContractResolver, which solves camelCase issues
 			var settings = new JsonSerializerSettings
@@ -81,8 +99,6 @@ namespace Dapplo.SignalR
 				Resolver = new DefaultDependencyResolver()
 			});
 
-			// Register our own IHubActivator, so we can use dependency injection
-			GlobalHost.DependencyResolver.Register(typeof(IHubActivator), () => HubActivator);
 		}
 	}
 }

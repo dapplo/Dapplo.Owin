@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2017 Dapplo
+//  Copyright (C) 2016-2017 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -21,32 +21,43 @@
 
 #region using
 
+using System.ComponentModel.Composition;
+using System.Threading;
 using System.Threading.Tasks;
-using Dapplo.Log;
-using Microsoft.Owin;
+using Dapplo.Addons;
 
 #endregion
 
-namespace Dapplo.SignalR.Tests
+namespace Dapplo.Owin
 {
 	/// <summary>
-	///     The "test" Middleware, it returns "Dapplo" for EVERY request
+	/// Helper to start/stop the owin server, extend this class and add the
+	/// StartupAction / ShutdownAction attributues... and you are set.
 	/// </summary>
-	public class TestMiddleware : OwinMiddleware
+	public abstract class BaseOwinServerStartupShutdownAction : IAsyncStartupAction, IAsyncShutdownAction
 	{
-		private static readonly LogSource Log = new LogSource();
+		/// <summary>
+		/// The IOwinServer
+		/// </summary>
+		[Import]
+		protected IOwinServer OwinServer { get; set; }
 
-		public TestMiddleware(OwinMiddleware next) : base(next)
+		/// <summary>
+		/// This starts Owin
+		/// </summary>
+		/// <param name="token">CancellationToken</param>
+		public virtual Task StartAsync(CancellationToken token = new CancellationToken())
 		{
+			return OwinServer.StartAsync(token);
 		}
 
-		public override async Task Invoke(IOwinContext owinContext)
+		/// <summary>
+		/// This stops Owin
+		/// </summary>
+		/// <param name="token">CancellationToken</param>
+		public virtual Task ShutdownAsync(CancellationToken token = new CancellationToken())
 		{
-			Log.Debug().WriteLine("Http method: {0}, path: {1}", owinContext.Request.Method, owinContext.Request.Path);
-			owinContext.Response.StatusCode = 200;
-			owinContext.Response.ContentType = "text/plain";
-			await owinContext.Response.WriteAsync("Dapplo");
-			await Next.Invoke(owinContext);
+			return OwinServer.ShutdownAsync(token);
 		}
 	}
 }

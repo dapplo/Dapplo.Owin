@@ -20,12 +20,11 @@
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using Dapplo.Ini;
-using Dapplo.Owin;
 
-namespace Dapplo.SignalR.Tests
+namespace Dapplo.Owin.Tests.Configuration
 {
 	[IniSection("Core")]
-	public interface IMyTestConfiguration : IIniSection, IOwinConfiguration, ISignalRConfiguration
+	public interface IMyTestConfiguration : IIniSection, IOwinConfiguration
 	{
 	}
 }

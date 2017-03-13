@@ -32,7 +32,7 @@ using Newtonsoft.Json.Serialization;
 
 #endregion
 
-namespace Dapplo.SignalR
+namespace Dapplo.SignalR.Utils
 {
 	/// <summary>
 	///     This is a helper class for the Json resolver, which helps to format things as they should be in JavaScript.

@@ -26,42 +26,49 @@
 #region Usings
 
 using System;
-using System.Reflection;
-using Microsoft.AspNet.SignalR.Infrastructure;
-using Newtonsoft.Json.Serialization;
+using System.ComponentModel.Composition;
+using Dapplo.Addons;
+using Microsoft.AspNet.SignalR.Hubs;
 
 #endregion
 
-namespace Dapplo.SignalR
+namespace Dapplo.SignalR.Utils
 {
 	/// <summary>
-	///     This solves the problem that signalr communication is made with PascalCase instead of camelCase
-	///     For more information, see <a href="http://stackoverflow.com/a/30019100/1886251">here</a>
+	///     This IHubActivator implementation uses the Dapplo.Addons to enable dependency injection
 	/// </summary>
-	internal class SignalRContractResolver : IContractResolver
+	[Export(typeof(IHubActivator))]
+	public class HubActivator : IHubActivator
 	{
-		private readonly Assembly _assembly;
-		private readonly IContractResolver _camelCaseContractResolver;
-		private readonly IContractResolver _defaultContractSerializer;
+		[Import]
+		private IServiceLocator ServiceLocator { get; set; }
+
+		[Import]
+		private IServiceExporter ServiceExporter { get; set; }
 
 		/// <summary>
-		///     Constructor
+		///     Lookup or create a IHub and inject it.
 		/// </summary>
-		public SignalRContractResolver()
+		/// <param name="descriptor">HubDescriptor</param>
+		/// <returns>IHub</returns>
+		public IHub Create(HubDescriptor descriptor)
 		{
-			_defaultContractSerializer = new DefaultContractResolver();
-			_camelCaseContractResolver = new CamelCaseContractResolver();
-			_assembly = typeof(Connection).Assembly;
-		}
-
-		JsonContract IContractResolver.ResolveContract(Type type)
-		{
-			if (type.Assembly.Equals(_assembly))
+			// Have the base implementation create the hub
+			var hub = ServiceLocator.GetExport(descriptor.HubType) as IHub;
+			if (hub != null)
 			{
-				return _defaultContractSerializer.ResolveContract(type);
+				return hub;
 			}
-
-			return _camelCaseContractResolver.ResolveContract(type);
+			hub = Activator.CreateInstance(descriptor.HubType) as IHub;
+			if (hub == null)
+			{
+				return null;
+			}
+			// Use the IServiceLocator to inject dependencies
+			ServiceLocator.FillImports(hub);
+			// Use the IServiceExporter to export the hub
+			ServiceExporter.Export(descriptor.HubType, hub);
+			return hub;
 		}
 	}
 }

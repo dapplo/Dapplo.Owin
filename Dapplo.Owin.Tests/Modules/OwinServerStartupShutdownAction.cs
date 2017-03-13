@@ -22,17 +22,16 @@
 #region using
 
 using Dapplo.Addons;
-using Dapplo.Owin;
 
 #endregion
 
-namespace Dapplo.SignalR.Tests
+namespace Dapplo.Owin.Tests.Modules
 {
 	/// <summary>
 	/// Helper to start/stop owin
 	/// </summary>
 	[StartupAction, ShutdownAction]
-	public class OwinServerStartStopAction : SimpleOwinStartStopAction
+	public class OwinServerStartupShutdownAction : BaseOwinServerStartupShutdownAction
 	{
 	}
 }

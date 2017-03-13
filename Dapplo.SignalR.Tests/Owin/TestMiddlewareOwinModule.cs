@@ -27,10 +27,10 @@ using Owin;
 
 #endregion
 
-namespace Dapplo.SignalR.Tests
+namespace Dapplo.SignalR.Tests.Owin
 {
 	[OwinModule]
-	public class SignalRConfigurationTest : ConfigureDefaultsOwinModule
+	public class TestMiddlewareOwinModule : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
 
@@ -38,7 +38,6 @@ namespace Dapplo.SignalR.Tests
 		{
 			Log.Debug().WriteLine("Configuring test middleware in the Owin pipeline");
 			appBuilder.Use(typeof (TestMiddleware));
-			base.Configure(server, appBuilder);
 		}
 	}
 }

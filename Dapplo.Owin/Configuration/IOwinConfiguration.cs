@@ -48,12 +48,6 @@ namespace Dapplo.Owin
 		int Port { get; set; }
 
 		/// <summary>
-		/// Enable serving of files from a html sub folder, this can be used to allow error pages.
-		/// </summary>
-		[Description("Enable serving of files from a html sub folder, this can be used to allow error pages"), DefaultValue(true)]
-		bool EnableFileServer { get; set; }
-
-		/// <summary>
 		/// Specify if an error page should be shown
 		/// </summary>
 		[Description("Show an error page when something happens"), DefaultValue(false), DataMember(EmitDefaultValue = true)]
@@ -62,7 +56,7 @@ namespace Dapplo.Owin
 		/// <summary>
 		/// Enable Cross Origin calls
 		/// </summary>
-		[Description("Set this to true to allow cross origin calls, this is needed when your html page is not served by the owin server.")]
+		[Description("Set this to true to allow cross origin calls, this is needed when a site is not served by the owin server, but uses this.")]
 		[DefaultValue(true)]
 		bool EnableCors { get; set; }
 

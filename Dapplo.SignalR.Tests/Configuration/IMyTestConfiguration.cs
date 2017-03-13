@@ -19,25 +19,14 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
+using Dapplo.Ini;
+using Dapplo.Owin;
+using Dapplo.SignalR.Configuration;
 
-using Dapplo.Log;
-using Owin;
-
-#endregion
-
-namespace Dapplo.Owin.Tests
+namespace Dapplo.SignalR.Tests.Configuration
 {
-	[OwinModule]
-	public class OwinConfigurationTest : ConfigureDefaultsOwinModule
+	[IniSection("Core")]
+	public interface IMyTestConfiguration : IIniSection, IOwinConfiguration, ISignalRConfiguration
 	{
-		private static readonly LogSource Log = new LogSource();
-
-		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
-		{
-			Log.Debug().WriteLine("Configuring test middleware in the Owin pipeline");
-			appBuilder.Use(typeof (TestMiddleware));
-			base.Configure(server, appBuilder);
-		}
 	}
 }

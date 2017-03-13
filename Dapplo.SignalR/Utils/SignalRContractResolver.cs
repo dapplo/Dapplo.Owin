@@ -26,49 +26,42 @@
 #region Usings
 
 using System;
-using System.ComponentModel.Composition;
-using Dapplo.Addons;
-using Microsoft.AspNet.SignalR.Hubs;
+using System.Reflection;
+using Microsoft.AspNet.SignalR.Infrastructure;
+using Newtonsoft.Json.Serialization;
 
 #endregion
 
-namespace Dapplo.SignalR
+namespace Dapplo.SignalR.Utils
 {
 	/// <summary>
-	///     This IHubActivator implementation uses the Dapplo.Addons to enable dependency injection
+	///     This solves the problem that signalr communication is made with PascalCase instead of camelCase
+	///     For more information, see <a href="http://stackoverflow.com/a/30019100/1886251">here</a>
 	/// </summary>
-	[Export(typeof(IHubActivator))]
-	public class HubActivator : IHubActivator
+	internal class SignalRContractResolver : IContractResolver
 	{
-		[Import]
-		private IServiceLocator ServiceLocator { get; set; }
-
-		[Import]
-		private IServiceExporter ServiceExporter { get; set; }
+		private readonly Assembly _assembly;
+		private readonly IContractResolver _camelCaseContractResolver;
+		private readonly IContractResolver _defaultContractSerializer;
 
 		/// <summary>
-		///     Lookup or create a IHub and inject it.
+		///     Constructor
 		/// </summary>
-		/// <param name="descriptor">HubDescriptor</param>
-		/// <returns>IHub</returns>
-		public IHub Create(HubDescriptor descriptor)
+		public SignalRContractResolver()
 		{
-			// Have the base implementation create the hub
-			var hub = ServiceLocator.GetExport(descriptor.HubType) as IHub;
-			if (hub != null)
+			_defaultContractSerializer = new DefaultContractResolver();
+			_camelCaseContractResolver = new CamelCaseContractResolver();
+			_assembly = typeof(Connection).Assembly;
+		}
+
+		JsonContract IContractResolver.ResolveContract(Type type)
+		{
+			if (type.Assembly.Equals(_assembly))
 			{
-				return hub;
+				return _defaultContractSerializer.ResolveContract(type);
 			}
-			hub = Activator.CreateInstance(descriptor.HubType) as IHub;
-			if (hub == null)
-			{
-				return null;
-			}
-			// Use the IServiceLocator to inject dependencies
-			ServiceLocator.FillImports(hub);
-			// Use the IServiceExporter to export the hub
-			ServiceExporter.Export(descriptor.HubType, hub);
-			return hub;
+
+			return _camelCaseContractResolver.ResolveContract(type);
 		}
 	}
 }

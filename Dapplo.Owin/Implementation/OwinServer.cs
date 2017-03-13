@@ -29,7 +29,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Dapplo.Addons;
 using Dapplo.Log;
 using Microsoft.Owin.Hosting;
 
@@ -47,19 +46,22 @@ namespace Dapplo.Owin.Implementation
 		private static readonly LogSource Log = new LogSource();
 		private IDisposable _webApp;
 
+		/// <summary>
+		/// The owin configuration
+		/// </summary>
 		[Import]
-		private IOwinConfiguration OwinConfiguration { get; set; }
+		protected IOwinConfiguration OwinConfiguration { get; set; }
 
+		/// <summary>
+		/// The injected list of Owin modules
+		/// </summary>
 		[ImportMany]
-		private IEnumerable<Lazy<IOwinModule, IOwinModuleMetadata>> OwinModules
+		protected IEnumerable<Lazy<IOwinModule, IOwinModuleMetadata>> OwinModules
 		{
 			get;
-			// ReSharper disable once UnusedAutoPropertyAccessor.Local
+			// ReSharper disable once UnusedAutoPropertyAccessor.Global
 			set;
 		}
-
-		[Import]
-		private IServiceExporter ServiceExporter { get; set; }
 
 		/// <summary>
 		///     The server is listening on the following Uri
@@ -75,7 +77,7 @@ namespace Dapplo.Owin.Implementation
 		///     Stop the WebApp
 		/// </summary>
 		/// <param name="cancellationToken">CancellationToken</param>
-		public async Task ShutdownAsync(CancellationToken cancellationToken = default(CancellationToken))
+		public virtual async Task ShutdownAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			Log.Verbose().WriteLine("Stopping the Owin Server on {0}", ListeningOn);
 			var owinModules = OwinModules.OrderBy(export => export.Metadata.ShutdownOrder).Select(export => export.Value).Distinct().ToList();
@@ -102,7 +104,7 @@ namespace Dapplo.Owin.Implementation
 		///     Start the WebApp
 		/// </summary>
 		/// <param name="cancellationToken">CancellationToken</param>
-		public async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
+		public virtual async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
 			var owinModules = OwinModules.OrderBy(export => export.Metadata.StartupOrder).Select(export => export.Value).Distinct().ToList();
 			if (!owinModules.Any())
@@ -132,7 +134,7 @@ namespace Dapplo.Owin.Implementation
 			_webApp = WebApp.Start(ListeningOn.AbsoluteUri, appBuilder =>
 			{
 				Log.Verbose().WriteLine("Starting WebApp.");
-				foreach (var owinModule in OwinModules.OrderBy(export => export.Metadata.StartupOrder).Select(export => export.Value).Distinct())
+				foreach (var owinModule in owinModules)
 				{
 					Log.Debug().WriteLine("configuring OwinModule {0}", owinModule.GetType());
 					owinModule.Configure(this, appBuilder);
@@ -149,7 +151,7 @@ namespace Dapplo.Owin.Implementation
 		/// </summary>
 		/// <param name="possiblePorts">An int array with ports, the routine will return the first free port.</param>
 		/// <returns>A free port</returns>
-		private static int GetFreeListenerPort(int[] possiblePorts)
+		protected static int GetFreeListenerPort(int[] possiblePorts)
 		{
 			possiblePorts = possiblePorts ?? new[] {0};
 

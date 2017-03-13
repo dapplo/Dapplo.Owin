@@ -33,7 +33,7 @@ namespace Dapplo.Owin
 	/// <summary>
 	/// A base implementation for an Owin module, don't forget to mark you
 	/// </summary>
-	public abstract class SimpleOwinModule : IOwinModule
+	public abstract class BaseOwinModule : IOwinModule
 	{
 		/// <summary>
 		/// A default implementation, which does nothing

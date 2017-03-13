@@ -31,6 +31,8 @@ using Dapplo.Ini;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Owin;
+using Dapplo.SignalR.Tests.Configuration;
+using Dapplo.SignalR.Tests.Owin;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -55,7 +57,7 @@ namespace Dapplo.SignalR.Tests
 		{
 			using (var bootstrapper = new ApplicationBootstrapper(ApplicationName))
 			{
-				bootstrapper.Add(typeof (SignalRConfigurationTest));
+				bootstrapper.Add(typeof (TestMiddlewareOwinModule));
 
 				// Make sure IniConfig can resolve and find IMyTestConfiguration
 				using (var iniConfig = new IniConfig(ApplicationName, ApplicationName))
