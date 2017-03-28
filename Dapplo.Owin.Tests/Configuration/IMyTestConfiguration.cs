@@ -20,6 +20,7 @@
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using Dapplo.Ini;
+using Dapplo.Owin.Configuration;
 
 namespace Dapplo.Owin.Tests.Configuration
 {

@@ -26,7 +26,6 @@ using System.Net.Cache;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Dapplo.Addons.Bootstrapper;
-using Dapplo.Addons.Bootstrapper.ExportProviders;
 using Dapplo.Ini;
 using Dapplo.HttpExtensions;
 using Dapplo.Log;
@@ -34,7 +33,6 @@ using Xunit;
 using Xunit.Abstractions;
 using Dapplo.Log.XUnit;
 using Dapplo.Owin.Tests.Configuration;
-using Dapplo.Owin.Tests.Modules;
 using Dapplo.Owin.Tests.Owin;
 using Nito.AsyncEx;
 
@@ -52,17 +50,20 @@ namespace Dapplo.Owin.Tests
 
 			bootstrapper.Add(typeof(TestMiddlewareOwinModule));
 
-			// Make sure IniConfig can resolve and find IMyTestConfiguration
-			var iniConfig = new IniConfig(ApplicationName, ApplicationName);
-			// TODO: Find a solution where register is not needed?
-			await iniConfig.RegisterAndGetAsync<IMyTestConfiguration>();
-			var exportProvider = new ServiceProviderExportProvider(iniConfig, bootstrapper);
-			bootstrapper.ExportProviders.Add(exportProvider);
-
 			// Normally one would add Dapplo.Owin and Dapplo.SignalR dlls, without having a direct reference:
 			// e.g.: bootstrapper.AddScanDirectory(@"..\..\..\Dapplo.Owin\bin\Debug");
 			// e.g.: bootstrapper.AddScanDirectory(@"..\..\..\Dapplo.SignalR\bin\Debug");
 			bootstrapper.FindAndLoadAssemblies("Dapplo*");
+
+
+			await bootstrapper.InitializeAsync();
+
+			// Make sure IniConfig can resolve and find IMyTestConfiguration
+			var iniConfig = new IniConfig(ApplicationName, ApplicationName);
+			// TODO: Find a solution where register is not needed?
+			await iniConfig.RegisterAndGetAsync<IMyTestConfiguration>();
+			bootstrapper.Export<IServiceProvider>(iniConfig);
+
 			// Start the composition
 			await bootstrapper.RunAsync();
 			return bootstrapper;

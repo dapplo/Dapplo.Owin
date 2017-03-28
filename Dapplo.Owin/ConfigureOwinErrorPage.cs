@@ -21,6 +21,7 @@
 
 using System.ComponentModel.Composition;
 using Dapplo.Log;
+using Dapplo.Owin.Configuration;
 using Owin;
 
 namespace Dapplo.Owin

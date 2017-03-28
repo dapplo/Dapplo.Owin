@@ -30,6 +30,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapplo.Log;
+using Dapplo.Owin.Configuration;
 using Microsoft.Owin.Hosting;
 
 #endregion

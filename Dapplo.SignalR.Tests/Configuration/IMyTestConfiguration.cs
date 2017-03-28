@@ -20,7 +20,7 @@
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using Dapplo.Ini;
-using Dapplo.Owin;
+using Dapplo.Owin.Configuration;
 using Dapplo.SignalR.Configuration;
 
 namespace Dapplo.SignalR.Tests.Configuration

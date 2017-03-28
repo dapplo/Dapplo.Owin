@@ -28,7 +28,7 @@ using Dapplo.Ini;
 
 #endregion
 
-namespace Dapplo.Owin
+namespace Dapplo.Owin.Configuration
 {
 	/// <summary>
 	///     The Owin configuration container, this can be stored with Dapplo.Config
