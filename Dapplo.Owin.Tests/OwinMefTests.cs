@@ -26,30 +26,29 @@ using System.Net.Cache;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Dapplo.Addons.Bootstrapper;
-using Dapplo.HttpExtensions;
 using Dapplo.Ini;
+using Dapplo.HttpExtensions;
 using Dapplo.Log;
-using Dapplo.Log.XUnit;
-using Dapplo.Owin;
-using Dapplo.SignalR.Tests.Configuration;
-using Dapplo.SignalR.Tests.Owin;
 using Xunit;
 using Xunit.Abstractions;
+using Dapplo.Log.XUnit;
+using Dapplo.Owin.Tests.Configuration;
+using Dapplo.Owin.Tests.Owin;
 using Nito.AsyncEx;
 
 #endregion
 
-namespace Dapplo.SignalR.Tests
+namespace Dapplo.Owin.Tests
 {
-    public sealed class SignalRTests
+    public sealed class OwinMefTests
     {
-        private const string ApplicationName = "DapploSignalR";
+        private const string ApplicationName = "DapploOwin";
+
         private static readonly AsyncLazy<ApplicationBootstrapper> Bootstrapper = new AsyncLazy<ApplicationBootstrapper>(async () =>
         {
             var bootstrapper = new ApplicationBootstrapper(ApplicationName);
 
             bootstrapper.Add(typeof(TestMiddlewareOwinModule));
-
 
             // Normally one would add Dapplo.Owin and Dapplo.SignalR dlls somewhere in a components or addons directory.
             // This would prevent to have a direct reference. Than use bootstrapper.AddScanDirectory to add this directory.
@@ -68,16 +67,16 @@ namespace Dapplo.SignalR.Tests
             return bootstrapper;
         });
 
-        public SignalRTests(ITestOutputHelper testOutputHelper)
+
+        public OwinMefTests(ITestOutputHelper testOutputHelper)
         {
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-
             // Disable cache, otherwise the server seems to respond even if it isn't running
             HttpExtensionsGlobals.HttpSettings.RequestCacheLevel = RequestCacheLevel.BypassCache;
         }
 
         [Fact]
-        public async Task TestStartupAsync()
+        public async Task TestStartupShutdownAsync()
         {
             using (var bootstrapper = await Bootstrapper)
             {
