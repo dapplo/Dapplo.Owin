@@ -19,35 +19,25 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using System.Net;
-using Dapplo.Log;
-using Owin;
+#region using
+
+#endregion
 
 namespace Dapplo.Owin
 {
 	/// <summary>
-	///     An Owin Module which configures the Authentication
+	/// Meta data for OwinModules, this is for when MEF isn't used.
 	/// </summary>
-	[OwinModule(StartupOrder = int.MinValue)]
-	public class ConfigureOwinAuthentication : BaseOwinModule
+	public class OwinModuleMetadata : IOwinModuleMetadata
 	{
-		private static readonly LogSource Log = new LogSource();
+		/// <summary>
+		///     Here the order of the IOwinModule Initialize can be specified, starting with low values and ending with high.
+		/// </summary>
+		public int StartupOrder { get; set; } = 1;
 
 		/// <summary>
-		///     Configure the authentication scheme for Owin
+		///     Here the order of the IOwinModule Deinitialize can be specified, starting with low values and ending with high.
 		/// </summary>
-		/// <param name="server">IOwinServer</param>
-		/// <param name="appBuilder">IAppBuilder</param>
-		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
-		{
-			Log.Verbose().WriteLine("AuthenticationScheme is configured to {0}", server.OwinConfiguration.AuthenticationScheme);
-			// Enable Authentication, if a scheme is set
-			if (server.OwinConfiguration.AuthenticationScheme == AuthenticationSchemes.None)
-			{
-				return;
-			}
-			var listener = (HttpListener)appBuilder.Properties[typeof(HttpListener).FullName];
-			listener.AuthenticationSchemes = server.OwinConfiguration.AuthenticationScheme;
-		}
+		public int ShutdownOrder { get; set;  } = 1;
 	}
 }

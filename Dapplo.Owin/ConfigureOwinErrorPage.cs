@@ -19,9 +19,7 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using System.ComponentModel.Composition;
 using Dapplo.Log;
-using Dapplo.Owin.Configuration;
 using Owin;
 
 namespace Dapplo.Owin
@@ -34,9 +32,6 @@ namespace Dapplo.Owin
 	{
 		private static readonly LogSource Log = new LogSource();
 
-		[Import]
-		private IOwinConfiguration OwinConfiguration { get; set; }
-
 		/// <summary>
 		///     Configure the error page for Owin
 		/// </summary>
@@ -44,8 +39,8 @@ namespace Dapplo.Owin
 		/// <param name="appBuilder">IAppBuilder</param>
 		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 		{
-			Log.Verbose().WriteLine("Enabling error page: {0}", OwinConfiguration.UseErrorPage);
-			if (!OwinConfiguration.UseErrorPage)
+			Log.Verbose().WriteLine("Enabling error page: {0}", server.OwinConfiguration.UseErrorPage);
+			if (!server.OwinConfiguration.UseErrorPage)
 			{
 				return;
 			}

@@ -23,25 +23,31 @@
 
 using System;
 using Dapplo.Addons;
+using Dapplo.Owin.Configuration;
 
 #endregion
 
 namespace Dapplo.Owin
 {
-	/// <summary>
-	///     The IOwinServer is the public interface for the "server".
-	///     This is also available via the Dapplo.Addons IServiceLocator, and can be imported
-	/// </summary>
-	public interface IOwinServer : IAsyncStartupAction, IAsyncShutdownAction
-	{
-		/// <summary>
-		///     Is the server running?
-		/// </summary>
-		bool IsListening { get; }
+    /// <summary>
+    ///     The IOwinServer is the public interface for the "server".
+    ///     This is also available via the Dapplo.Addons IServiceLocator, and can be imported
+    /// </summary>
+    public interface IOwinServer : IAsyncStartupAction, IAsyncShutdownAction
+    {
+        /// <summary>
+        /// The Owin Server configuration
+        /// </summary>
+        IOwinConfiguration OwinConfiguration { get; }
 
-		/// <summary>
-		///     The Uri where Owin is listening on
-		/// </summary>
-		Uri ListeningOn { get; }
-	}
+        /// <summary>
+        ///     Is the server running?
+        /// </summary>
+        bool IsListening { get; }
+
+        /// <summary>
+        ///     The Uri where Owin is listening on
+        /// </summary>
+        Uri ListeningOn { get; }
+    }
 }

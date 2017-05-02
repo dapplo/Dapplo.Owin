@@ -37,148 +37,181 @@ using Microsoft.Owin.Hosting;
 
 namespace Dapplo.Owin.Implementation
 {
-	/// <summary>
-	///     This class will can start an Owin server.
-	///  as a Startup-Action and will shut it down when the shutdown action is called.
-	/// </summary>
-	[Export(typeof(IOwinServer))]
-	public class OwinServer : IOwinServer
-	{
-		private static readonly LogSource Log = new LogSource();
-		private IDisposable _webApp;
+    /// <summary>
+    ///     This class will can start an Owin server.
+    ///  as a Startup-Action and will shut it down when the shutdown action is called.
+    /// </summary>
+    [Export(typeof(IOwinServer))]
+    // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
+    public class OwinServer : IOwinServer
+    {
+        private static readonly LogSource Log = new LogSource();
+        private IDisposable _webApp;
 
-		/// <summary>
-		/// The owin configuration
-		/// </summary>
-		[Import]
-		protected IOwinConfiguration OwinConfiguration { get; set; }
+        /// <summary>
+        /// The Owin configuration
+        /// </summary>
+        public IOwinConfiguration OwinConfiguration { get; }
 
-		/// <summary>
-		/// The injected list of Owin modules
-		/// </summary>
-		[ImportMany]
-		protected IEnumerable<Lazy<IOwinModule, IOwinModuleMetadata>> OwinModules
-		{
-			get;
-			// ReSharper disable once UnusedAutoPropertyAccessor.Global
-			set;
-		}
+        /// <summary>
+        /// The injected list of Owin modules
+        /// </summary>
+        protected IEnumerable<Lazy<IOwinModule, IOwinModuleMetadata>> OwinModules
+        {
+            get;
+        }
 
-		/// <summary>
-		///     The server is listening on the following Uri
-		/// </summary>
-		public Uri ListeningOn { get; private set; }
+        /// <summary>
+        /// Create an Owin Server
+        /// </summary>
+        /// <param name="owinConfiguration">IOwinConfiguration with the hostname and port to listen on, and some other parameters</param>
+        /// <param name="owinModules">IEnumerable of Lazy IOwinModule and IOwinModuleMetadata</param>
+        [ImportingConstructor]
+        public OwinServer(
+            IOwinConfiguration owinConfiguration,
+            [ImportMany]
+            IEnumerable<Lazy<IOwinModule, IOwinModuleMetadata>> owinModules)
+        {
+            OwinConfiguration = owinConfiguration;
+            OwinModules = owinModules;
+        }
 
-		/// <summary>
-		///     Is the server running?
-		/// </summary>
-		public bool IsListening { get; private set; }
+        /// <summary>
+        /// Create an Owin Server
+        /// </summary>
+        /// <param name="owinConfiguration">IOwinConfiguration with the hostname and port to listen on, and some other parameters</param>
+        /// <param name="owinModules">IEnumerable IOwinModule</param>
+        public OwinServer(
+            IOwinConfiguration owinConfiguration,
+            IEnumerable<IOwinModule> owinModules)
+        {
+            OwinConfiguration = owinConfiguration;
+            int startupIndex = 0;
+            var modules = owinModules.ToList();
+            int shutdownIndex = modules.Count;
 
-		/// <summary>
-		///     Stop the WebApp
-		/// </summary>
-		/// <param name="cancellationToken">CancellationToken</param>
-		public virtual async Task ShutdownAsync(CancellationToken cancellationToken = default(CancellationToken))
-		{
-			Log.Verbose().WriteLine("Stopping the Owin Server on {0}", ListeningOn);
-			var owinModules = OwinModules.OrderBy(export => export.Metadata.ShutdownOrder).Select(export => export.Value).Distinct().ToList();
-			if (!owinModules.Any())
-			{
-				Log.Info().WriteLine("No OwinModules to start.");
-				return;
-			}
-			foreach (var owinModule in owinModules)
-			{
-				if (cancellationToken.IsCancellationRequested)
-				{
-					break;
-				}
-				Log.Debug().WriteLine("Stopping OwinModule {0}", owinModule.GetType());
-				await owinModule.DeinitializeAsync(this, cancellationToken).ConfigureAwait(false);
-			}
-			IsListening = false;
-			_webApp?.Dispose();
-			_webApp = null;
-		}
+            OwinModules = modules.Select(module => new Lazy<IOwinModule, IOwinModuleMetadata>(() => module, new OwinModuleMetadata
+            {
+                StartupOrder = startupIndex++,
+                ShutdownOrder = shutdownIndex--
+            }));
+        }
 
-		/// <summary>
-		///     Start the WebApp
-		/// </summary>
-		/// <param name="cancellationToken">CancellationToken</param>
-		public virtual async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
-		{
-			var owinModules = OwinModules.OrderBy(export => export.Metadata.StartupOrder).Select(export => export.Value).Distinct().ToList();
-			if (!owinModules.Any())
-			{
-				Log.Info().WriteLine("No OwinModules to start.");
-				return;
-			}
+        /// <summary>
+        ///     The server is listening on the following Uri
+        /// </summary>
+        public Uri ListeningOn { get; private set; }
 
-			// If there is no port given, find a free one and store this in the configuration
-			if (OwinConfiguration.Port == 0)
-			{
-				OwinConfiguration.Port = GetFreeListenerPort(new[] { 0 });
-			}
-			ListeningOn = new Uri($"http://{OwinConfiguration.Hostname}:{OwinConfiguration.Port}");
-			Log.Info().WriteLine("Starting WebApp on {0}", ListeningOn.AbsoluteUri);
+        /// <summary>
+        ///     Is the server running?
+        /// </summary>
+        public bool IsListening { get; private set; }
 
-			foreach (var owinModule in owinModules)
-			{
-				if (cancellationToken.IsCancellationRequested)
-				{
-					break;
-				}
-				Log.Debug().WriteLine("Intializing OwinModule {0}", owinModule.GetType());
-				await owinModule.InitializeAsync(this, cancellationToken).ConfigureAwait(false);
-			}
+        /// <summary>
+        ///     Stop the WebApp
+        /// </summary>
+        /// <param name="cancellationToken">CancellationToken</param>
+        public virtual async Task ShutdownAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            Log.Verbose().WriteLine("Stopping the Owin Server on {0}", ListeningOn);
+            var owinModules = OwinModules.OrderBy(export => export.Metadata.ShutdownOrder).Select(export => export.Value).Distinct().ToList();
+            if (!owinModules.Any())
+            {
+                Log.Info().WriteLine("No OwinModules to start.");
+                return;
+            }
+            foreach (var owinModule in owinModules)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+                Log.Debug().WriteLine("Stopping OwinModule {0}", owinModule.GetType());
+                await owinModule.DeinitializeAsync(this, cancellationToken).ConfigureAwait(false);
+            }
+            IsListening = false;
+            _webApp?.Dispose();
+            _webApp = null;
+        }
 
-			_webApp = WebApp.Start(ListeningOn.AbsoluteUri, appBuilder =>
-			{
-				Log.Verbose().WriteLine("Starting WebApp.");
-				foreach (var owinModule in owinModules)
-				{
-					Log.Debug().WriteLine("configuring OwinModule {0}", owinModule.GetType());
-					owinModule.Configure(this, appBuilder);
-				}
-			});
-			IsListening = true;
-		}
+        /// <summary>
+        ///     Start the WebApp
+        /// </summary>
+        /// <param name="cancellationToken">CancellationToken</param>
+        public virtual async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var owinModules = OwinModules.OrderBy(export => export.Metadata.StartupOrder).Select(export => export.Value).Distinct().ToList();
+            if (!owinModules.Any())
+            {
+                Log.Info().WriteLine("No OwinModules to start.");
+                return;
+            }
 
-		/// <summary>
-		///     Returns an unused port, which savely can be used to listen to
-		///     A port of 0 in the list will have the following behaviour: https://msdn.microsoft.com/en-us/library/c6z86e63.aspx
-		///     If you do not care which local port is used, you can specify 0 for the port number. In this case, the service
-		///     provider will assign an available port number between 1024 and 5000.
-		/// </summary>
-		/// <param name="possiblePorts">An int array with ports, the routine will return the first free port.</param>
-		/// <returns>A free port</returns>
-		protected static int GetFreeListenerPort(int[] possiblePorts)
-		{
-			possiblePorts = possiblePorts ?? new[] {0};
+            // If there is no port given, find a free one and store this in the configuration
+            if (OwinConfiguration.Port == 0)
+            {
+                OwinConfiguration.Port = GetFreeListenerPort();
+            }
+            ListeningOn = new Uri($"http://{OwinConfiguration.Hostname}:{OwinConfiguration.Port}");
+            Log.Info().WriteLine("Starting WebApp on {0}", ListeningOn.AbsoluteUri);
 
-			foreach (var portToCheck in possiblePorts)
-			{
-				var listener = new TcpListener(IPAddress.Loopback, portToCheck);
-				try
-				{
-					listener.Start();
-					// As the LocalEndpoint is of type EndPoint, this doesn't have the port, we need to cast it to IPEndPoint
-					var port = ((IPEndPoint) listener.LocalEndpoint).Port;
-					Log.Info().WriteLine("Found free listener port {0} for the WebApp.", port);
-					return port;
-				}
-				catch
-				{
-					Log.Debug().WriteLine("Port {0} isn't free.", portToCheck);
-				}
-				finally
-				{
-					listener.Stop();
-				}
-			}
-			var message = $"No free ports in the range {possiblePorts} found!";
-			Log.Warn().WriteLine(message);
-			throw new ApplicationException(message);
-		}
-	}
+            foreach (var owinModule in owinModules)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+                Log.Debug().WriteLine("Intializing OwinModule {0}", owinModule.GetType());
+                await owinModule.InitializeAsync(this, cancellationToken).ConfigureAwait(false);
+            }
+
+            _webApp = WebApp.Start(ListeningOn.AbsoluteUri, appBuilder =>
+            {
+                Log.Verbose().WriteLine("Starting WebApp.");
+                foreach (var owinModule in owinModules)
+                {
+                    Log.Debug().WriteLine("configuring OwinModule {0}", owinModule.GetType());
+                    owinModule.Configure(this, appBuilder);
+                }
+            });
+            IsListening = true;
+        }
+
+        /// <summary>
+        ///     Returns an unused port, which savely can be used to listen to
+        ///     A port of 0 in the list will have the following behaviour: https://msdn.microsoft.com/en-us/library/c6z86e63.aspx
+        ///     If you do not care which local port is used, you can specify 0 for the port number. In this case, the service
+        ///     provider will assign an available port number between 1024 and 5000.
+        /// </summary>
+        /// <param name="possiblePorts">An optional int array with ports, the routine will return the first free port.</param>
+        /// <returns>A free port</returns>
+        protected static int GetFreeListenerPort(int[] possiblePorts = null)
+        {
+            possiblePorts = possiblePorts ?? new[] {0};
+
+            foreach (var portToCheck in possiblePorts)
+            {
+                var listener = new TcpListener(IPAddress.Loopback, portToCheck);
+                try
+                {
+                    listener.Start();
+                    // As the LocalEndpoint is of type EndPoint, this doesn't have the port, we need to cast it to IPEndPoint
+                    var port = ((IPEndPoint) listener.LocalEndpoint).Port;
+                    Log.Info().WriteLine("Found free listener port {0} for the WebApp.", port);
+                    return port;
+                }
+                catch
+                {
+                    Log.Debug().WriteLine("Port {0} isn't free.", portToCheck);
+                }
+                finally
+                {
+                    listener.Stop();
+                }
+            }
+            var message = $"No free ports in the range {possiblePorts} found!";
+            Log.Warn().WriteLine(message);
+            throw new NotSupportedException(message);
+        }
+    }
 }

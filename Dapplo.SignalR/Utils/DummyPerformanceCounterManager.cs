@@ -23,201 +23,140 @@
 
 #endregion
 
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
 using Microsoft.AspNet.SignalR.Infrastructure;
 
 namespace Dapplo.SignalR.Utils
 {
-	/// <summary>
-	/// Build after the TempPerformanceCounterManager <a href="https://github.com/SignalR/SignalR/issues/3414">here</a>
-	/// This is a workaround which solves some issues in performance and reduces some exceptions.
-	/// </summary>
-	public class DummyPerformanceCounterManager : IPerformanceCounterManager
-	{
-		private static readonly PropertyInfo[] CounterProperties = GetCounterPropertyInfo();
-		private static readonly IPerformanceCounter NoOpCounter = new NoOpPerformanceCounter();
+    /// <summary>
+    /// Build after the TempPerformanceCounterManager <a href="https://github.com/SignalR/SignalR/issues/3414">here</a>
+    /// This is a workaround which solves some issues in performance and reduces some exceptions.
+    /// </summary>
+    public class DummyPerformanceCounterManager : IPerformanceCounterManager
+    {
+        private static readonly IPerformanceCounter NoOpCounter = new NoOpPerformanceCounter();
 
-		/// <summary>
-		/// This initializes a dummy performance counter, which can be used as a workaround for some issues.
-		/// </summary>
-		public DummyPerformanceCounterManager()
-		{
-			foreach (var property in CounterProperties)
-			{
-				property.SetValue(this, new NoOpPerformanceCounter(), null);
-			}
-		}
+        /// <inheritdoc />
+        public void Initialize(string instanceName, CancellationToken hostShutdownToken)
+        {
+            // Do nothing
+        }
 
-		/// <inheritdoc />
-		public void Initialize(string instanceName, CancellationToken hostShutdownToken)
-		{
-		}
+        /// <inheritdoc />
+        public IPerformanceCounter LoadCounter(string categoryName, string counterName, string instanceName, bool isReadOnly)
+        {
+            return NoOpCounter;
+        }
 
-		/// <inheritdoc />
-		public IPerformanceCounter LoadCounter(string categoryName, string counterName, string instanceName, bool isReadOnly)
-		{
-			return NoOpCounter;
-		}
+        /// <inheritdoc />
+        public IPerformanceCounter ConnectionsConnected { get; } = NoOpCounter;
 
-		internal static PropertyInfo[] GetCounterPropertyInfo()
-		{
-			return typeof(DummyPerformanceCounterManager)
-				.GetProperties()
-				.Where(p => p.PropertyType == typeof(IPerformanceCounter))
-				.ToArray();
-		}
+        /// <inheritdoc />
+        public IPerformanceCounter ConnectionsReconnected { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ConnectionsConnected { get; set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ConnectionsDisconnected { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ConnectionsReconnected { get; set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ConnectionsCurrentForeverFrame { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ConnectionsDisconnected { get; set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ConnectionsCurrentLongPolling { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ConnectionsCurrentForeverFrame { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ConnectionsCurrentServerSentEvents { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ConnectionsCurrentLongPolling { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ConnectionsCurrentWebSockets { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ConnectionsCurrentServerSentEvents { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ConnectionsCurrent { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ConnectionsCurrentWebSockets { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ConnectionMessagesReceivedTotal { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ConnectionsCurrent { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ConnectionMessagesSentTotal { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ConnectionMessagesReceivedTotal { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ConnectionMessagesReceivedPerSec { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ConnectionMessagesSentTotal { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ConnectionMessagesSentPerSec { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ConnectionMessagesReceivedPerSec { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter MessageBusMessagesReceivedTotal { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ConnectionMessagesSentPerSec { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter MessageBusMessagesReceivedPerSec { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter MessageBusMessagesReceivedTotal { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ScaleoutMessageBusMessagesReceivedPerSec { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter MessageBusMessagesReceivedPerSec { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter MessageBusMessagesPublishedTotal { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ScaleoutMessageBusMessagesReceivedPerSec { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter MessageBusMessagesPublishedPerSec { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter MessageBusMessagesPublishedTotal { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter MessageBusSubscribersCurrent { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter MessageBusMessagesPublishedPerSec { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter MessageBusSubscribersTotal { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter MessageBusSubscribersCurrent { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter MessageBusSubscribersPerSec { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter MessageBusSubscribersTotal { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter MessageBusAllocatedWorkers { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter MessageBusSubscribersPerSec { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter MessageBusBusyWorkers { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter MessageBusAllocatedWorkers { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter MessageBusTopicsCurrent { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter MessageBusBusyWorkers { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ErrorsAllTotal { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter MessageBusTopicsCurrent { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ErrorsAllPerSec { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ErrorsAllTotal { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ErrorsHubResolutionTotal { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ErrorsAllPerSec { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ErrorsHubResolutionPerSec { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ErrorsHubResolutionTotal { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ErrorsHubInvocationTotal { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ErrorsHubResolutionPerSec { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ErrorsHubInvocationPerSec { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ErrorsHubInvocationTotal { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ErrorsTransportTotal { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ErrorsHubInvocationPerSec { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ErrorsTransportPerSec { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ErrorsTransportTotal { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ScaleoutStreamCountTotal { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ErrorsTransportPerSec { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ScaleoutStreamCountOpen { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ScaleoutStreamCountTotal { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ScaleoutStreamCountBuffering { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ScaleoutStreamCountOpen { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ScaleoutErrorsTotal { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ScaleoutStreamCountBuffering { get; private set; }
+        /// <inheritdoc />
+        public IPerformanceCounter ScaleoutErrorsPerSec { get; } = NoOpCounter;
 
-		/// <inheritdoc />
-		public IPerformanceCounter ScaleoutErrorsTotal { get; private set; }
-
-		/// <inheritdoc />
-		public IPerformanceCounter ScaleoutErrorsPerSec { get; private set; }
-
-		/// <inheritdoc />
-		public IPerformanceCounter ScaleoutSendQueueLength { get; private set; }
-	}
-
-	internal class NoOpPerformanceCounter : IPerformanceCounter
-	{
-		public string CounterName => GetType().Name;
-
-		public long Decrement()
-		{
-			return 0;
-		}
-
-		public long Increment()
-		{
-			return 0;
-		}
-
-		public long IncrementBy(long value)
-		{
-			return 0;
-		}
-
-		public long RawValue
-		{
-			get { return 0; }
-			set { }
-		}
-
-		public void Close()
-		{
-		}
-
-		public void RemoveInstance()
-		{
-		}
-
-		public CounterSample NextSample()
-		{
-			return CounterSample.Empty;
-		}
-	}
+        /// <inheritdoc />
+        public IPerformanceCounter ScaleoutSendQueueLength { get; } = NoOpCounter;
+    }
 }

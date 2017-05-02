@@ -19,34 +19,32 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using Dapplo.Log;
-using Microsoft.Owin.Cors;
-using Owin;
+#region using
 
-namespace Dapplo.Owin
+using System.Net;
+
+#endregion
+
+namespace Dapplo.Owin.Configuration
 {
-	/// <summary>
-	///     An Owin Module which configures CORS
-	/// </summary>
-	[OwinModule(StartupOrder = int.MinValue + 2)]
-	public class ConfigureOwinCors : BaseOwinModule
-	{
-		private static readonly LogSource Log = new LogSource();
+    /// <summary>
+    ///     A basic implementation of the IOwinConfiguration, not needed when using Dapplo
+    /// </summary>
+    public class OwinConfiguration : IOwinConfiguration
+    {
+        /// <inheritdoc />
+        public string Hostname { get; set; } = "localhost";
 
-		/// <summary>
-		///     Configure CORS for Owin
-		/// </summary>
-		/// <param name="server">IOwinServer</param>
-		/// <param name="appBuilder">IAppBuilder</param>
-		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
-		{
-			Log.Verbose().WriteLine("Enabling Cors: {0}", server.OwinConfiguration.EnableCors);
-			if (!server.OwinConfiguration.EnableCors)
-			{
-				return;
-			}
-			// Enable CORS (allow cross domain requests)
-			appBuilder.UseCors(CorsOptions.AllowAll);
-		}
-	}
+        /// <inheritdoc />
+        public int Port { get; set; }
+
+        /// <inheritdoc />
+        public bool UseErrorPage { get; set; } = true;
+
+        /// <inheritdoc />
+        public bool EnableCors { get; set; } = true;
+
+        /// <inheritdoc />
+        public AuthenticationSchemes AuthenticationScheme { get; set; } = AuthenticationSchemes.None;
+    }
 }
