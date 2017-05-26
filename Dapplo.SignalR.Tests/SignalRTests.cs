@@ -32,7 +32,9 @@ using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Owin;
 using Dapplo.SignalR.Tests.Configuration;
+using Dapplo.SignalR.Tests.Hub;
 using Dapplo.SignalR.Tests.Owin;
+using Microsoft.AspNet.SignalR.Client;
 using Xunit;
 using Xunit.Abstractions;
 using Nito.AsyncEx;
@@ -83,11 +85,22 @@ namespace Dapplo.SignalR.Tests
             {
                 var owinServer = bootstrapper.GetExport<IOwinServer>().Value;
                 Assert.True(owinServer.IsListening, "Server not running!");
+
+                // Resetting the port to random
+                owinServer.OwinConfiguration.Port = 0;
+
                 // Test request, we need to build the url
                 var testUri = owinServer.ListeningOn.AppendSegments("Test");
 
                 var result = await testUri.GetAsAsync<string>();
                 Assert.Equal("Dapplo", result);
+
+                var hubConnection = new HubConnection(owinServer.ListeningOn.AbsoluteUri, true);
+                IHubProxy testHubProxy = hubConnection.CreateHubProxy("TestHub");
+                await hubConnection.Start();
+
+                result = await testHubProxy.Invoke<string>("Hello", "World");
+                Assert.Equal("Hello World", result);
 
                 await owinServer.ShutdownAsync();
                 Assert.False(owinServer.IsListening, "Server still running!");

@@ -147,12 +147,15 @@ namespace Dapplo.Owin.Implementation
                 return;
             }
 
-            // If there is no port given, find a free one and store this in the configuration
+            // Logic to find the port to use, first take the one from the configuration
+            int portToUse = OwinConfiguration.Port;
+            // If there is no port given, find a free one
             if (OwinConfiguration.Port == 0)
             {
-                OwinConfiguration.Port = GetFreeListenerPort();
+                portToUse = GetFreeListenerPort();
             }
-            ListeningOn = new Uri($"http://{OwinConfiguration.Hostname}:{OwinConfiguration.Port}");
+            // build the uri to listen on
+            ListeningOn = new Uri($"{OwinConfiguration.ListeningSchema}://{OwinConfiguration.Hostname}:{portToUse}");
             Log.Info().WriteLine("Starting WebApp on {0}", ListeningOn.AbsoluteUri);
 
             foreach (var owinModule in owinModules)
@@ -189,29 +192,41 @@ namespace Dapplo.Owin.Implementation
         {
             possiblePorts = possiblePorts ?? new[] {0};
 
-            foreach (var portToCheck in possiblePorts)
+            var resultingPort =  possiblePorts.Select(TryPort).FirstOrDefault(i => i > 0);
+            if (resultingPort > 0)
             {
-                var listener = new TcpListener(IPAddress.Loopback, portToCheck);
-                try
-                {
-                    listener.Start();
-                    // As the LocalEndpoint is of type EndPoint, this doesn't have the port, we need to cast it to IPEndPoint
-                    var port = ((IPEndPoint) listener.LocalEndpoint).Port;
-                    Log.Info().WriteLine("Found free listener port {0} for the WebApp.", port);
-                    return port;
-                }
-                catch
-                {
-                    Log.Debug().WriteLine("Port {0} isn't free.", portToCheck);
-                }
-                finally
-                {
-                    listener.Stop();
-                }
+                return resultingPort;
             }
             var message = $"No free ports in the range {possiblePorts} found!";
             Log.Warn().WriteLine(message);
             throw new NotSupportedException(message);
+        }
+
+        /// <summary>
+        /// Helper method to find an unused port
+        /// </summary>
+        /// <param name="portToCheck">0 for random, otherwise a specific</param>
+        /// <returns>The actual port, or -1 of there isn't a free port</returns>
+        private static int TryPort(int portToCheck)
+        {
+            var listener = new TcpListener(IPAddress.Loopback, portToCheck);
+            try
+            {
+                listener.Start();
+                // As the LocalEndpoint is of type EndPoint, this doesn't have the port, we need to cast it to IPEndPoint
+                var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+                Log.Info().WriteLine("Found free listener port {0} for the WebApp.", port);
+                return port;
+            }
+            catch
+            {
+                Log.Debug().WriteLine("Port {0} isn't free.", portToCheck);
+            }
+            finally
+            {
+                listener.Stop();
+            }
+            return -1;
         }
     }
 }

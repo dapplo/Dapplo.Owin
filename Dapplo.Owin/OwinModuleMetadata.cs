@@ -33,11 +33,11 @@ namespace Dapplo.Owin
 		/// <summary>
 		///     Here the order of the IOwinModule Initialize can be specified, starting with low values and ending with high.
 		/// </summary>
-		public int StartupOrder { get; set; } = 1;
+		public int StartupOrder { get; set; } = (int)OwinModuleStartupOrders.User;
 
 		/// <summary>
 		///     Here the order of the IOwinModule Deinitialize can be specified, starting with low values and ending with high.
 		/// </summary>
-		public int ShutdownOrder { get; set;  } = 1;
+		public int ShutdownOrder { get; set;  } = (int)OwinModuleStartupOrders.User;
 	}
 }

@@ -82,6 +82,10 @@ namespace Dapplo.Owin.Tests
             {
                 var owinServer = bootstrapper.GetExport<IOwinServer>().Value;
                 Assert.True(owinServer.IsListening, "Server not running!");
+
+                // Resetting the port to random
+                owinServer.OwinConfiguration.Port = 0;
+
                 // Test request, we need to build the url
                 var testUri = owinServer.ListeningOn.AppendSegments("Test");
 

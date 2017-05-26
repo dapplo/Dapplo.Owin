@@ -29,24 +29,27 @@ using Microsoft.Owin;
 
 namespace Dapplo.Owin.Tests.Owin
 {
-	/// <summary>
-	///     The "test" Middleware, it returns "Dapplo" for EVERY request
-	/// </summary>
-	public class TestMiddleware : OwinMiddleware
-	{
-		private static readonly LogSource Log = new LogSource();
+    /// <summary>
+    ///     The "test" Middleware, it returns "Dapplo" for EVERY request
+    /// </summary>
+    public class TestMiddleware : OwinMiddleware
+    {
+        private static readonly LogSource Log = new LogSource();
 
-		public TestMiddleware(OwinMiddleware next) : base(next)
-		{
-		}
+        public TestMiddleware(OwinMiddleware next) : base(next)
+        {
+        }
 
-		public override async Task Invoke(IOwinContext owinContext)
-		{
-			Log.Debug().WriteLine("Http method: {0}, path: {1}", owinContext.Request.Method, owinContext.Request.Path);
-			owinContext.Response.StatusCode = 200;
-			owinContext.Response.ContentType = "text/plain";
-			await owinContext.Response.WriteAsync("Dapplo");
-			await Next.Invoke(owinContext);
-		}
-	}
+        public override async Task Invoke(IOwinContext owinContext)
+        {
+            Log.Debug().WriteLine("Http method: {0}, path: {1}", owinContext.Request.Method, owinContext.Request.Path);
+
+            var user = owinContext.Authentication?.User;
+            Log.Debug().WriteLine("User: {0}", user?.Identity?.Name ?? "not available");
+            owinContext.Response.StatusCode = 200;
+            owinContext.Response.ContentType = "text/plain";
+            await owinContext.Response.WriteAsync("Dapplo");
+            await Next.Invoke(owinContext);
+        }
+    }
 }

@@ -21,8 +21,16 @@
 
 namespace Dapplo.SignalR.Tests.Hub
 {
+    /// <summary>
+    /// Interface for the server
+    /// </summary>
 	public interface ITestHubServer
 	{
-		void Test(string testString);
+        /// <summary>
+        /// Return a string when called
+        /// </summary>
+        /// <param name="testString">string</param>
+        /// <returns>string</returns>
+		string Hello(string testString);
 	}
 }

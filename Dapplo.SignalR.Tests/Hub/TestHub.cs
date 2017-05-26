@@ -37,15 +37,16 @@ namespace Dapplo.SignalR.Tests.Hub
 		[Import]
 		private IMyTestConfiguration MyTestConfiguration { get; set; }
 
-		/// <summary>
-		/// This method is offered as a service to the client and will share a context
-		/// </summary>
-		/// <param name="testString">some string to test with</param>
-		public void Test(string testString)
+	    /// <inheritdoc />
+	    public string Hello(string testString)
 		{
 			Assert.NotNull(MyTestConfiguration);
-			Log.Verbose().WriteLine("Teststring {0}", testString);
+		    var returnValue = $"Hello {testString}";
+
+            Log.Verbose().WriteLine(returnValue);
 			Clients.Others.TestCalled(testString);
+		    return returnValue;
+
 		}
 	}
 }

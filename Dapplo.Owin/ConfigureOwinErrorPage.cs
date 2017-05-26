@@ -27,7 +27,7 @@ namespace Dapplo.Owin
 	/// <summary>
 	///     An Owin Module which configures the error page
 	/// </summary>
-	[OwinModule(StartupOrder = int.MinValue + 3)]
+	[OwinModule(StartupOrder = (int)OwinModuleStartupOrders.Configuration)]
 	public class ConfigureOwinErrorPage : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();

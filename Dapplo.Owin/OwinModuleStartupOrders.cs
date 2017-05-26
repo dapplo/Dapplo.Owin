@@ -19,34 +19,28 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using Dapplo.Log;
-using Microsoft.Owin.Cors;
-using Owin;
-
 namespace Dapplo.Owin
 {
-	/// <summary>
-	///     An Owin Module which configures CORS
-	/// </summary>
-	[OwinModule(StartupOrder = (int)OwinModuleStartupOrders.Security)]
-	public class ConfigureOwinCors : BaseOwinModule
-	{
-		private static readonly LogSource Log = new LogSource();
-
-		/// <summary>
-		///     Configure CORS for Owin
-		/// </summary>
-		/// <param name="server">IOwinServer</param>
-		/// <param name="appBuilder">IAppBuilder</param>
-		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
-		{
-			Log.Verbose().WriteLine("Enabling Cors: {0}", server.OwinConfiguration.EnableCors);
-			if (!server.OwinConfiguration.EnableCors)
-			{
-				return;
-			}
-			// Enable CORS (allow cross domain requests)
-			appBuilder.UseCors(CorsOptions.AllowAll);
-		}
-	}
+    /// <summary>
+    /// An enum which assists in finding a location for the startup order of Owin modules
+    /// </summary>
+    public enum OwinModuleStartupOrders
+    {
+        /// <summary>
+        /// Security settings
+        /// </summary>
+        Security = 0,
+        /// <summary>
+        /// Configuration
+        /// </summary>
+        Configuration = 1000,
+        /// <summary>
+        /// Services like SignalR
+        /// </summary>
+        Services = 10000,
+        /// <summary>
+        /// From here user specific modules are started
+        /// </summary>
+        User = 100000
+    }
 }

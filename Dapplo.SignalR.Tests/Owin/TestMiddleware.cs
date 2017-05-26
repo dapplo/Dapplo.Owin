@@ -44,7 +44,10 @@ namespace Dapplo.SignalR.Tests.Owin
 		{
 			Log.Debug().WriteLine("Http method: {0}, path: {1}", owinContext.Request.Method, owinContext.Request.Path);
 			owinContext.Response.StatusCode = 200;
-			owinContext.Response.ContentType = "text/plain";
+
+            var user = owinContext.Authentication?.User;
+            Log.Debug().WriteLine("User: {0}", user?.Identity?.Name ?? "not available");
+            owinContext.Response.ContentType = "text/plain";
 			await owinContext.Response.WriteAsync("Dapplo");
 			await Next.Invoke(owinContext);
 		}

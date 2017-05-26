@@ -43,7 +43,7 @@ namespace Dapplo.SignalR.Owin
 	/// <summary>
 	///     SignalR generic OWIN configuration
 	/// </summary>
-	[OwinModule(StartupOrder = int.MaxValue)]
+	[OwinModule(StartupOrder = (int)OwinModuleStartupOrders.Services)]
 	public class ConfigureSignalROwinModule : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();

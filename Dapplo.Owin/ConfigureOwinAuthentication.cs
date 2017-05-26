@@ -28,7 +28,7 @@ namespace Dapplo.Owin
 	/// <summary>
 	///     An Owin Module which configures the Authentication
 	/// </summary>
-	[OwinModule(StartupOrder = int.MinValue)]
+	[OwinModule(StartupOrder = (int)OwinModuleStartupOrders.Security)]
 	public class ConfigureOwinAuthentication : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();

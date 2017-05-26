@@ -30,40 +30,47 @@ using Dapplo.Ini;
 
 namespace Dapplo.Owin.Configuration
 {
-	/// <summary>
-	///     The Owin configuration container, this can be stored with Dapplo.Config
-	/// </summary>
-	public interface IOwinConfiguration : IIniSubSection
-	{
-		/// <summary>
-		/// Hostname for Owin to accept request on, default is localhost
-		/// </summary>
-		[DefaultValue("localhost"), Description("Host for Owin to accept request on."), DataMember(EmitDefaultValue = true)]
-		string Hostname { get; set; }
+    /// <summary>
+    ///     The Owin configuration container, this can be stored with Dapplo.Config
+    /// </summary>
+    public interface IOwinConfiguration : IIniSubSection
+    {
+        /// <summary>
+        /// Schema for Owin to accept request on, e.g. http or https. Default is HTTP
+        /// There is no support for https yet, so this probably doesn't work out of the box.
+        /// </summary>
+        [DefaultValue("http"), Description("Schema for Owin to accept request on, e.g. http (default) or https. For https, there is no help with certificates (yet?)."), DataMember(EmitDefaultValue = true)]
+        string ListeningSchema { get; set; }
 
-		/// <summary>
-		/// Port for owin to accept requests on, default is a random nummber greater than 10800
-		/// </summary>
-		[DefaultValue(0), Description("Port for Owin to accept request on, default is first free after 10800."), DataMember(EmitDefaultValue = true)]
-		int Port { get; set; }
+        /// <summary>
+        /// Hostname for Owin to accept request on, default is localhost
+        /// </summary>
+        [DefaultValue("localhost"), Description("Host for Owin to accept request on."), DataMember(EmitDefaultValue = true)]
+        string Hostname { get; set; }
 
-		/// <summary>
-		/// Specify if an error page should be shown
-		/// </summary>
-		[Description("Show an error page when something happens"), DefaultValue(false), DataMember(EmitDefaultValue = true)]
-		bool UseErrorPage { get; set; }
+        /// <summary>
+        /// Port for owin to accept requests on, default is a random nummber greater than 10800
+        /// </summary>
+        [DefaultValue(0), Description("Port for Owin to accept request on, when this is 0 the first free port after 10800 is located."), DataMember(EmitDefaultValue = true)]
+        int Port { get; set; }
 
-		/// <summary>
-		/// Enable Cross Origin calls
-		/// </summary>
-		[Description("Set this to true to allow cross origin calls, this is needed when a site is not served by the owin server, but uses this.")]
-		[DefaultValue(true)]
-		bool EnableCors { get; set; }
+        /// <summary>
+        /// Specify if an error page should be shown
+        /// </summary>
+        [Description("Show an error page when something happens"), DefaultValue(false), DataMember(EmitDefaultValue = true)]
+        bool UseErrorPage { get; set; }
 
-		/// <summary>
-		/// Specify what AuthenticationScheme is used, default is none
-		/// </summary>
-		[Description("The Authentication scheme for Owin"), DefaultValue(AuthenticationSchemes.None), DataMember(EmitDefaultValue = true)]
-		AuthenticationSchemes AuthenticationScheme { get; set; }
-	}
+        /// <summary>
+        /// Enable Cross Origin calls
+        /// </summary>
+        [Description("Set this to true to allow cross origin calls, this is needed when a site is not served by the owin server, but uses this.")]
+        [DefaultValue(true)]
+        bool EnableCors { get; set; }
+
+        /// <summary>
+        /// Specify what AuthenticationScheme is used, default is none
+        /// </summary>
+        [Description("The Authentication scheme for Owin"), DefaultValue(AuthenticationSchemes.None), DataMember(EmitDefaultValue = true)]
+        AuthenticationSchemes AuthenticationScheme { get; set; }
+    }
 }

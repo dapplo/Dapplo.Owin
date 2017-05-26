@@ -29,38 +29,38 @@ using Dapplo.Addons;
 
 namespace Dapplo.Owin
 {
-	/// <summary>
-	///     Set this attribute on a class that implements Dapplo.Owin.IOwinConfigure have it called when Owin is started and
-	///     needs to be configured.
-	///     This attribute will make sure it's available via MEF (dependency injection)
-	/// </summary>
-	[MetadataAttribute, AttributeUsage(AttributeTargets.Class)]
-	public class OwinModuleAttribute : ModuleAttribute, IOwinModuleMetadata
-	{
-		/// <summary>
-		///     Default constructor calls the ModuleAttribute with the interface type so it can be imported accordingly
-		/// </summary>
-		public OwinModuleAttribute() : base(typeof (IOwinModule))
-		{
-		}
+    /// <summary>
+    ///     Set this attribute on a class that implements Dapplo.Owin.IOwinConfigure have it called when Owin is started and
+    ///     needs to be configured.
+    ///     This attribute will make sure it's available via MEF (dependency injection)
+    /// </summary>
+    [MetadataAttribute, AttributeUsage(AttributeTargets.Class)]
+    public class OwinModuleAttribute : ModuleAttribute, IOwinModuleMetadata
+    {
+        /// <summary>
+        ///     Default constructor calls the ModuleAttribute with the interface type so it can be imported accordingly
+        /// </summary>
+        public OwinModuleAttribute() : base(typeof (IOwinModule))
+        {
+        }
 
-		/// <summary>
-		///     Use a specific contract name for the IOwinConfigure
-		///     Calls the ModuleAttribute constructor with contractName and the interface type so it can be imported accordingly
-		/// </summary>
-		/// <param name="contractName"></param>
-		public OwinModuleAttribute(string contractName) : base(contractName, typeof (IOwinModule))
-		{
-		}
+        /// <summary>
+        ///     Use a specific contract name for the IOwinConfigure
+        ///     Calls the ModuleAttribute constructor with contractName and the interface type so it can be imported accordingly
+        /// </summary>
+        /// <param name="contractName"></param>
+        public OwinModuleAttribute(string contractName) : base(contractName, typeof (IOwinModule))
+        {
+        }
 
-		/// <summary>
-		///     Here the order of the IOwinModule Initialize can be specified, starting with low values and ending with high.
-		/// </summary>
-		public int StartupOrder { get; set; } = 1;
+        /// <summary>
+        ///     Here the order of the IOwinModule Initialize can be specified, starting with low values and ending with high.
+        /// </summary>
+        public int StartupOrder { get; set; } = (int)OwinModuleStartupOrders.User;
 
-		/// <summary>
-		///     Here the order of the IOwinModule Deinitialize can be specified, starting with low values and ending with high.
-		/// </summary>
-		public int ShutdownOrder { get; set;  } = 1;
-	}
+        /// <summary>
+        ///     Here the order of the IOwinModule Deinitialize can be specified, starting with low values and ending with high.
+        /// </summary>
+        public int ShutdownOrder { get; set;  } = (int)OwinModuleStartupOrders.User;
+    }
 }

@@ -115,6 +115,7 @@
     <Compile Include="BaseOwinModule.cs" />
     <Compile Include="OwinModuleMetadata.cs" />
     <Compile Include="OwinModuleAttribute.cs" />
+    <Compile Include="OwinModuleStartupOrders.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

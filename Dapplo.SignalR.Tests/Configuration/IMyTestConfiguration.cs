@@ -28,5 +28,6 @@ namespace Dapplo.SignalR.Tests.Configuration
 	[IniSection("Core")]
 	public interface IMyTestConfiguration : IIniSection, IOwinConfiguration, ISignalRConfiguration
 	{
+        
 	}
 }

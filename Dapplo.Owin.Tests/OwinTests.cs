@@ -21,6 +21,7 @@
 
 #region using
 
+using System.Net;
 using System.Net.Cache;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -50,10 +51,14 @@ namespace Dapplo.Owin.Tests
         [Fact]
         public async Task TestStartupWithoutBootstrapper()
         {
-            var owinConfiguration = new OwinConfiguration();
+            var owinConfiguration = new OwinConfiguration
+            {
+                AuthenticationScheme = AuthenticationSchemes.Negotiate
+            };
 
             var owinModule = new TestMiddlewareOwinModule();
-            var owinServer = new OwinServer(owinConfiguration, new[] { owinModule });
+            var configureOwinModule = new ConfigureOwinAuthentication();
+            var owinServer = new OwinServer(owinConfiguration, new IOwinModule[] { configureOwinModule, owinModule });
             await owinServer.StartAsync();
 
             // Test request, we need to build the url

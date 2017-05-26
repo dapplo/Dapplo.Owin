@@ -33,6 +33,9 @@ namespace Dapplo.Owin.Configuration
     public class OwinConfiguration : IOwinConfiguration
     {
         /// <inheritdoc />
+        public string ListeningSchema { get; set; } = "http";
+
+        /// <inheritdoc />
         public string Hostname { get; set; } = "localhost";
 
         /// <inheritdoc />
