@@ -27,26 +27,26 @@ using Microsoft.AspNet.SignalR;
 
 namespace Dapplo.SignalR.Tests.Hub
 {
-	/// <summary>
-	///     The share context hub
-	/// </summary>
-	public class TestHub : Hub<ITestHubClient>, ITestHubServer
-	{
-		private static readonly LogSource Log = new LogSource();
+    /// <summary>
+    ///     The share context hub
+    /// </summary>
+    public class TestHub : Hub<ITestHubClient>, ITestHubServer
+    {
+        private static readonly LogSource Log = new LogSource();
 
-		[Import]
-		private IMyTestConfiguration MyTestConfiguration { get; set; }
+        [Import]
+        private IMyTestConfiguration MyTestConfiguration { get; set; }
 
-	    /// <inheritdoc />
-	    public string Hello(string testString)
-		{
-			Assert.NotNull(MyTestConfiguration);
-		    var returnValue = $"Hello {testString}";
+        /// <inheritdoc />
+        public string Hello(TestType testValue)
+        {
+            Assert.NotNull(MyTestConfiguration);
+            var returnValue = $"Hello {testValue.Message}";
 
             Log.Verbose().WriteLine(returnValue);
-			Clients.Others.TestCalled(testString);
-		    return returnValue;
+            Clients.Others.TestCalled(testValue);
+            return returnValue;
 
-		}
-	}
+        }
+    }
 }

@@ -36,20 +36,20 @@
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapplo.Addons, Version=0.5.14.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapplo.Addons.0.5.14\lib\net45\Dapplo.Addons.dll</HintPath>
+    <Reference Include="Dapplo.Addons, Version=0.5.21.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapplo.Addons.0.5.21\lib\net45\Dapplo.Addons.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Dapplo.Addons.Bootstrapper, Version=0.5.14.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapplo.Addons.Bootstrapper.0.5.14\lib\net45\Dapplo.Addons.Bootstrapper.dll</HintPath>
+    <Reference Include="Dapplo.Addons.Bootstrapper, Version=0.5.21.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapplo.Addons.Bootstrapper.0.5.21\lib\net45\Dapplo.Addons.Bootstrapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Dapplo.HttpExtensions, Version=0.6.22.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapplo.HttpExtensions.0.6.22\lib\net46\Dapplo.HttpExtensions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Dapplo.Ini, Version=0.5.18.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapplo.Ini.0.5.18\lib\net45\Dapplo.Ini.dll</HintPath>
+    <Reference Include="Dapplo.Ini, Version=0.5.19.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapplo.Ini.0.5.19\lib\net45\Dapplo.Ini.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Dapplo.InterfaceImpl, Version=0.2.9.0, Culture=neutral, processorArchitecture=MSIL">

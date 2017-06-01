@@ -24,13 +24,13 @@ namespace Dapplo.SignalR.Tests.Hub
     /// <summary>
     /// Interface for the server
     /// </summary>
-	public interface ITestHubServer
-	{
+    public interface ITestHubServer
+    {
         /// <summary>
         /// Return a string when called
         /// </summary>
-        /// <param name="testString">string</param>
+        /// <param name="testValue">TestType</param>
         /// <returns>string</returns>
-		string Hello(string testString);
-	}
+        string Hello(TestType testValue);
+    }
 }

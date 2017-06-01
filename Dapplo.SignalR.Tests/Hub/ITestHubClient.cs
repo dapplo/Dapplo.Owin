@@ -23,6 +23,6 @@ namespace Dapplo.SignalR.Tests.Hub
 {
 	public interface ITestHubClient
 	{
-		void TestCalled(string testString);
+		void TestCalled(TestType testString);
 	}
 }

@@ -54,7 +54,7 @@ namespace Dapplo.SignalR.Utils
 		protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
 		{
 			var property = base.CreateProperty(member, memberSerialization);
-			if (typeof(IObservable<>).IsAssignableFrom(property.DeclaringType))
+			if (property.PropertyType.IsGenericType && typeof(IObservable<>).IsAssignableFrom(property.PropertyType.GetGenericTypeDefinition()))
 			{
 				property.ShouldSerialize = instance => false;
 			}

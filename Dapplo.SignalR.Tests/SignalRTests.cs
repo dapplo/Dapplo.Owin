@@ -99,8 +99,8 @@ namespace Dapplo.SignalR.Tests
                 IHubProxy testHubProxy = hubConnection.CreateHubProxy("TestHub");
                 await hubConnection.Start();
 
-                result = await testHubProxy.Invoke<string>("Hello", "World");
-                Assert.Equal("Hello World", result);
+                var signalrRresult = await testHubProxy.Invoke<string>("Hello", new TestType {Message = "World"});
+                Assert.Equal("Hello World", signalrRresult);
 
                 await owinServer.ShutdownAsync();
                 Assert.False(owinServer.IsListening, "Server still running!");
