@@ -40,69 +40,76 @@ using Owin;
 
 namespace Dapplo.SignalR.Owin
 {
-	/// <summary>
-	///     SignalR generic OWIN configuration
-	/// </summary>
-	[OwinModule(StartupOrder = (int)OwinModuleStartupOrders.Services)]
-	public class ConfigureSignalROwinModule : BaseOwinModule
-	{
-		private static readonly LogSource Log = new LogSource();
+    /// <summary>
+    ///     SignalR generic OWIN configuration
+    /// </summary>
+    [OwinModule(StartupOrder = (int)OwinModuleStartupOrders.Services)]
+    public class ConfigureSignalROwinModule : BaseOwinModule
+    {
+        private static readonly LogSource Log = new LogSource();
 
-		/// <summary>
-		/// The configuration for SignalR
-		/// </summary>
-		[Import]
-		protected ISignalRConfiguration SignalRConfiguration { get; set; }
+        /// <summary>
+        /// The configuration for SignalR
+        /// </summary>
+        [Import]
+        protected ISignalRConfiguration SignalRConfiguration { get; set; }
 
-		/// <summary>
-		/// The IHubActivator which overrides the DefaultHubActivator
-		/// </summary>
-		[Import]
-		protected IHubActivator HubActivator { get; set; }
+        /// <summary>
+        /// The IHubActivator which overrides the DefaultHubActivator
+        /// </summary>
+        [Import]
+        protected IHubActivator HubActivator { get; set; }
 
-		/// <summary>
-		///     Configure Owin for SignalR
-		/// </summary>
-		/// <param name="server"></param>
-		/// <param name="appBuilder"></param>
-		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
-		{
-			Log.Verbose().WriteLine("Activating SignalR, EnableJavaEnableJavaScriptProxies={0}, EnableDetailedErrors={1}, UseDummyPerformanceCounter={2}", SignalRConfiguration.EnableJavaEnableJavaScriptProxies, SignalRConfiguration.EnableDetailedErrors, SignalRConfiguration.UseDummyPerformanceCounter);
+        /// <summary>
+        ///     Configure Owin for SignalR
+        /// </summary>
+        /// <param name="server"></param>
+        /// <param name="appBuilder"></param>
+        public override void Configure(IOwinServer server, IAppBuilder appBuilder)
+        {
+            Log.Verbose().WriteLine("Activating SignalR, EnableJavaEnableJavaScriptProxies={0}, EnableDetailedErrors={1}, UseDummyPerformanceCounter={2}, UseErrorLogger={3}", SignalRConfiguration.EnableJavaEnableJavaScriptProxies, SignalRConfiguration.EnableDetailedErrors, SignalRConfiguration.UseDummyPerformanceCounter, SignalRConfiguration.UseErrorLogger);
 
-			// Needed to make sure we can start & stop it multiple times
-			GlobalHost.DependencyResolver = new DefaultDependencyResolver();
-			if (HubActivator != null)
-			{
-				Log.Verbose().WriteLine("Overriding the DefaultHubActivator");
-				// Register our own IHubActivator, so we can use dependency injection
-				GlobalHost.DependencyResolver.Register(typeof(IHubActivator), () => HubActivator);
-			}
+            // Needed to make sure we can start & stop it multiple times
+            GlobalHost.DependencyResolver = new DefaultDependencyResolver();
 
-			// Register a dummy IPerformanceCounterManager as a workaround
-			if (SignalRConfiguration.UseDummyPerformanceCounter)
-			{
-				GlobalHost.DependencyResolver.Register(typeof(IPerformanceCounterManager), () => new DummyPerformanceCounterManager());
-			}
+            // Activate error logger if this is enabled
+            if (SignalRConfiguration.UseErrorLogger)
+            {
+                GlobalHost.HubPipeline.AddModule(new ExceptionLoggerHubPipelineModule());
+            }
 
-			// Register the SignalRContractResolver, which solves camelCase issues
-			var settings = new JsonSerializerSettings
-			{
-				ContractResolver = new SignalRContractResolver()
-			};
-			var serializer = JsonSerializer.Create(settings);
-			GlobalHost.DependencyResolver.Register(typeof(JsonSerializer), () => serializer);
+            if (HubActivator != null)
+            {
+                Log.Verbose().WriteLine("Overriding the DefaultHubActivator");
+                // Register our own IHubActivator, so we can use dependency injection
+                GlobalHost.DependencyResolver.Register(typeof(IHubActivator), () => HubActivator);
+            }
 
-			// Add SignalR
-			var hubConfiguration = new HubConfiguration
-			{
-				EnableJavaScriptProxies = SignalRConfiguration.EnableJavaEnableJavaScriptProxies,
-				EnableDetailedErrors = SignalRConfiguration.EnableDetailedErrors,
-				Resolver = GlobalHost.DependencyResolver
-			};
-			appBuilder.Map("/signalr", map =>
-			{
-				map.RunSignalR(hubConfiguration);
-			});
-		}
-	}
+            // Register a dummy IPerformanceCounterManager as a workaround
+            if (SignalRConfiguration.UseDummyPerformanceCounter)
+            {
+                GlobalHost.DependencyResolver.Register(typeof(IPerformanceCounterManager), () => new DummyPerformanceCounterManager());
+            }
+
+            // Register the SignalRContractResolver, which solves camelCase issues
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = new SignalRContractResolver()
+            };
+            var serializer = JsonSerializer.Create(settings);
+            GlobalHost.DependencyResolver.Register(typeof(JsonSerializer), () => serializer);
+
+            // Add SignalR
+            var hubConfiguration = new HubConfiguration
+            {
+                EnableJavaScriptProxies = SignalRConfiguration.EnableJavaEnableJavaScriptProxies,
+                EnableDetailedErrors = SignalRConfiguration.EnableDetailedErrors,
+                Resolver = GlobalHost.DependencyResolver
+            };
+            appBuilder.Map("/signalr", map =>
+            {
+                map.RunSignalR(hubConfiguration);
+            });
+        }
+    }
 }
