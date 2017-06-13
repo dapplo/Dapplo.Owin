@@ -68,10 +68,10 @@ namespace Dapplo.SignalR.Configuration
         bool UseDummyPerformanceCounter { get; set; }
 
         /// <summary>
-        ///     Activate a HubPipelineModule to log errors
+        ///     Activate a HubPipelineModule to log exception
         /// </summary>
-        [Description("Is the HubPipelineModule to log errors enabled.")]
+        [Description("Enable an exception logger for SignalR hubs.")]
         [DefaultValue(true), DataMember(EmitDefaultValue = false)]
-        bool UseErrorLogger { get; set; }
+        bool EnableExceptionLogger { get; set; }
     }
 }

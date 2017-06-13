@@ -32,5 +32,10 @@ namespace Dapplo.SignalR.Tests.Hub
         /// <param name="testValue">TestType</param>
         /// <returns>string</returns>
         string Hello(TestType testValue);
+
+        /// <summary>
+        /// This just throws an exception.
+        /// </summary>
+        void CreateException();
     }
 }

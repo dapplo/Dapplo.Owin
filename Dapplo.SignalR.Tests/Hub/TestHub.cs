@@ -19,6 +19,7 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System;
 using Dapplo.Log;
 using System.ComponentModel.Composition;
 using Dapplo.SignalR.Tests.Configuration;
@@ -47,6 +48,11 @@ namespace Dapplo.SignalR.Tests.Hub
             Clients.Others.TestCalled(testValue);
             return returnValue;
 
+        }
+
+        public void CreateException()
+        {
+            throw new NotSupportedException("Doesn't do anything usefull, just throws.");
         }
     }
 }

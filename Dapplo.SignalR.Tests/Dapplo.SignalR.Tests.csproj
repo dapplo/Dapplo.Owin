@@ -190,6 +190,7 @@
     <Compile Include="Hub\ITestHubClient.cs" />
     <Compile Include="Hub\TestType.cs" />
     <Compile Include="Modules\OwinServerStartupShutdownAction.cs" />
+    <Compile Include="Owin\HubPipelineTestModule.cs" />
     <Compile Include="SignalRTests.cs" />
     <Compile Include="Owin\TestMiddlewareOwinModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

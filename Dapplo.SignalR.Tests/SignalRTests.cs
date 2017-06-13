@@ -99,6 +99,14 @@ namespace Dapplo.SignalR.Tests
                 IHubProxy testHubProxy = hubConnection.CreateHubProxy("TestHub");
                 await hubConnection.Start();
 
+                // Test HubPipelineModules
+                await Assert.ThrowsAsync<InvalidOperationException>(async () => await testHubProxy.Invoke<string>("CreateException"));
+
+                var hubPipelineTestModule = bootstrapper.GetExport<HubPipelineTestModule>().Value;
+                Assert.NotNull(hubPipelineTestModule.LatestException);
+                Assert.Equal(typeof(NotSupportedException),hubPipelineTestModule.LatestException.GetType());
+
+
                 var signalrRresult = await testHubProxy.Invoke<string>("Hello", new TestType {Message = "World"});
                 Assert.Equal("Hello World", signalrRresult);
 

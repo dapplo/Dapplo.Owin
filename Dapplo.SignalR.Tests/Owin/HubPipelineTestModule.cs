@@ -23,28 +23,26 @@
 
 #endregion
 
-using Dapplo.Log;
+using System;
+using System.ComponentModel.Composition;
 using Microsoft.AspNet.SignalR.Hubs;
 
-namespace Dapplo.SignalR.Utils
+namespace Dapplo.SignalR.Tests.Owin
 {
     /// <summary>
     /// This helps to track exceptions, without this they are simple lost (unless tracing is turned on)
     /// </summary>
-    public class ExceptionLoggerHubPipelineModule : HubPipelineModule
+    [Export(typeof(IHubPipelineModule))]
+    [Export]
+    public class HubPipelineTestModule : HubPipelineModule
     {
-        private static readonly LogSource Log = new LogSource();
+
+        public Exception LatestException { get; private set; }
 
         /// <inheritdoc />
         protected override void OnIncomingError(ExceptionContext exceptionContext, IHubIncomingInvokerContext invokerContext)
         {
-            var methodDescriptor = invokerContext.MethodDescriptor;
-
-            Log.Error().WriteLine(exceptionContext.Error, "{0}.{1}({2}) threw the following uncaught exception:",
-                methodDescriptor.Hub.Name,
-                methodDescriptor.Name,
-                string.Join(", ", invokerContext.Args));
-
+            LatestException = exceptionContext.Error;
             base.OnIncomingError(exceptionContext, invokerContext);
         }
     }

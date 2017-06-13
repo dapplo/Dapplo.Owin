@@ -25,7 +25,10 @@
 
 #region Usings
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Linq;
 using Dapplo.Log;
 using Dapplo.Owin;
 using Dapplo.SignalR.Configuration;
@@ -61,28 +64,52 @@ namespace Dapplo.SignalR.Owin
         protected IHubActivator HubActivator { get; set; }
 
         /// <summary>
+        /// The IHubActivator which overrides the DefaultHubActivator
+        /// </summary>
+        [ImportMany]
+        protected IEnumerable<Lazy<IHubPipelineModule, IOwinModuleMetadata>> HubPipelineModules { get; set; }
+
+        /// <summary>
         ///     Configure Owin for SignalR
         /// </summary>
         /// <param name="server"></param>
         /// <param name="appBuilder"></param>
         public override void Configure(IOwinServer server, IAppBuilder appBuilder)
         {
-            Log.Verbose().WriteLine("Activating SignalR, EnableJavaEnableJavaScriptProxies={0}, EnableDetailedErrors={1}, UseDummyPerformanceCounter={2}, UseErrorLogger={3}", SignalRConfiguration.EnableJavaEnableJavaScriptProxies, SignalRConfiguration.EnableDetailedErrors, SignalRConfiguration.UseDummyPerformanceCounter, SignalRConfiguration.UseErrorLogger);
+            Log.Verbose().WriteLine("Activating SignalR, EnableJavaEnableJavaScriptProxies={0}, EnableDetailedErrors={1}, UseDummyPerformanceCounter={2}, UseErrorLogger={3}", SignalRConfiguration.EnableJavaEnableJavaScriptProxies, SignalRConfiguration.EnableDetailedErrors, SignalRConfiguration.UseDummyPerformanceCounter, SignalRConfiguration.EnableExceptionLogger);
 
             // Needed to make sure we can start & stop it multiple times
             GlobalHost.DependencyResolver = new DefaultDependencyResolver();
-
-            // Activate error logger if this is enabled
-            if (SignalRConfiguration.UseErrorLogger)
-            {
-                GlobalHost.HubPipeline.AddModule(new ExceptionLoggerHubPipelineModule());
-            }
 
             if (HubActivator != null)
             {
                 Log.Verbose().WriteLine("Overriding the DefaultHubActivator");
                 // Register our own IHubActivator, so we can use dependency injection
                 GlobalHost.DependencyResolver.Register(typeof(IHubActivator), () => HubActivator);
+            }
+
+
+            // Register HubPipelineExceptionLoggerModule if error logger is enabled
+            if (SignalRConfiguration.EnableExceptionLogger)
+            {
+                Log.Info().WriteLine("Added PipelineModule HubPipelineExceptionLoggerModule.");
+                GlobalHost.HubPipeline.AddModule(new HubPipelineExceptionLoggerModule());
+            }
+
+            // Register pipeline modules
+            var hubPipelineModules = HubPipelineModules.OrderBy(export => export.Metadata.ShutdownOrder).Select(export => export.Value).Distinct().ToList();
+            if (!hubPipelineModules.Any())
+            {
+                Log.Info().WriteLine("No HubPipelineModule(s) to register.");
+            }
+            else
+            {
+                foreach (var hubPipelineModule in hubPipelineModules)
+                {
+                    Log.Verbose().WriteLine("Adding PipelineModule {0}.", hubPipelineModule.GetType());
+                    GlobalHost.HubPipeline.AddModule(hubPipelineModule);
+                }
+
             }
 
             // Register a dummy IPerformanceCounterManager as a workaround

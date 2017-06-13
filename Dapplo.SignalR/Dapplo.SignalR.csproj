@@ -94,7 +94,7 @@
   <ItemGroup>
     <Compile Include="Utils\CamelCaseContractResolver.cs" />
     <Compile Include="Utils\DummyPerformanceCounterManager.cs" />
-    <Compile Include="Utils\ExceptionLoggerHubPipelineModule.cs" />
+    <Compile Include="Utils\HubPipelineExceptionLoggerModule.cs" />
     <Compile Include="Utils\HubActivator.cs" />
     <Compile Include="Configuration\ISignalRConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
