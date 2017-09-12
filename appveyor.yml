@@ -16,14 +16,11 @@ assembly_info:
 environment:
   COVERALLS_REPO_TOKEN:
     secure: LTJUAbG51ZPCn02tphWKlD6lVpm6DOgW9LUYAoR0g6QpVKFRMSCMMgjZxWPXcaLs
-install:
-  - choco install gitlink -y
 before_build:
   - nuget restore
   - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:is_not_pr = "true"; }
 before_package:
   - ps: Remove-Item packages\OpenCover* -include ("*.pdb", "*.sln", "*.csproj") -recurse
-  - GitLink .\
 after_test: 
     - ps: .\CreateCoverage.ps1
 build:
