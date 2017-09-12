@@ -28,6 +28,7 @@
 using System;
 using System.ComponentModel.Composition;
 using Dapplo.Addons;
+using Dapplo.Log;
 using Microsoft.AspNet.SignalR.Hubs;
 
 #endregion
@@ -40,6 +41,8 @@ namespace Dapplo.SignalR.Utils
     [Export(typeof(IHubActivator))]
     public class HubActivator : IHubActivator
     {
+        private static readonly LogSource Log = new LogSource();
+
         [Import]
         private IMefServiceLocator MefServiceLocator { get; set; }
 
@@ -56,15 +59,16 @@ namespace Dapplo.SignalR.Utils
         /// <returns>IHub</returns>
         public IHub Create(HubDescriptor descriptor)
         {
-            // Have the base implementation create the hub
-            var hub = MefServiceLocator.GetExport(descriptor.HubType) as IHub;
-            if (hub != null)
+            // Use the Mef container to locate the hub
+            if (MefServiceLocator.GetExport(descriptor.HubType) is IHub hub)
             {
                 return hub;
             }
+            Log.Warn().WriteLine("Type {0} was not exported, will be instanciated via the type Activator.", descriptor.HubType);
             hub = Activator.CreateInstance(descriptor.HubType) as IHub;
             if (hub == null)
             {
+                Log.Warn().WriteLine("Type {0} could not be instanciated.", descriptor.HubType);
                 return null;
             }
             // Use the IServiceLocator to inject dependencies

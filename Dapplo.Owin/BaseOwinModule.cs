@@ -35,20 +35,17 @@ namespace Dapplo.Owin
 	public abstract class BaseOwinModule : IOwinModule
 	{
 		/// <summary>
-		/// A default implementation, which does nothing
+		/// This is a default implementation, which does nothing
 		/// </summary>
 		public virtual Task InitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			return Task.FromResult(true);
 		}
 
-		/// <summary>
-		/// Implement this to configure Owin
-		/// </summary>
-		/// <param name="server">IOwinServer</param>
-		/// <param name="appBuilder">IAppBuilder</param>
+		/// <inheritdoc />
 		public abstract void Configure(IOwinServer server, IAppBuilder appBuilder);
 
+		/// <inheritdoc />
 		/// <summary>
 		/// A default implementation, which does nothing
 		/// </summary>
