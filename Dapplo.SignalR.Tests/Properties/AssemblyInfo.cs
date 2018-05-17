@@ -7,9 +7,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Dapplo.SignalR.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("ING-DiBa AG")]
+[assembly: AssemblyCompany("Dapplo")]
 [assembly: AssemblyProduct("Dapplo.SignalR.Tests")]
-[assembly: AssemblyCopyright("Copyright © ING-DiBa AG 2017")]
+[assembly: AssemblyCopyright("Copyright © Dapplo 2016-2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

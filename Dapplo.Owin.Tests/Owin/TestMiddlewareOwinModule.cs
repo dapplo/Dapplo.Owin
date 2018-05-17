@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2017 Dapplo
+//  Copyright (C) 2015-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -21,17 +21,24 @@
 
 #region using
 
+using Dapplo.Addons;
 using Dapplo.Log;
+using Dapplo.Owin.Tests.Configuration;
 using Owin;
 
 #endregion
 
 namespace Dapplo.Owin.Tests.Owin
 {
-	[OwinModule]
-	public class TestMiddlewareOwinModule : BaseOwinModule
+	[ServiceOrder(OwinModuleStartupOrders.User)]
+    public class TestMiddlewareOwinModule : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
+
+		public TestMiddlewareOwinModule(IMyTestConfiguration myTestConfiguration)
+		{
+
+		}
 
 		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 		{

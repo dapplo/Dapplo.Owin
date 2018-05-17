@@ -1,7 +1,7 @@
 ﻿#region Dapplo License
 
 //  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2017 Dapplo
+//  Copyright (C) 2015-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -26,8 +26,7 @@
 #region Usings
 
 using System;
-using System.ComponentModel.Composition;
-using Dapplo.Addons;
+using Autofac;
 using Dapplo.Log;
 using Microsoft.AspNet.SignalR.Hubs;
 
@@ -38,19 +37,19 @@ namespace Dapplo.SignalR.Utils
     /// <summary>
     ///     This IHubActivator implementation uses the Dapplo.Addons to enable dependency injection
     /// </summary>
-    [Export(typeof(IHubActivator))]
     public class HubActivator : IHubActivator
     {
         private static readonly LogSource Log = new LogSource();
+        private readonly ILifetimeScope _lifetimeScope;
 
-        [Import]
-        private IMefServiceLocator MefServiceLocator { get; set; }
-
-        [Import]
-        private IDependencyProvider DependencyProvider { get; set; }
-
-        [Import]
-        private IServiceExporter ServiceExporter { get; set; }
+        /// <summary>
+        /// Default constructor for the HubActivator
+        /// </summary>
+        /// <param name="lifetimeScope">ILifetimeScope from Autofac</param>
+        public HubActivator(ILifetimeScope lifetimeScope)
+        {
+            _lifetimeScope = lifetimeScope;
+        }
 
         /// <summary>
         ///     Lookup or create a IHub and inject it.
@@ -59,9 +58,10 @@ namespace Dapplo.SignalR.Utils
         /// <returns>IHub</returns>
         public IHub Create(HubDescriptor descriptor)
         {
-            // Use the Mef container to locate the hub
-            if (MefServiceLocator.GetExport(descriptor.HubType) is IHub hub)
+            // Use the container to locate the hub
+            if (_lifetimeScope.TryResolve(descriptor.HubType, out var hubService) && hubService is IHub hub)
             {
+                Log.Verbose().WriteLine("Hub {0} was resolved.", descriptor.HubType);
                 return hub;
             }
             Log.Warn().WriteLine("Type {0} was not exported, will be instanciated via the type Activator.", descriptor.HubType);
@@ -71,10 +71,9 @@ namespace Dapplo.SignalR.Utils
                 Log.Warn().WriteLine("Type {0} could not be instanciated.", descriptor.HubType);
                 return null;
             }
-            // Use the IServiceLocator to inject dependencies
-            DependencyProvider.ProvideDependencies(hub);
-            // Use the IServiceExporter to export the hub
-            ServiceExporter.Export(descriptor.HubType, hub);
+
+            // Use the container to inject dependencies
+            _lifetimeScope.InjectProperties(hub);
             return hub;
         }
     }

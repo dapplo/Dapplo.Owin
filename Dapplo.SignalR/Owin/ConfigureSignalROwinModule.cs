@@ -1,7 +1,7 @@
 ﻿#region Dapplo License
 
 //  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2017 Dapplo
+//  Copyright (C) 2015-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -27,8 +27,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
+using Autofac;
+using Autofac.Integration.SignalR;
+using Dapplo.Addons;
 using Dapplo.Log;
 using Dapplo.Owin;
 using Dapplo.SignalR.Configuration;
@@ -46,28 +48,36 @@ namespace Dapplo.SignalR.Owin
     /// <summary>
     ///     SignalR generic OWIN configuration
     /// </summary>
-    [OwinModule(StartupOrder = (int)OwinModuleStartupOrders.Services)]
+    [ServiceOrder(OwinModuleStartupOrders.Services)]
     public class ConfigureSignalROwinModule : BaseOwinModule
     {
         private static readonly LogSource Log = new LogSource();
+        private readonly ILifetimeScope _lifetimeScope;
+        private readonly IHubActivator _hubActivator;
 
         /// <summary>
         /// The configuration for SignalR
         /// </summary>
-        [Import]
-        protected ISignalRConfiguration SignalRConfiguration { get; set; }
+        protected ISignalRConfiguration SignalRConfiguration { get; }
 
         /// <summary>
         /// The IHubActivator which overrides the DefaultHubActivator
         /// </summary>
-        [Import]
-        protected IHubActivator HubActivator { get; set; }
+        protected IEnumerable<Lazy<IHubPipelineModule, ServiceOrderAttribute>> HubPipelineModules { get; }
 
-        /// <summary>
-        /// The IHubActivator which overrides the DefaultHubActivator
-        /// </summary>
-        [ImportMany]
-        protected IEnumerable<Lazy<IHubPipelineModule, IOwinModuleMetadata>> HubPipelineModules { get; set; }
+        /// <inheritdoc />
+        public ConfigureSignalROwinModule(
+            ILifetimeScope lifetimeScope,
+            ISignalRConfiguration signalRConfiguration,
+            IEnumerable<Lazy<IHubPipelineModule, ServiceOrderAttribute>> hubPipelineModules,
+            IHubActivator hubActivator = null
+            )
+        {
+            _lifetimeScope = lifetimeScope;
+            _hubActivator = hubActivator;
+            SignalRConfiguration = signalRConfiguration;
+            HubPipelineModules = hubPipelineModules;
+        }
 
         /// <summary>
         ///     Configure Owin for SignalR
@@ -79,15 +89,14 @@ namespace Dapplo.SignalR.Owin
             Log.Verbose().WriteLine("Activating SignalR, EnableJavaEnableJavaScriptProxies={0}, EnableDetailedErrors={1}, UseDummyPerformanceCounter={2}, UseErrorLogger={3}", SignalRConfiguration.EnableJavaEnableJavaScriptProxies, SignalRConfiguration.EnableDetailedErrors, SignalRConfiguration.UseDummyPerformanceCounter, SignalRConfiguration.EnableExceptionLogger);
 
             // Needed to make sure we can start & stop it multiple times
-            GlobalHost.DependencyResolver = new DefaultDependencyResolver();
+            GlobalHost.DependencyResolver = new AutofacDependencyResolver(_lifetimeScope);
 
-            if (HubActivator != null)
+            if (_hubActivator != null)
             {
                 Log.Verbose().WriteLine("Overriding the DefaultHubActivator");
                 // Register our own IHubActivator, so we can use dependency injection
-                GlobalHost.DependencyResolver.Register(typeof(IHubActivator), () => HubActivator);
+                GlobalHost.DependencyResolver.Register(typeof(IHubActivator), () => _hubActivator);
             }
-
 
             // Register HubPipelineExceptionLoggerModule if error logger is enabled
             if (SignalRConfiguration.EnableExceptionLogger)
@@ -109,7 +118,6 @@ namespace Dapplo.SignalR.Owin
                     Log.Verbose().WriteLine("Adding PipelineModule {0}.", hubPipelineModule.GetType());
                     GlobalHost.HubPipeline.AddModule(hubPipelineModule);
                 }
-
             }
 
             // Register a dummy IPerformanceCounterManager as a workaround

@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2016-2017 Dapplo
+//  Copyright (C) 2015-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -19,45 +19,33 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
-using System.ComponentModel.Composition;
-using System.Threading;
-using System.Threading.Tasks;
 using Dapplo.Addons;
+using Dapplo.Log;
+using Owin;
 
-#endregion
-
-namespace Dapplo.Owin
+namespace Dapplo.Owin.OwinModules
 {
 	/// <summary>
-	/// Helper to start/stop the owin server, extend this class and add the
-	/// StartupAction / ShutdownAction attributues... and you are set.
+	///     An Owin Module which configures the error page
 	/// </summary>
-	public abstract class BaseOwinServerStartupShutdownAction : IAsyncStartupAction, IAsyncShutdownAction
+	[ServiceOrder(OwinModuleStartupOrders.Configuration)]
+	public class ConfigureOwinErrorPage : BaseOwinModule
 	{
-		/// <summary>
-		/// The IOwinServer
-		/// </summary>
-		[Import]
-		protected IOwinServer OwinServer { get; set; }
+		private static readonly LogSource Log = new LogSource();
 
 		/// <summary>
-		/// This starts Owin
+		///     Configure the error page for Owin
 		/// </summary>
-		/// <param name="token">CancellationToken</param>
-		public virtual Task StartAsync(CancellationToken token = new CancellationToken())
+		/// <param name="server">IOwinServer</param>
+		/// <param name="appBuilder">IAppBuilder</param>
+		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 		{
-			return OwinServer.StartAsync(token);
-		}
-
-		/// <summary>
-		/// This stops Owin
-		/// </summary>
-		/// <param name="token">CancellationToken</param>
-		public virtual Task ShutdownAsync(CancellationToken token = new CancellationToken())
-		{
-			return OwinServer.ShutdownAsync(token);
+			Log.Verbose().WriteLine("Enabling error page: {0}", server.OwinConfiguration.UseErrorPage);
+			if (!server.OwinConfiguration.UseErrorPage)
+			{
+				return;
+			}
+			appBuilder.UseErrorPage();
 		}
 	}
 }

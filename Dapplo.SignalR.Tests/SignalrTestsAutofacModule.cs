@@ -19,23 +19,42 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-namespace Dapplo.SignalR.Tests.Hub
+using Autofac;
+using Dapplo.Addons;
+using Dapplo.Owin;
+using Dapplo.SignalR.Tests.Hub;
+using Dapplo.SignalR.Tests.Owin;
+using Microsoft.AspNet.SignalR.Hubs;
+
+namespace Dapplo.SignalR.Tests
 {
     /// <summary>
-    /// Interface for the server
+    /// Configure Autofac builder for the tests
     /// </summary>
-    public interface ITestHubServer
+    public class SignalrTestsAutofacModule : Module
     {
-        /// <summary>
-        /// Return a string when called
-        /// </summary>
-        /// <param name="testValue">TestType</param>
-        /// <returns>string</returns>
-        string Hello(TestType testValue);
+        protected override void Load(ContainerBuilder builder)
+        {
+            builder
+                .RegisterType<OwinService>()
+                .As<IService>()
+                .SingleInstance();
 
-        /// <summary>
-        /// This just throws an exception.
-        /// </summary>
-        void CreateException();
+            builder
+                .RegisterType<TestHub>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder
+                .RegisterType<HubPipelineTestModule>()
+                .As<IHubPipelineModule>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder
+                .RegisterType<TestMiddlewareOwinModule>()
+                .As<IOwinModule>()
+                .SingleInstance();
+        }
     }
 }

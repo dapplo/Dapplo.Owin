@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2017 Dapplo
+//  Copyright (C) 2015-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -21,6 +21,8 @@
 
 #region using
 
+using System.IO;
+using Dapplo.Addons;
 using Dapplo.Log;
 using Dapplo.Owin;
 using Owin;
@@ -29,8 +31,9 @@ using Owin;
 
 namespace Dapplo.SignalR.Tests.Owin
 {
-	[OwinModule]
-	public class TestMiddlewareOwinModule : BaseOwinModule
+    /// <inheritdoc />
+    [ServiceOrder(OwinModuleStartupOrders.User)]
+    public class TestMiddlewareOwinModule : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
 
@@ -38,6 +41,6 @@ namespace Dapplo.SignalR.Tests.Owin
 		{
 			Log.Debug().WriteLine("Configuring test middleware in the Owin pipeline");
 			appBuilder.Use(typeof (TestMiddleware));
-		}
+        }
 	}
 }

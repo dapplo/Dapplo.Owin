@@ -23,23 +23,30 @@
 
 #endregion
 
-using System;
+using Autofac;
+using Dapplo.Owin;
+using Dapplo.SignalR.Owin;
+using Dapplo.SignalR.Utils;
 using Microsoft.AspNet.SignalR.Hubs;
 
-namespace Dapplo.SignalR.Tests.Owin
+namespace Dapplo.SignalR
 {
     /// <summary>
-    /// This helps to track exceptions, without this they are simple lost (unless tracing is turned on)
+    /// Adds an IOwinModule to configure SignalR to Autofac
     /// </summary>
-    public class HubPipelineTestModule : HubPipelineModule
+    public class SignalrAutofacModule : Module
     {
-        public Exception LatestException { get; private set; }
-
         /// <inheritdoc />
-        protected override void OnIncomingError(ExceptionContext exceptionContext, IHubIncomingInvokerContext invokerContext)
+        protected override void Load(ContainerBuilder builder)
         {
-            LatestException = exceptionContext.Error;
-            base.OnIncomingError(exceptionContext, invokerContext);
+            builder
+                .RegisterType<ConfigureSignalROwinModule>()
+                .As<IOwinModule>()
+                .SingleInstance();
+            builder
+                .RegisterType<HubActivator>()
+                .As<IHubActivator>()
+                .SingleInstance();
         }
     }
 }

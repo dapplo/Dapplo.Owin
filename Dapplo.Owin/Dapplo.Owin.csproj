@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\GitLink.3.1.0\build\GitLink.props" Condition="Exists('..\packages\GitLink.3.1.0\build\GitLink.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -37,14 +36,26 @@
     <DocumentationFile>bin\Release\Dapplo.Owin.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=4.8.1.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.8.1\lib\net45\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Extras.AttributeMetadata, Version=4.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.Extras.AttributeMetadata.4.0.1\lib\net45\Autofac.Extras.AttributeMetadata.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Integration.Mef, Version=4.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.Mef.4.0.0\lib\net45\Autofac.Integration.Mef.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Integration.Owin, Version=4.2.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.Owin.4.2.0\lib\net45\Autofac.Integration.Owin.dll</HintPath>
+    </Reference>
     <Reference Include="CommonServiceLocator, Version=2.0.3.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.2.0.3\lib\net45\CommonServiceLocator.dll</HintPath>
     </Reference>
-    <Reference Include="Dapplo.Addons, Version=0.5.55.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapplo.Addons.0.5.55\lib\net45\Dapplo.Addons.dll</HintPath>
+    <Reference Include="Dapplo.Addons, Version=1.0.32.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapplo.Addons.1.0.32-beta\lib\net45\Dapplo.Addons.dll</HintPath>
     </Reference>
-    <Reference Include="Dapplo.Ini, Version=0.5.24.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dapplo.Ini.0.5.24\lib\net45\Dapplo.Ini.dll</HintPath>
+    <Reference Include="Dapplo.Ini, Version=0.5.27.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapplo.Ini.0.5.27\lib\net45\Dapplo.Ini.dll</HintPath>
     </Reference>
     <Reference Include="Dapplo.InterfaceImpl, Version=0.2.12.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapplo.InterfaceImpl.0.2.12\lib\net45\Dapplo.InterfaceImpl.dll</HintPath>
@@ -80,40 +91,32 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Web.Cors, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.4\lib\net45\System.Web.Cors.dll</HintPath>
+    <Reference Include="System.Web.Cors, Version=5.2.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.6\lib\net45\System.Web.Cors.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\OwinConfiguration.cs" />
-    <Compile Include="ConfigureOwinCors.cs" />
-    <Compile Include="ConfigureOwinErrorPage.cs" />
-    <Compile Include="ConfigureOwinAuthentication.cs" />
+    <Compile Include="OwinModules\ConfigureOwinAutofac.cs" />
+    <Compile Include="OwinModules\ConfigureOwinCors.cs" />
+    <Compile Include="OwinModules\ConfigureOwinErrorPage.cs" />
+    <Compile Include="OwinModules\ConfigureOwinAuthentication.cs" />
     <Compile Include="IOwinServer.cs" />
     <Compile Include="IOwinModule.cs" />
-    <Compile Include="IOwinModuleMetadata.cs" />
     <Compile Include="Implementation\OwinServer.cs" />
     <Compile Include="Configuration\IOwinConfiguration.cs" />
-    <Compile Include="BaseOwinServerStartupShutdownAction.cs" />
+    <Compile Include="OwinService.cs" />
     <Compile Include="BaseOwinModule.cs" />
-    <Compile Include="OwinModuleMetadata.cs" />
-    <Compile Include="OwinModuleAttribute.cs" />
     <Compile Include="OwinModuleStartupOrders.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="OwinAutofacModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\GitLink.3.1.0\build\GitLink.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitLink.3.1.0\build\GitLink.props'))" />
-    <Error Condition="!Exists('..\packages\GitLink.3.1.0\build\GitLink.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitLink.3.1.0\build\GitLink.targets'))" />
-  </Target>
-  <Import Project="..\packages\GitLink.3.1.0\build\GitLink.targets" Condition="Exists('..\packages\GitLink.3.1.0\build\GitLink.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2017 Dapplo
+//  Copyright (C) 2016-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -21,23 +21,47 @@
 
 #region using
 
+using System.Threading;
+using System.Threading.Tasks;
+using Dapplo.Addons;
+
 #endregion
 
 namespace Dapplo.Owin
 {
-	/// <summary>
-	/// Meta data for OwinModules, this is for when MEF isn't used.
-	/// </summary>
-	public class OwinModuleMetadata : IOwinModuleMetadata
-	{
+    /// <summary>
+    /// Basic service implementation to start/stop the owin server, register this with Autofac as  Dapplo.Addons.IService
+    /// Or extend to bring your own...
+    /// </summary>
+    public class OwinService : IStartupAsync, IShutdownAsync
+    {
 		/// <summary>
-		///     Here the order of the IOwinModule Initialize can be specified, starting with low values and ending with high.
+		/// The IOwinServer
 		/// </summary>
-		public int StartupOrder { get; set; } = (int)OwinModuleStartupOrders.User;
+		protected IOwinServer OwinServer { get;}
+
+	    /// <inheritdoc />
+	    public OwinService(IOwinServer owinServer)
+	    {
+		    OwinServer = owinServer;
+	    }
 
 		/// <summary>
-		///     Here the order of the IOwinModule Deinitialize can be specified, starting with low values and ending with high.
+		/// This starts Owin
 		/// </summary>
-		public int ShutdownOrder { get; set;  } = (int)OwinModuleStartupOrders.User;
+		/// <param name="token">CancellationToken</param>
+		public virtual Task StartAsync(CancellationToken token = new CancellationToken())
+		{
+			return OwinServer.StartAsync(token);
+		}
+
+		/// <summary>
+		/// This stops Owin
+		/// </summary>
+		/// <param name="token">CancellationToken</param>
+		public virtual Task ShutdownAsync(CancellationToken token = new CancellationToken())
+		{
+			return OwinServer.ShutdownAsync(token);
+		}
 	}
 }

@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2017 Dapplo
+//  Copyright (C) 2015-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -21,7 +21,6 @@
 
 using System;
 using Dapplo.Log;
-using System.ComponentModel.Composition;
 using Dapplo.SignalR.Tests.Configuration;
 using Xunit;
 using Microsoft.AspNet.SignalR;
@@ -35,13 +34,17 @@ namespace Dapplo.SignalR.Tests.Hub
     {
         private static readonly LogSource Log = new LogSource();
 
-        [Import]
-        private IMyTestConfiguration MyTestConfiguration { get; set; }
+        private readonly IMyTestConfiguration _myTestConfiguration;
+
+        public TestHub(IMyTestConfiguration myTestConfiguration)
+        {
+            _myTestConfiguration = myTestConfiguration;
+        }
 
         /// <inheritdoc />
         public string Hello(TestType testValue)
         {
-            Assert.NotNull(MyTestConfiguration);
+            Assert.NotNull(_myTestConfiguration);
             var returnValue = $"Hello {testValue.Message}";
 
             Log.Verbose().WriteLine(returnValue);

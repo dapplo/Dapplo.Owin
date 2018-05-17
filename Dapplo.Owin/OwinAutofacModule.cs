@@ -23,23 +23,40 @@
 
 #endregion
 
-using System;
-using Microsoft.AspNet.SignalR.Hubs;
+using Autofac;
+using Dapplo.Owin.Implementation;
+using Dapplo.Owin.OwinModules;
 
-namespace Dapplo.SignalR.Tests.Owin
+namespace Dapplo.Owin
 {
     /// <summary>
-    /// This helps to track exceptions, without this they are simple lost (unless tracing is turned on)
+    /// Adds an IOwinModule to configure Owin in Autofac
     /// </summary>
-    public class HubPipelineTestModule : HubPipelineModule
+    public class OwinAutofacModule : Module
     {
-        public Exception LatestException { get; private set; }
-
         /// <inheritdoc />
-        protected override void OnIncomingError(ExceptionContext exceptionContext, IHubIncomingInvokerContext invokerContext)
+        protected override void Load(ContainerBuilder builder)
         {
-            LatestException = exceptionContext.Error;
-            base.OnIncomingError(exceptionContext, invokerContext);
+            builder
+                .RegisterType<OwinServer>()
+                .As<IOwinServer>()
+                .SingleInstance();
+            builder
+                .RegisterType<ConfigureOwinAuthentication>()
+                .As<IOwinModule>()
+                .SingleInstance();
+            builder
+                .RegisterType<ConfigureOwinAutofac>()
+                .As<IOwinModule>()
+                .SingleInstance();
+            builder
+                .RegisterType<ConfigureOwinCors>()
+                .As<IOwinModule>()
+                .SingleInstance();
+            builder
+                .RegisterType<ConfigureOwinErrorPage>()
+                .As<IOwinModule>()
+                .SingleInstance();
         }
     }
 }

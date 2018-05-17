@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2017 Dapplo
+//  Copyright (C) 2015-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -23,12 +23,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Dapplo.Addons;
 using Dapplo.Log;
 using Dapplo.Owin.Configuration;
 using Microsoft.Owin.Hosting;
@@ -41,7 +41,6 @@ namespace Dapplo.Owin.Implementation
     ///     This class will can start an Owin server.
     ///  as a Startup-Action and will shut it down when the shutdown action is called.
     /// </summary>
-    [Export(typeof(IOwinServer))]
     // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
     public class OwinServer : IOwinServer
     {
@@ -56,7 +55,7 @@ namespace Dapplo.Owin.Implementation
         /// <summary>
         /// The injected list of Owin modules
         /// </summary>
-        protected IEnumerable<Lazy<IOwinModule, IOwinModuleMetadata>> OwinModules
+        protected IEnumerable<Lazy<IOwinModule, ServiceOrderAttribute>> OwinModules
         {
             get;
         }
@@ -66,22 +65,21 @@ namespace Dapplo.Owin.Implementation
         /// </summary>
         /// <param name="owinConfiguration">IOwinConfiguration with the hostname and port to listen on, and some other parameters</param>
         /// <param name="owinModules">IEnumerable of Lazy IOwinModule and IOwinModuleMetadata</param>
-        [ImportingConstructor]
         public OwinServer(
             IOwinConfiguration owinConfiguration,
-            [ImportMany]
-            IEnumerable<Lazy<IOwinModule, IOwinModuleMetadata>> owinModules)
+            IEnumerable<Lazy<IOwinModule, ServiceOrderAttribute>> owinModules
+            )
         {
             OwinConfiguration = owinConfiguration;
             OwinModules = owinModules;
         }
 
         /// <summary>
-        /// Create an Owin Server
+        /// Create an Owin Server for tests
         /// </summary>
         /// <param name="owinConfiguration">IOwinConfiguration with the hostname and port to listen on, and some other parameters</param>
         /// <param name="owinModules">IEnumerable IOwinModule</param>
-        public OwinServer(
+        internal OwinServer(
             IOwinConfiguration owinConfiguration,
             IEnumerable<IOwinModule> owinModules)
         {
@@ -90,7 +88,7 @@ namespace Dapplo.Owin.Implementation
             var modules = owinModules.ToList();
             int shutdownIndex = modules.Count;
 
-            OwinModules = modules.Select(module => new Lazy<IOwinModule, IOwinModuleMetadata>(() => module, new OwinModuleMetadata
+            OwinModules = modules.Select(module => new Lazy<IOwinModule, ServiceOrderAttribute>(() => module, new ServiceOrderAttribute
             {
                 StartupOrder = startupIndex++,
                 ShutdownOrder = shutdownIndex--

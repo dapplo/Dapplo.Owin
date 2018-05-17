@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2017 Dapplo
+//  Copyright (C) 2015-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -19,34 +19,29 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-using Dapplo.Log;
-using Microsoft.Owin.Cors;
-using Owin;
+using Autofac;
+using Dapplo.Addons;
+using Dapplo.Owin.Tests.Owin;
 
-namespace Dapplo.Owin
+namespace Dapplo.Owin.Tests
 {
-	/// <summary>
-	///     An Owin Module which configures CORS
-	/// </summary>
-	[OwinModule(StartupOrder = (int)OwinModuleStartupOrders.Security)]
-	public class ConfigureOwinCors : BaseOwinModule
-	{
-		private static readonly LogSource Log = new LogSource();
+    /// <summary>
+    /// Configure Autofac with OWIN for the test
+    /// </summary>
+    public class OwinAutofacModule : Module
+    {
+        /// <inheritdoc />
+        protected override void Load(ContainerBuilder builder)
+        {
+            builder
+                .RegisterType<OwinService>()
+                .As<IService>()
+                .SingleInstance();
 
-		/// <summary>
-		///     Configure CORS for Owin
-		/// </summary>
-		/// <param name="server">IOwinServer</param>
-		/// <param name="appBuilder">IAppBuilder</param>
-		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
-		{
-			Log.Verbose().WriteLine("Enabling Cors: {0}", server.OwinConfiguration.EnableCors);
-			if (!server.OwinConfiguration.EnableCors)
-			{
-				return;
-			}
-			// Enable CORS (allow cross domain requests)
-			appBuilder.UseCors(CorsOptions.AllowAll);
-		}
-	}
+            builder
+                .RegisterType<TestMiddlewareOwinModule>()
+                .As<IOwinModule>()
+                .SingleInstance();
+        }
+    }
 }

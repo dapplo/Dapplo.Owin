@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2017 Dapplo
+//  Copyright (C) 2015-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -32,6 +32,7 @@ using Xunit.Abstractions;
 using Dapplo.Log.XUnit;
 using Dapplo.Owin.Configuration;
 using Dapplo.Owin.Implementation;
+using Dapplo.Owin.OwinModules;
 using Dapplo.Owin.Tests.Owin;
 
 #endregion
@@ -56,7 +57,7 @@ namespace Dapplo.Owin.Tests
                 AuthenticationScheme = AuthenticationSchemes.Negotiate
             };
 
-            var owinModule = new TestMiddlewareOwinModule();
+            var owinModule = new TestMiddlewareOwinModule(null);
             var configureOwinModule = new ConfigureOwinAuthentication();
             var owinServer = new OwinServer(owinConfiguration, new IOwinModule[] { configureOwinModule, owinModule });
             await owinServer.StartAsync();

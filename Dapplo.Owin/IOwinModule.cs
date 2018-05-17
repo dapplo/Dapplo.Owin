@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2017 Dapplo
+//  Copyright (C) 2015-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -33,7 +33,7 @@ namespace Dapplo.Owin
 	/// <summary>
 	///     The IOwinStartup describes Owin modules that add functionality to an Owin server, like SignalR or a file-servers
 	/// </summary>
-	public interface IOwinModule : IModule
+	public interface IOwinModule
 	{
 		/// <summary>
 		/// If you need to initialize something, do it here

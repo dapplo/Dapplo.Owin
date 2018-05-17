@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2017 Dapplo
+//  Copyright (C) 2015-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -27,9 +27,13 @@ namespace Dapplo.Owin
     public enum OwinModuleStartupOrders
     {
         /// <summary>
+        /// Autofac
+        /// </summary>
+        Autofac = 0,
+        /// <summary>
         /// Security settings
         /// </summary>
-        Security = 0,
+        Security = 100,
         /// <summary>
         /// Configuration
         /// </summary>

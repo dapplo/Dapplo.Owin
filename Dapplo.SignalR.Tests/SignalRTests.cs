@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2017 Dapplo
+//  Copyright (C) 2015-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -25,9 +25,9 @@ using System;
 using System.Net.Cache;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Autofac;
 using Dapplo.Addons.Bootstrapper;
 using Dapplo.HttpExtensions;
-using Dapplo.Ini;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Owin;
@@ -37,7 +37,6 @@ using Dapplo.SignalR.Tests.Owin;
 using Microsoft.AspNet.SignalR.Client;
 using Xunit;
 using Xunit.Abstractions;
-using Nito.AsyncEx;
 
 #endregion
 
@@ -46,29 +45,6 @@ namespace Dapplo.SignalR.Tests
     public sealed class SignalRTests
     {
         private const string ApplicationName = "DapploSignalR";
-        private static readonly AsyncLazy<ApplicationBootstrapper> Bootstrapper = new AsyncLazy<ApplicationBootstrapper>(async () =>
-        {
-            var bootstrapper = new ApplicationBootstrapper(ApplicationName);
-
-            bootstrapper.Add(typeof(TestMiddlewareOwinModule));
-
-
-            // Normally one would add Dapplo.Owin and Dapplo.SignalR dlls somewhere in a components or addons directory.
-            // This would prevent to have a direct reference. Than use bootstrapper.AddScanDirectory to add this directory.
-            bootstrapper.FindAndLoadAssemblies("Dapplo*");
-
-            await bootstrapper.InitializeAsync();
-
-            // Make sure IniConfig can resolve and find IMyTestConfiguration
-            var iniConfig = new IniConfig(ApplicationName, ApplicationName);
-            // TODO: Find a solution where register is not needed?
-            await iniConfig.RegisterAndGetAsync<IMyTestConfiguration>();
-            bootstrapper.Export<IServiceProvider>(iniConfig);
-
-            // Start the composition
-            await bootstrapper.RunAsync();
-            return bootstrapper;
-        });
 
         public SignalRTests(ITestOutputHelper testOutputHelper)
         {
@@ -81,13 +57,26 @@ namespace Dapplo.SignalR.Tests
         [Fact]
         public async Task TestStartupAsync()
         {
-            using (var bootstrapper = await Bootstrapper)
+            using (var bootstrapper = new ApplicationBootstrapper(ApplicationName))
             {
-                var owinServer = bootstrapper.GetExport<IOwinServer>().Value;
-                Assert.True(owinServer.IsListening, "Server not running!");
 
-                // Resetting the port to random
-                owinServer.OwinConfiguration.Port = 0;
+                bootstrapper.Configure();
+
+                // Normally one would add Dapplo.Owin and Dapplo.SignalR dlls somewhere in a components or addons directory.
+                // This would prevent to have a direct reference. Than use bootstrapper.AddScanDirectory to add this directory.
+                bootstrapper.FindAndLoadAssemblies("Dapplo*");
+
+                // Startup the bootstrapper
+                await bootstrapper.InitializeAsync();
+
+                // Force mapping of IIniSubSection to IIniSection
+                var t = bootstrapper.Container.Resolve<IMyTestConfiguration>();
+
+                // Startup the services
+                await bootstrapper.StartupAsync();
+
+                var owinServer = bootstrapper.Container.Resolve<IOwinServer>();
+                Assert.True(owinServer.IsListening, "Server not running!");
 
                 // Test request, we need to build the url
                 var testUri = owinServer.ListeningOn.AppendSegments("Test");
@@ -95,14 +84,15 @@ namespace Dapplo.SignalR.Tests
                 var result = await testUri.GetAsAsync<string>();
                 Assert.Equal("Dapplo", result);
 
-                var hubConnection = new HubConnection(owinServer.ListeningOn.AbsoluteUri, true);
+                var uri = owinServer.ListeningOn.AbsoluteUri;
+                var hubConnection = new HubConnection(uri, true);
                 IHubProxy testHubProxy = hubConnection.CreateHubProxy("TestHub");
                 await hubConnection.Start();
 
                 // Test HubPipelineModules
                 await Assert.ThrowsAsync<InvalidOperationException>(async () => await testHubProxy.Invoke<string>("CreateException"));
 
-                var hubPipelineTestModule = bootstrapper.GetExport<HubPipelineTestModule>().Value;
+                var hubPipelineTestModule = bootstrapper.Container.Resolve<HubPipelineTestModule>();
                 Assert.NotNull(hubPipelineTestModule.LatestException);
                 Assert.Equal(typeof(NotSupportedException),hubPipelineTestModule.LatestException.GetType());
 

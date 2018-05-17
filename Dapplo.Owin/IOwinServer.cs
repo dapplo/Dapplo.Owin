@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2017 Dapplo
+//  Copyright (C) 2015-2018 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -33,7 +33,7 @@ namespace Dapplo.Owin
     ///     The IOwinServer is the public interface for the "server".
     ///     This is also available via the Dapplo.Addons IServiceLocator, and can be imported
     /// </summary>
-    public interface IOwinServer : IAsyncStartupAction, IAsyncShutdownAction
+    public interface IOwinServer : IStartupAsync, IShutdownAsync
     {
         /// <summary>
         /// The Owin Server configuration
