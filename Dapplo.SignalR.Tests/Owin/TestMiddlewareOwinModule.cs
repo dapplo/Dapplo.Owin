@@ -21,7 +21,6 @@
 
 #region using
 
-using System.IO;
 using Dapplo.Addons;
 using Dapplo.Log;
 using Dapplo.Owin;

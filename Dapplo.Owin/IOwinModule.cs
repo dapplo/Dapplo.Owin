@@ -23,7 +23,6 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Dapplo.Addons;
 using Owin;
 
 #endregion

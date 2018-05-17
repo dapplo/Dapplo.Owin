@@ -70,7 +70,7 @@ namespace Dapplo.SignalR.Tests
                 await bootstrapper.InitializeAsync();
 
                 // Force mapping of IIniSubSection to IIniSection
-                var t = bootstrapper.Container.Resolve<IMyTestConfiguration>();
+                bootstrapper.Container.Resolve<IMyTestConfiguration>();
 
                 // Startup the services
                 await bootstrapper.StartupAsync();

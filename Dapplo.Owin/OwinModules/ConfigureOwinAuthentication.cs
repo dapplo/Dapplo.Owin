@@ -47,7 +47,13 @@ namespace Dapplo.Owin.OwinModules
 			{
 				return;
 			}
-			var listener = (HttpListener)appBuilder.Properties[typeof(HttpListener).FullName];
+
+			var propertyName = typeof(HttpListener).FullName;
+			if (propertyName == null)
+			{
+				return;
+			}
+            var listener = (HttpListener)appBuilder.Properties[propertyName];
 			listener.AuthenticationSchemes = server.OwinConfiguration.AuthenticationScheme;
 		}
 	}

@@ -35,6 +35,7 @@ namespace Dapplo.Owin.Tests.Owin
 	{
 		private static readonly LogSource Log = new LogSource();
 
+		// ReSharper disable once UnusedParameter.Local
 		public TestMiddlewareOwinModule(IMyTestConfiguration myTestConfiguration)
 		{
 
