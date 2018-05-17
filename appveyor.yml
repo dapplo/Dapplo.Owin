@@ -1,4 +1,4 @@
-version: 0.1.{build}
+version: 0.2.{build}
 skip_tags: true
 os: Visual Studio 2017
 configuration: Release
@@ -8,12 +8,13 @@ test: off
 branches:
   only:
   - master
+  - /feature*/
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
   assembly_version: '{version}'
   assembly_file_version: '{version}'
-  assembly_informational_version: '{version}'
+  assembly_informational_version: '{version}-beta'
 environment:
   COVERALLS_REPO_TOKEN:
     secure: LTJUAbG51ZPCn02tphWKlD6lVpm6DOgW9LUYAoR0g6QpVKFRMSCMMgjZxWPXcaLs
