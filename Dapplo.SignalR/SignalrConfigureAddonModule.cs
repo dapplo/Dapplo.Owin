@@ -24,6 +24,7 @@
 #endregion
 
 using Autofac;
+using Dapplo.Addons;
 using Dapplo.Owin;
 using Dapplo.SignalR.Owin;
 using Dapplo.SignalR.Utils;
@@ -34,7 +35,7 @@ namespace Dapplo.SignalR
     /// <summary>
     /// Adds an IOwinModule to configure SignalR to Autofac
     /// </summary>
-    public class SignalrAutofacModule : Module
+    public class SignalrConfigureAddonModule : AddonModule
     {
         /// <inheritdoc />
         protected override void Load(ContainerBuilder builder)

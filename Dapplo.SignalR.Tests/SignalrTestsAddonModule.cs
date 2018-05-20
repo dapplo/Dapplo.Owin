@@ -21,21 +21,34 @@
 
 using Autofac;
 using Dapplo.Addons;
-using Dapplo.Owin.Tests.Owin;
+using Dapplo.Owin;
+using Dapplo.SignalR.Tests.Hub;
+using Dapplo.SignalR.Tests.Owin;
+using Microsoft.AspNet.SignalR.Hubs;
 
-namespace Dapplo.Owin.Tests
+namespace Dapplo.SignalR.Tests
 {
     /// <summary>
-    /// Configure Autofac with OWIN for the test
+    /// Configure Autofac builder for the tests
     /// </summary>
-    public class OwinAutofacModule : Module
+    public class SignalrTestsAddonModule : AddonModule
     {
-        /// <inheritdoc />
         protected override void Load(ContainerBuilder builder)
         {
             builder
                 .RegisterType<OwinService>()
                 .As<IService>()
+                .SingleInstance();
+
+            builder
+                .RegisterType<TestHub>()
+                .AsSelf()
+                .SingleInstance();
+
+            builder
+                .RegisterType<HubPipelineTestModule>()
+                .As<IHubPipelineModule>()
+                .AsSelf()
                 .SingleInstance();
 
             builder

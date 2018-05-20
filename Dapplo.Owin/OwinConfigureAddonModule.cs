@@ -24,6 +24,7 @@
 #endregion
 
 using Autofac;
+using Dapplo.Addons;
 using Dapplo.Owin.Implementation;
 using Dapplo.Owin.OwinModules;
 
@@ -32,7 +33,7 @@ namespace Dapplo.Owin
     /// <summary>
     /// Adds an IOwinModule to configure Owin in Autofac
     /// </summary>
-    public class OwinAutofacModule : Module
+    public class OwinConfigureAddonModule : AddonModule
     {
         /// <inheritdoc />
         protected override void Load(ContainerBuilder builder)
