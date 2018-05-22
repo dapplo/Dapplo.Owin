@@ -112,7 +112,7 @@ namespace Dapplo.Owin.Implementation
         public virtual async Task ShutdownAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             Log.Verbose().WriteLine("Stopping the Owin Server on {0}", ListeningOn);
-            var owinModules = OwinModules.OrderBy(export => export.Metadata.ShutdownOrder).Select(export => export.Value).Distinct().ToList();
+            var owinModules = OwinModules.OrderByDescending(export => export.Metadata.ShutdownOrder).Select(export => export.Value).Distinct().ToList();
             if (!owinModules.Any())
             {
                 Log.Info().WriteLine("No OwinModules to start.");
