@@ -8,31 +8,19 @@ test: off
 branches:
   only:
   - master
-  - /feature*/
-assembly_info:
-  patch: true
-  file: '**\AssemblyInfo.*'
-  assembly_version: '{version}'
-  assembly_file_version: '{version}'
-  assembly_informational_version: '{version}-beta'
+  - /feature.*/
 environment:
-  COVERALLS_REPO_TOKEN:
+  NuGetApiKey:
+    secure: xkDQ385+smLqdzhESsXBJvnUjK4FZ4Djjrqi9tFR29dwESIvPYOrQAqgri5Nf/fA
+  CoverallsRepoToken:
     secure: LTJUAbG51ZPCn02tphWKlD6lVpm6DOgW9LUYAoR0g6QpVKFRMSCMMgjZxWPXcaLs
-before_build:
-  - nuget restore
-  - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { $env:is_not_pr = "true"; }
-before_package:
-  - ps: Remove-Item packages\OpenCover* -include ("*.pdb", "*.sln", "*.csproj") -recurse
-after_test: 
-    - ps: .\CreateCoverage.ps1
-build:
-  project: Dapplo.Owin.sln
-  publish_nuget: true
-  publish_nuget_symbols: false
-  verbosity: minimal
+build_script:
+- ps: .\build.ps1 --settings_skipverification=true
 artifacts:
-- path: '*.nupkg'
-  name: NuGet package
+- path: artifacts\**\*.nupkg
+- path: artifacts\**\site.zip
+- path: artifacts\*.xml
+- path: artifacts\*.html
 notifications:
 - provider: Email
   to:
@@ -40,12 +28,9 @@ notifications:
   on_build_success: true
   on_build_failure: true
   on_build_status_changed: false
-deploy:
-- provider: NuGet
-  skip_symbols: true
-  api_key:
-    secure: 0+4uMr/wsyh8BisfHCwkDbaWwzmKNvvB2MwFz45/ePwbOMB6WT1AfhzujeddcN/2
-  on:
-    branch: master
-    is_not_pr: true
-    appveyor_repo_commit_message_extended: /\[release\]/
+- provider: GitHubPullRequest
+  auth_token:
+    secure: YDFCm4fj2pYoTR+QCKcR1Q==
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true

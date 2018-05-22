@@ -30,18 +30,30 @@ using Owin;
 
 namespace Dapplo.Owin.Tests.Owin
 {
+	/// <summary>
+    /// A simple Owin module
+    /// </summary>
 	[ServiceOrder(OwinModuleStartupOrders.User)]
     public class TestMiddlewareOwinModule : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
 
-		// ReSharper disable once UnusedParameter.Local
-		public TestMiddlewareOwinModule(IMyTestConfiguration myTestConfiguration)
+        /// <summary>
+        /// Constructor which can take dependencies
+        /// </summary>
+        /// <param name="myTestConfiguration">IMyTestConfiguration</param>
+        // ReSharper disable once UnusedParameter.Local
+        public TestMiddlewareOwinModule(IMyTestConfiguration myTestConfiguration)
 		{
 
 		}
 
-		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
+        /// <summary>
+        /// Configure the IAppBuilder
+        /// </summary>
+        /// <param name="server">IOwinServer</param>
+        /// <param name="appBuilder">IAppBuilder</param>
+        public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 		{
 			Log.Debug().WriteLine("Configuring test middleware in the Owin pipeline");
 			appBuilder.Use(typeof (TestMiddleware));
