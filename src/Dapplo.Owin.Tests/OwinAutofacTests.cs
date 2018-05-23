@@ -54,13 +54,15 @@ namespace Dapplo.Owin.Tests
         [Fact]
         public async Task TestStartupShutdownAsync()
         {
-            using (var bootstrapper = new ApplicationBootstrapper(ApplicationName))
+            var applicationConfig = ApplicationConfig.Create()
+                .WithApplicationName(ApplicationName)
+                // Normally one would add Dapplo.Owin and Dapplo.SignalR dlls somewhere in a components or addons directory.
+                // This would prevent to have a direct reference.
+                .WithAssemblyPatterns("Dapplo*");
+
+            using (var bootstrapper = new ApplicationBootstrapper(applicationConfig))
             {
                 bootstrapper.Configure();
-
-                // Normally one would add Dapplo.Owin and Dapplo.SignalR dlls somewhere in a components or addons directory.
-                // This would prevent to have a direct reference. Than use bootstrapper.AddScanDirectory to add this directory.
-                bootstrapper.FindAndLoadAssemblies("Dapplo*");
 
                 await bootstrapper.InitializeAsync();
 
