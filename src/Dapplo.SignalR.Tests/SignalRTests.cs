@@ -57,11 +57,13 @@ namespace Dapplo.SignalR.Tests
         [Fact]
         public async Task TestStartupAsync()
         {
-            var applicationConfig = ApplicationConfig.Create()
+            var applicationConfig = ApplicationConfigBuilder.
+                Create()
                 .WithApplicationName(ApplicationName)
                 // Normally one would add Dapplo.Owin and Dapplo.SignalR dlls somewhere in a components or addons directory.
                 // This would prevent to have a direct reference.
-                .WithAssemblyPatterns("Dapplo*");
+                .WithAssemblyPatterns("Dapplo*")
+                .BuildApplicationConfig();
 
             using (var bootstrapper = new ApplicationBootstrapper(applicationConfig))
             {
