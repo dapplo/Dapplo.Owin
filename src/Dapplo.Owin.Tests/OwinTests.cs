@@ -21,10 +21,13 @@
 
 #region using
 
+using System.Linq;
 using System.Net;
 using System.Net.Cache;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Autofac.Features.Metadata;
+using Dapplo.Addons;
 using Dapplo.HttpExtensions;
 using Dapplo.Log;
 using Xunit;
@@ -59,8 +62,11 @@ namespace Dapplo.Owin.Tests
 
             var owinModule = new TestMiddlewareOwinModule(null);
             var configureOwinModule = new ConfigureOwinAuthentication();
-            var owinServer = new OwinServer(owinConfiguration, new IOwinModule[] { configureOwinModule, owinModule });
-            await owinServer.StartAsync();
+
+            var testModules = new IOwinModule[] {configureOwinModule, owinModule}.Select(module =>
+                new Meta<IOwinModule, ServiceAttribute>(module, new ServiceAttribute(module.GetType().Name)));
+            var owinServer = new OwinServer(owinConfiguration, testModules);
+            await owinServer.StartupAsync();
 
             // Test request, we need to build the url
             var testUri = owinServer.ListeningOn.AppendSegments("Test");
@@ -76,7 +82,7 @@ namespace Dapplo.Owin.Tests
                 result = await testUri.GetAsAsync<string>();
             });
 
-            await owinServer.StartAsync();
+            await owinServer.StartupAsync();
             Assert.True(owinServer.IsListening, "Server not running!");
 
             await owinServer.ShutdownAsync();

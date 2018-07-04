@@ -26,11 +26,11 @@ using Owin;
 
 namespace Dapplo.Owin.OwinModules
 {
-	/// <summary>
-	///     An Owin Module which configures CORS
-	/// </summary>
-	[ServiceOrder(OwinModuleStartupOrders.Security)]
-	public class ConfigureOwinCors : BaseOwinModule
+    /// <summary>
+    ///     An Owin Module which configures CORS
+    /// </summary>
+    [Service(nameof(ConfigureOwinCors))]
+    public class ConfigureOwinCors : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
 

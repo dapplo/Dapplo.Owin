@@ -33,6 +33,7 @@ namespace Dapplo.Owin
     /// Basic service implementation to start/stop the owin server, register this with Autofac as  Dapplo.Addons.IService
     /// Or extend to bring your own...
     /// </summary>
+    [Service(nameof(OwinService))]
     public class OwinService : IStartupAsync, IShutdownAsync
     {
 		/// <summary>
@@ -50,9 +51,9 @@ namespace Dapplo.Owin
 		/// This starts Owin
 		/// </summary>
 		/// <param name="token">CancellationToken</param>
-		public virtual Task StartAsync(CancellationToken token = new CancellationToken())
+		public virtual Task StartupAsync(CancellationToken token = new CancellationToken())
 		{
-			return OwinServer.StartAsync(token);
+			return OwinServer.StartupAsync(token);
 		}
 
 		/// <summary>

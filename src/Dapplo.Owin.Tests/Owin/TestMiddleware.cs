@@ -48,8 +48,8 @@ namespace Dapplo.Owin.Tests.Owin
             Log.Debug().WriteLine("User: {0}", user?.Identity?.Name ?? "not available");
             owinContext.Response.StatusCode = 200;
             owinContext.Response.ContentType = "text/plain";
-            await owinContext.Response.WriteAsync("Dapplo");
-            await Next.Invoke(owinContext);
+            await owinContext.Response.WriteAsync("Dapplo").ConfigureAwait(false);
+            await Next.Invoke(owinContext).ConfigureAwait(false);
         }
     }
 }

@@ -25,11 +25,11 @@ using Owin;
 
 namespace Dapplo.Owin.OwinModules
 {
-	/// <summary>
-	///     An Owin Module which configures Autofac
-	/// </summary>
-	[ServiceOrder(OwinModuleStartupOrders.Autofac)]
-	public class ConfigureOwinAutofac : BaseOwinModule
+    /// <summary>
+    ///     An Owin Module which configures Autofac
+    /// </summary>
+    [Service(nameof(ConfigureOwinAutofac))]
+    public class ConfigureOwinAutofac : BaseOwinModule
 	{
 		private readonly ILifetimeScope _lifetimeScope;
 

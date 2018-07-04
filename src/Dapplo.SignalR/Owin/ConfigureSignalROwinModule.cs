@@ -25,9 +25,7 @@
 
 #region Usings
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Autofac;
 using Autofac.Integration.SignalR;
 using Dapplo.Addons;
@@ -48,11 +46,12 @@ namespace Dapplo.SignalR.Owin
     /// <summary>
     ///     SignalR generic OWIN configuration
     /// </summary>
-    [ServiceOrder(OwinModuleStartupOrders.Services)]
+    [Service(nameof(ConfigureSignalROwinModule))]
     public class ConfigureSignalROwinModule : BaseOwinModule
     {
         private static readonly LogSource Log = new LogSource();
         private readonly ILifetimeScope _lifetimeScope;
+        private readonly IEnumerable<IHubPipelineModule> _hubPipelineModules;
         private readonly IHubActivator _hubActivator;
 
         /// <summary>
@@ -60,23 +59,17 @@ namespace Dapplo.SignalR.Owin
         /// </summary>
         protected ISignalRConfiguration SignalRConfiguration { get; }
 
-        /// <summary>
-        /// The IHubActivator which overrides the DefaultHubActivator
-        /// </summary>
-        protected IEnumerable<Lazy<IHubPipelineModule, ServiceOrderAttribute>> HubPipelineModules { get; }
-
         /// <inheritdoc />
         public ConfigureSignalROwinModule(
             ILifetimeScope lifetimeScope,
             ISignalRConfiguration signalRConfiguration,
-            IEnumerable<Lazy<IHubPipelineModule, ServiceOrderAttribute>> hubPipelineModules,
-            IHubActivator hubActivator = null
-            )
+            IEnumerable<IHubPipelineModule> hubPipelineModules,
+            IHubActivator hubActivator = null)
         {
             _lifetimeScope = lifetimeScope;
+            _hubPipelineModules = hubPipelineModules;
             _hubActivator = hubActivator;
             SignalRConfiguration = signalRConfiguration;
-            HubPipelineModules = hubPipelineModules;
         }
 
         /// <summary>
@@ -106,18 +99,10 @@ namespace Dapplo.SignalR.Owin
             }
 
             // Register pipeline modules
-            var hubPipelineModules = HubPipelineModules.OrderBy(export => export.Metadata.ShutdownOrder).Select(export => export.Value).Distinct().ToList();
-            if (!hubPipelineModules.Any())
+            foreach (var hubPipelineModule in _hubPipelineModules)
             {
-                Log.Info().WriteLine("No HubPipelineModule(s) to register.");
-            }
-            else
-            {
-                foreach (var hubPipelineModule in hubPipelineModules)
-                {
-                    Log.Verbose().WriteLine("Adding PipelineModule {0}.", hubPipelineModule.GetType());
-                    GlobalHost.HubPipeline.AddModule(hubPipelineModule);
-                }
+                Log.Verbose().WriteLine("Adding PipelineModule {0}.", hubPipelineModule.GetType());
+                GlobalHost.HubPipeline.AddModule(hubPipelineModule);
             }
 
             // Register a dummy IPerformanceCounterManager as a workaround

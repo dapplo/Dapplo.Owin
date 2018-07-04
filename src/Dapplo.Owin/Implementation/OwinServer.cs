@@ -28,10 +28,13 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac.Features.Metadata;
 using Dapplo.Addons;
+using Dapplo.Addons.Services;
 using Dapplo.Log;
 using Dapplo.Owin.Configuration;
 using Microsoft.Owin.Hosting;
+using Owin;
 
 #endregion
 
@@ -42,7 +45,7 @@ namespace Dapplo.Owin.Implementation
     ///  as a Startup-Action and will shut it down when the shutdown action is called.
     /// </summary>
     // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
-    public class OwinServer : IOwinServer
+    public class OwinServer : ServiceNodeContainer<IOwinModule>, IOwinServer
     {
         private static readonly LogSource Log = new LogSource();
         private IDisposable _webApp;
@@ -53,46 +56,16 @@ namespace Dapplo.Owin.Implementation
         public IOwinConfiguration OwinConfiguration { get; }
 
         /// <summary>
-        /// The injected list of Owin modules
-        /// </summary>
-        protected IEnumerable<Lazy<IOwinModule, ServiceOrderAttribute>> OwinModules
-        {
-            get;
-        }
-
-        /// <summary>
         /// Create an Owin Server
         /// </summary>
         /// <param name="owinConfiguration">IOwinConfiguration with the hostname and port to listen on, and some other parameters</param>
         /// <param name="owinModules">IEnumerable of Lazy IOwinModule and IOwinModuleMetadata</param>
         public OwinServer(
             IOwinConfiguration owinConfiguration,
-            IEnumerable<Lazy<IOwinModule, ServiceOrderAttribute>> owinModules
-            )
+            IEnumerable<Meta<IOwinModule, ServiceAttribute>> owinModules
+            ) : base(owinModules)
         {
             OwinConfiguration = owinConfiguration;
-            OwinModules = owinModules;
-        }
-
-        /// <summary>
-        /// Create an Owin Server for tests
-        /// </summary>
-        /// <param name="owinConfiguration">IOwinConfiguration with the hostname and port to listen on, and some other parameters</param>
-        /// <param name="owinModules">IEnumerable IOwinModule</param>
-        internal OwinServer(
-            IOwinConfiguration owinConfiguration,
-            IEnumerable<IOwinModule> owinModules)
-        {
-            OwinConfiguration = owinConfiguration;
-            int startupIndex = 0;
-            var modules = owinModules.ToList();
-            int shutdownIndex = modules.Count;
-
-            OwinModules = modules.Select(module => new Lazy<IOwinModule, ServiceOrderAttribute>(() => module, new ServiceOrderAttribute
-            {
-                StartupOrder = startupIndex++,
-                ShutdownOrder = shutdownIndex--
-            }));
         }
 
         /// <summary>
@@ -109,24 +82,16 @@ namespace Dapplo.Owin.Implementation
         ///     Stop the WebApp
         /// </summary>
         /// <param name="cancellationToken">CancellationToken</param>
-        public virtual async Task ShutdownAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task ShutdownAsync(CancellationToken cancellationToken = default)
         {
             Log.Verbose().WriteLine("Stopping the Owin Server on {0}", ListeningOn);
-            var owinModules = OwinModules.OrderByDescending(export => export.Metadata.ShutdownOrder).Select(export => export.Value).Distinct().ToList();
-            if (!owinModules.Any())
+            if (!ServiceNodes.Any())
             {
-                Log.Info().WriteLine("No OwinModules to start.");
+                Log.Info().WriteLine("No OwinModules to stop.");
                 return;
             }
-            foreach (var owinModule in owinModules)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    break;
-                }
-                Log.Debug().WriteLine("Stopping OwinModule {0}", owinModule.GetType());
-                await owinModule.DeinitializeAsync(this, cancellationToken).ConfigureAwait(false);
-            }
+
+            await DeinitializeModules(ServiceNodes.Values.Where(node => !node.HasDependencies), cancellationToken).ConfigureAwait(false);
             IsListening = false;
             _webApp?.Dispose();
             _webApp = null;
@@ -136,10 +101,9 @@ namespace Dapplo.Owin.Implementation
         ///     Start the WebApp
         /// </summary>
         /// <param name="cancellationToken">CancellationToken</param>
-        public virtual async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task StartupAsync(CancellationToken cancellationToken = default)
         {
-            var owinModules = OwinModules.OrderBy(export => export.Metadata.StartupOrder).Select(export => export.Value).Distinct().ToList();
-            if (!owinModules.Any())
+            if (!ServiceNodes.Any())
             {
                 Log.Info().WriteLine("No OwinModules to start.");
                 return;
@@ -156,26 +120,90 @@ namespace Dapplo.Owin.Implementation
             ListeningOn = new Uri($"{OwinConfiguration.ListeningSchema}://{OwinConfiguration.Hostname}:{portToUse}");
             Log.Info().WriteLine("Starting WebApp on {0}", ListeningOn.AbsoluteUri);
 
-            foreach (var owinModule in owinModules)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    break;
-                }
-                Log.Debug().WriteLine("Intializing OwinModule {0}", owinModule.GetType());
-                await owinModule.InitializeAsync(this, cancellationToken).ConfigureAwait(false);
-            }
+            var rootModules = ServiceNodes.Values.Where(serviceNode => !serviceNode.HasPrerequisites).ToList();
+            await InitializeModules(rootModules, cancellationToken).ConfigureAwait(false);
 
             _webApp = WebApp.Start(ListeningOn.AbsoluteUri, appBuilder =>
             {
                 Log.Verbose().WriteLine("Starting WebApp.");
-                foreach (var owinModule in owinModules)
-                {
-                    Log.Debug().WriteLine("configuring OwinModule {0}", owinModule.GetType());
-                    owinModule.Configure(this, appBuilder);
-                }
+                ConfigureModules(appBuilder, rootModules);
             });
             IsListening = true;
+        }
+
+        /// <summary>
+        /// Create a task for the InitializeAsync
+        /// </summary>
+        /// <param name="serviceNodes">IEnumerable with ServiceNode</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>Task</returns>
+        private Task InitializeModules(IEnumerable<ServiceNode<IOwinModule>> serviceNodes, CancellationToken cancellationToken = default)
+        {
+            var tasks = new List<Task>();
+            foreach (var serviceNode in serviceNodes)
+            {
+                Log.Debug().WriteLine("Initializing {0} ({1})", serviceNode.Details.Name, serviceNode.Service.GetType());
+
+                var initializeTask = Task.Run(() => serviceNode.Service.InitializeAsync(this, cancellationToken), cancellationToken);
+
+                if (serviceNode.Dependencies.Count > 0)
+                {
+                    // Recurse into InitializeModules
+                    initializeTask = initializeTask.ContinueWith(task => InitializeModules(serviceNode.Dependencies, cancellationToken), cancellationToken).Unwrap();
+                }
+                if (!serviceNode.Details.SkipAwait)
+                {
+                    tasks.Add(initializeTask);
+                }
+            }
+
+            return tasks.Count > 0 ? Task.WhenAll(tasks) : Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Create a task for the InitializeAsync
+        /// </summary>
+        /// <param name="serviceNodes">IEnumerable with ServiceNode</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>Task</returns>
+        private Task DeinitializeModules(IEnumerable<ServiceNode<IOwinModule>> serviceNodes, CancellationToken cancellationToken = default)
+        {
+            var tasks = new List<Task>();
+            foreach (var serviceNode in serviceNodes)
+            {
+                Log.Debug().WriteLine("Deinitializing {0} ({1})", serviceNode.Details.Name, serviceNode.Service.GetType());
+
+                var deinitializeTask = Task.Run(() => serviceNode.Service.DeinitializeAsync(this, cancellationToken), cancellationToken);
+
+                if (serviceNode.Prerequisites.Count > 0)
+                {
+                    // Recurse into DeinitializeModules
+                    deinitializeTask = deinitializeTask.ContinueWith(task => DeinitializeModules(serviceNode.Prerequisites, cancellationToken), cancellationToken).Unwrap();
+                }
+
+                if (!serviceNode.Details.SkipAwait)
+                {
+                    tasks.Add(deinitializeTask);
+                }
+            }
+
+            return tasks.Count > 0 ? Task.WhenAll(tasks) : Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Call Configure recursively
+        /// </summary>
+        /// <param name="appBuilder">IAppBuilder</param>
+        /// <param name="serviceNodes">IEnumerable with ServiceNode</param>
+        private void ConfigureModules(IAppBuilder appBuilder, IEnumerable<ServiceNode<IOwinModule>> serviceNodes)
+        {
+            foreach (var serviceNode in serviceNodes)
+            {
+                Log.Debug().WriteLine("Configuring {0} ({1})", serviceNode.Details.Name, serviceNode.Service.GetType());
+
+                serviceNode.Service.Configure(this, appBuilder);
+                ConfigureModules(appBuilder, serviceNode.Dependencies);
+            }
         }
 
         /// <summary>

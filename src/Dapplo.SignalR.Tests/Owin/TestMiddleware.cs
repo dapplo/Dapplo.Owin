@@ -48,8 +48,8 @@ namespace Dapplo.SignalR.Tests.Owin
             var user = owinContext.Authentication?.User;
             Log.Debug().WriteLine("User: {0}", user?.Identity?.Name ?? "not available");
             owinContext.Response.ContentType = "text/plain";
-			await owinContext.Response.WriteAsync("Dapplo");
-			await Next.Invoke(owinContext);
+			await owinContext.Response.WriteAsync("Dapplo").ConfigureAwait(false);
+			await Next.Invoke(owinContext).ConfigureAwait(false);
 		}
 	}
 }

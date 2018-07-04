@@ -93,7 +93,7 @@ namespace Dapplo.Owin.Tests
                     result = await testUri.GetAsAsync<string>();
                 });
 
-                await owinServer.StartAsync();
+                await owinServer.StartupAsync();
                 Assert.True(owinServer.IsListening, "Server not running!");
 
                 await owinServer.ShutdownAsync();

@@ -25,11 +25,11 @@ using Owin;
 
 namespace Dapplo.Owin.OwinModules
 {
-	/// <summary>
-	///     An Owin Module which configures the error page
-	/// </summary>
-	[ServiceOrder(OwinModuleStartupOrders.Configuration)]
-	public class ConfigureOwinErrorPage : BaseOwinModule
+    /// <summary>
+    ///     An Owin Module which configures the error page
+    /// </summary>
+    [Service(nameof(ConfigureOwinErrorPage))]
+    public class ConfigureOwinErrorPage : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
 

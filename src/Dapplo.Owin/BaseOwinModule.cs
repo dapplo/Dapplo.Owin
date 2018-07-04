@@ -37,7 +37,7 @@ namespace Dapplo.Owin
 		/// <summary>
 		/// This is a default implementation, which does nothing
 		/// </summary>
-		public virtual Task InitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken))
+		public virtual Task InitializeAsync(IOwinServer server, CancellationToken cancellationToken = default)
 		{
 			return Task.FromResult(true);
 		}
@@ -49,7 +49,7 @@ namespace Dapplo.Owin
 		/// <summary>
 		/// A default implementation, which does nothing
 		/// </summary>
-		public virtual Task DeinitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken))
+		public virtual Task DeinitializeAsync(IOwinServer server, CancellationToken cancellationToken = default)
 		{
 			return Task.FromResult(true);
 		}

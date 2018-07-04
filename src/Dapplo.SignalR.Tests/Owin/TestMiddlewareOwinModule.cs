@@ -31,7 +31,7 @@ using Owin;
 namespace Dapplo.SignalR.Tests.Owin
 {
     /// <inheritdoc />
-    [ServiceOrder(OwinModuleStartupOrders.User)]
+    [Service(nameof(TestMiddlewareOwinModule))]
     public class TestMiddlewareOwinModule : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
