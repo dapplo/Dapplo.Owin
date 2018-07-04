@@ -14,7 +14,7 @@ An example OwinModule
 	/// <summary>
     /// A simple Owin module
     /// </summary>
-	[ServiceOrder(OwinModuleStartupOrders.User)]
+	[Service(nameof(TestMiddlewareOwinModule))]
     public class TestMiddlewareOwinModule : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
