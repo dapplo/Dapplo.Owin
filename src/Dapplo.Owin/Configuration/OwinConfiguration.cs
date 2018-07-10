@@ -21,6 +21,7 @@
 
 #region using
 
+using System.Collections.Generic;
 using System.Net;
 
 #endregion
@@ -33,13 +34,7 @@ namespace Dapplo.Owin.Configuration
     public class OwinConfiguration : IOwinConfiguration
     {
         /// <inheritdoc />
-        public string ListeningSchema { get; set; } = "http";
-
-        /// <inheritdoc />
-        public string Hostname { get; set; } = "localhost";
-
-        /// <inheritdoc />
-        public int Port { get; set; }
+        public IList<string> ListeningUrls { get; set; } = new List<string>();
 
         /// <inheritdoc />
         public bool UseErrorPage { get; set; } = true;

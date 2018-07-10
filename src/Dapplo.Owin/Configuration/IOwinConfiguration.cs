@@ -21,6 +21,7 @@
 
 #region using
 
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.Serialization;
@@ -36,23 +37,10 @@ namespace Dapplo.Owin.Configuration
     public interface IOwinConfiguration : IIniSubSection
     {
         /// <summary>
-        /// Schema for Owin to accept request on, e.g. http or https. Default is HTTP
-        /// There is no support for https yet, so this probably doesn't work out of the box.
+        /// Passed to the startoptions of the Owin webapp as urls to listen on
         /// </summary>
-        [DefaultValue("http"), Description("Schema for Owin to accept request on, e.g. http (default) or https. For https, there is no help with certificates (yet?)."), DataMember(EmitDefaultValue = true)]
-        string ListeningSchema { get; set; }
-
-        /// <summary>
-        /// Hostname for Owin to accept request on, default is localhost
-        /// </summary>
-        [DefaultValue("localhost"), Description("Host for Owin to accept request on."), DataMember(EmitDefaultValue = true)]
-        string Hostname { get; set; }
-
-        /// <summary>
-        /// Port for owin to accept requests on, default is a random nummber greater than 10800
-        /// </summary>
-        [DefaultValue(0), Description("Port for Owin to accept request on, when this is 0 the first free port after 10800 is located."), DataMember(EmitDefaultValue = true)]
-        int Port { get; set; }
+        [Description("Urls for the Owin server to listen on.")]
+        IList<string> ListeningUrls { get; set; }
 
         /// <summary>
         /// Specify if an error page should be shown

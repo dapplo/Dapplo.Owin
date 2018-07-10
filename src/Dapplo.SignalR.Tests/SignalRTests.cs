@@ -22,15 +22,18 @@
 #region using
 
 using System;
+using System.Linq;
 using System.Net.Cache;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Autofac;
 using Dapplo.Addons.Bootstrapper;
+using Dapplo.Addons.Config;
 using Dapplo.HttpExtensions;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Owin;
+using Dapplo.Owin.Configuration;
 using Dapplo.SignalR.Tests.Configuration;
 using Dapplo.SignalR.Tests.Hub;
 using Dapplo.SignalR.Tests.Owin;
@@ -60,6 +63,8 @@ namespace Dapplo.SignalR.Tests
             var applicationConfig = ApplicationConfigBuilder.
                 Create()
                 .WithApplicationName(ApplicationName)
+                .WithConfigSupport()
+                .WithIniSectionResolving()
                 // Normally one would add Dapplo.Owin and Dapplo.SignalR dlls somewhere in a components or addons directory.
                 // This would prevent to have a direct reference.
                 .WithAssemblyPatterns("Dapplo*")
@@ -76,20 +81,24 @@ namespace Dapplo.SignalR.Tests
                 // Force mapping of IIniSubSection to IIniSection
                 bootstrapper.Container.Resolve<IMyTestConfiguration>();
 
+                var owinServer = bootstrapper.Container.Resolve<IOwinServer>();
+                // Resetting the port to random
+                owinServer.OwinConfiguration.AddListenerUri();
+
                 // Startup the services
                 await bootstrapper.StartupAsync();
 
-                var owinServer = bootstrapper.Container.Resolve<IOwinServer>();
                 Assert.True(owinServer.IsListening, "Server not running!");
 
+                var baseUri = owinServer.ListeningOn.FirstOrDefault();
+                Assert.NotNull(baseUri);
                 // Test request, we need to build the url
-                var testUri = owinServer.ListeningOn.AppendSegments("Test");
+                var testUri = new Uri(baseUri).AppendSegments("Test");
 
                 var result = await testUri.GetAsAsync<string>();
                 Assert.Equal("Dapplo", result);
 
-                var uri = owinServer.ListeningOn.AbsoluteUri;
-                var hubConnection = new HubConnection(uri, true);
+                var hubConnection = new HubConnection(baseUri, true);
                 IHubProxy testHubProxy = hubConnection.CreateHubProxy("TestHub");
                 await hubConnection.Start();
 

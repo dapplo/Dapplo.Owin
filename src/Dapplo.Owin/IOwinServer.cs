@@ -21,7 +21,7 @@
 
 #region using
 
-using System;
+using System.Collections.Generic;
 using Dapplo.Addons;
 using Dapplo.Owin.Configuration;
 
@@ -46,8 +46,8 @@ namespace Dapplo.Owin
         bool IsListening { get; }
 
         /// <summary>
-        ///     The Uri where Owin is listening on
+        ///     The Uris where Owin is listening on
         /// </summary>
-        Uri ListeningOn { get; }
+        IEnumerable<string> ListeningOn { get; }
     }
 }

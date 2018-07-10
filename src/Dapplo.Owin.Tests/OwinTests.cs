@@ -21,6 +21,7 @@
 
 #region using
 
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Cache;
@@ -65,11 +66,16 @@ namespace Dapplo.Owin.Tests
 
             var testModules = new IOwinModule[] {configureOwinModule, owinModule}.Select(module =>
                 new Meta<IOwinModule, ServiceAttribute>(module, new ServiceAttribute(module.GetType().Name)));
+
+            owinConfiguration.AddListenerUri();
             var owinServer = new OwinServer(owinConfiguration, testModules);
+
             await owinServer.StartupAsync();
 
+            var baseUri = owinServer.ListeningOn.FirstOrDefault();
+            Assert.NotNull(baseUri);
             // Test request, we need to build the url
-            var testUri = owinServer.ListeningOn.AppendSegments("Test");
+            var testUri = new Uri(baseUri).AppendSegments("Test");
 
             var result = await testUri.GetAsAsync<string>();
             Assert.Equal("Dapplo", result);

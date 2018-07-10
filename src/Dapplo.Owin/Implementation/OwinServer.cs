@@ -24,8 +24,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Features.Metadata;
@@ -71,7 +69,7 @@ namespace Dapplo.Owin.Implementation
         /// <summary>
         ///     The server is listening on the following Uri
         /// </summary>
-        public Uri ListeningOn { get; private set; }
+        public IEnumerable<string> ListeningOn { get; private set; }
 
         /// <summary>
         ///     Is the server running?
@@ -110,20 +108,19 @@ namespace Dapplo.Owin.Implementation
             }
 
             // Logic to find the port to use, first take the one from the configuration
-            int portToUse = OwinConfiguration.Port;
-            // If there is no port given, find a free one
-            if (OwinConfiguration.Port == 0)
-            {
-                portToUse = GetFreeListenerPort();
-            }
             // build the uri to listen on
-            ListeningOn = new Uri($"{OwinConfiguration.ListeningSchema}://{OwinConfiguration.Hostname}:{portToUse}");
-            Log.Info().WriteLine("Starting WebApp on {0}", ListeningOn.AbsoluteUri);
+            ListeningOn = OwinConfiguration.ListeningUrls;
+            Log.Info().WriteLine("Starting WebApp on {0}", string.Join(", " , ListeningOn));
 
             var rootModules = ServiceNodes.Values.Where(serviceNode => !serviceNode.HasPrerequisites).ToList();
             await InitializeModules(rootModules, cancellationToken).ConfigureAwait(false);
 
-            _webApp = WebApp.Start(ListeningOn.AbsoluteUri, appBuilder =>
+            var startOptions = new StartOptions();
+            foreach (var url in ListeningOn)
+            {
+                startOptions.Urls.Add(url);
+            }
+            _webApp = WebApp.Start(startOptions, appBuilder =>
             {
                 Log.Verbose().WriteLine("Starting WebApp.");
                 ConfigureModules(appBuilder, rootModules);
@@ -204,55 +201,6 @@ namespace Dapplo.Owin.Implementation
                 serviceNode.Service.Configure(this, appBuilder);
                 ConfigureModules(appBuilder, serviceNode.Dependencies);
             }
-        }
-
-        /// <summary>
-        ///     Returns an unused port, which savely can be used to listen to
-        ///     A port of 0 in the list will have the following behaviour: https://msdn.microsoft.com/en-us/library/c6z86e63.aspx
-        ///     If you do not care which local port is used, you can specify 0 for the port number. In this case, the service
-        ///     provider will assign an available port number between 1024 and 5000.
-        /// </summary>
-        /// <param name="possiblePorts">An optional int array with ports, the routine will return the first free port.</param>
-        /// <returns>A free port</returns>
-        protected static int GetFreeListenerPort(int[] possiblePorts = null)
-        {
-            possiblePorts = possiblePorts ?? new[] {0};
-
-            var resultingPort =  possiblePorts.Select(TryPort).FirstOrDefault(i => i > 0);
-            if (resultingPort > 0)
-            {
-                return resultingPort;
-            }
-            var message = $"No free ports in the range {possiblePorts} found!";
-            Log.Warn().WriteLine(message);
-            throw new NotSupportedException(message);
-        }
-
-        /// <summary>
-        /// Helper method to find an unused port
-        /// </summary>
-        /// <param name="portToCheck">0 for random, otherwise a specific</param>
-        /// <returns>The actual port, or -1 of there isn't a free port</returns>
-        private static int TryPort(int portToCheck)
-        {
-            var listener = new TcpListener(IPAddress.Loopback, portToCheck);
-            try
-            {
-                listener.Start();
-                // As the LocalEndpoint is of type EndPoint, this doesn't have the port, we need to cast it to IPEndPoint
-                var port = ((IPEndPoint)listener.LocalEndpoint).Port;
-                Log.Info().WriteLine("Found free listener port {0} for the WebApp.", port);
-                return port;
-            }
-            catch
-            {
-                Log.Debug().WriteLine("Port {0} isn't free.", portToCheck);
-            }
-            finally
-            {
-                listener.Stop();
-            }
-            return -1;
         }
     }
 }
