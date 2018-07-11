@@ -33,7 +33,6 @@ using Dapplo.HttpExtensions;
 using Dapplo.Log;
 using Dapplo.Log.XUnit;
 using Dapplo.Owin;
-using Dapplo.Owin.Configuration;
 using Dapplo.SignalR.Tests.Configuration;
 using Dapplo.SignalR.Tests.Hub;
 using Dapplo.SignalR.Tests.Owin;

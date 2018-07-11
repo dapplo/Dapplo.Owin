@@ -118,7 +118,16 @@ namespace Dapplo.Owin.Implementation
             var startOptions = new StartOptions();
             foreach (var url in ListeningOn)
             {
+                if (string.IsNullOrEmpty(url))
+                {
+                    continue;
+                }
                 startOptions.Urls.Add(url);
+            }
+
+            if (startOptions.Urls.Count == 0)
+            {
+                throw new NotSupportedException("Can't start WebApp without Listening URLs.");
             }
             _webApp = WebApp.Start(startOptions, appBuilder =>
             {
