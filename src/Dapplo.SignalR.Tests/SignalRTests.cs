@@ -24,7 +24,6 @@
 using System;
 using System.Linq;
 using System.Net.Cache;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Autofac;
 using Dapplo.Addons.Bootstrapper;
@@ -47,6 +46,7 @@ namespace Dapplo.SignalR.Tests
     public sealed class SignalRTests
     {
         private const string ApplicationName = "DapploSignalR";
+        private static readonly LogSource Log = new LogSource();
 
         public SignalRTests(ITestOutputHelper testOutputHelper)
         {
@@ -112,14 +112,20 @@ namespace Dapplo.SignalR.Tests
                 var signalrRresult = await testHubProxy.Invoke<string>("Hello", new TestType {Message = "World"});
                 Assert.Equal("Hello World", signalrRresult);
 
+                Log.Debug().WriteLine("Shutdown");
                 await owinServer.ShutdownAsync();
                 Assert.False(owinServer.IsListening, "Server still running!");
 
-                await Assert.ThrowsAsync<HttpRequestException>(async () =>
+                Log.Debug().WriteLine("Test with a request that service is no longer available");
+                await Assert.ThrowsAsync<TaskCanceledException>(async () =>
                 {
+                    // setup the request timeout to something small
+                    var behavior = new HttpBehaviour {HttpSettings = {RequestTimeout = TimeSpan.FromMilliseconds(100)}};
+                    behavior.MakeCurrent();
                     result = await testUri.GetAsAsync<string>();
                 });
 
+                Log.Debug().WriteLine("Starting again");
                 await owinServer.StartupAsync();
                 Assert.True(owinServer.IsListening, "Server not running!");
 

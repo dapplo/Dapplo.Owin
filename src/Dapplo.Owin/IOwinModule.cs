@@ -39,7 +39,7 @@ namespace Dapplo.Owin
 		/// </summary>
 		/// <param name="server">IOwinServer</param>
 		/// <param name="cancellationToken">CancellationToken</param>
-		Task InitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken));
+		Task InitializeAsync(IOwinServer server, CancellationToken cancellationToken = default);
 
 		/// <summary>
 		/// Implement this to make sure you can configure the pipeline, like add a middleware
@@ -53,6 +53,6 @@ namespace Dapplo.Owin
 		/// </summary>
 		/// <param name="server">IOwinServer</param>
 		/// <param name="cancellationToken">CancellationToken</param>
-		Task DeinitializeAsync(IOwinServer server, CancellationToken cancellationToken = default(CancellationToken));
+		Task DeinitializeAsync(IOwinServer server, CancellationToken cancellationToken = default);
 	}
 }
