@@ -5,11 +5,8 @@
 //#tool "coveralls.net"
 #tool nuget:?package=coveralls.net&version=0.7.0
 #tool "PdbGit"
-// Needed for Cake.Compression, as described here: https://github.com/akordowski/Cake.Compression/issues/3
-#addin "Cake.FileHelpers"
 #addin "Cake.DocFx"
 #addin "Cake.Coveralls"
-#addin "Cake.Compression"
 
 var target = Argument("target", "Build");
 var configuration = Argument("configuration", "release");
