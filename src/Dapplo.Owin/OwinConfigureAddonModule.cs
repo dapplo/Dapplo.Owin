@@ -25,6 +25,7 @@
 
 using Autofac;
 using Dapplo.Addons;
+using Dapplo.Owin.Configuration;
 using Dapplo.Owin.Implementation;
 using Dapplo.Owin.OwinModules;
 
@@ -38,6 +39,10 @@ namespace Dapplo.Owin
         /// <inheritdoc />
         protected override void Load(ContainerBuilder builder)
         {
+            builder
+                .RegisterType<OwinConfigurationImpl>()
+                .IfNotRegistered(typeof(IOwinConfiguration))
+                .As<IOwinConfiguration>();
             builder
                 .RegisterType<OwinServer>()
                 .As<IOwinServer>()

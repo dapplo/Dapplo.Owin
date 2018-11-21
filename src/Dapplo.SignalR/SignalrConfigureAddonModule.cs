@@ -26,6 +26,7 @@
 using Autofac;
 using Dapplo.Addons;
 using Dapplo.Owin;
+using Dapplo.SignalR.Configuration;
 using Dapplo.SignalR.Owin;
 using Dapplo.SignalR.Utils;
 using Microsoft.AspNet.SignalR.Hubs;
@@ -40,6 +41,10 @@ namespace Dapplo.SignalR
         /// <inheritdoc />
         protected override void Load(ContainerBuilder builder)
         {
+            builder
+                .RegisterType<SignalRConfigurationImpl>()
+                .IfNotRegistered(typeof(ISignalRConfiguration))
+                .As<ISignalRConfiguration>();
             builder
                 .RegisterType<ConfigureSignalROwinModule>()
                 .As<IOwinModule>()

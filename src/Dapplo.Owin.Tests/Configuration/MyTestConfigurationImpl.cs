@@ -19,14 +19,17 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System.Collections.Generic;
 using Dapplo.Config.Ini;
-using Dapplo.Owin.Configuration;
-using Dapplo.SignalR.Configuration;
+using System.Net;
 
-namespace Dapplo.SignalR.Tests.Configuration
+namespace Dapplo.Owin.Tests.Configuration
 {
-	public interface IMyTestConfiguration : IOwinConfiguration, ISignalRConfiguration
-	{
-        
-	}
+    class MyTestConfigurationImpl : IniSectionBase<IMyTestConfiguration>, IMyTestConfiguration
+    {
+        public IList<string> ListeningUrls { get; set; }
+        public bool UseErrorPage { get; set; }
+        public bool EnableCors { get; set; }
+        public AuthenticationSchemes AuthenticationScheme { get; set; }
+    }
 }

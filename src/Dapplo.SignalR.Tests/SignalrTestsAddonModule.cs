@@ -22,6 +22,7 @@
 using Autofac;
 using Dapplo.Addons;
 using Dapplo.Owin;
+using Dapplo.SignalR.Tests.Configuration;
 using Dapplo.SignalR.Tests.Hub;
 using Dapplo.SignalR.Tests.Owin;
 using Microsoft.AspNet.SignalR.Hubs;
@@ -35,6 +36,11 @@ namespace Dapplo.SignalR.Tests
     {
         protected override void Load(ContainerBuilder builder)
         {
+            builder
+                .RegisterType<MyTestConfigurationImpl>()
+                .IfNotRegistered(typeof(IMyTestConfiguration))
+                .As<IMyTestConfiguration>();
+
             builder
                 .RegisterType<OwinService>()
                 .As<IService>()

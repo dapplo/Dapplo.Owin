@@ -31,7 +31,7 @@ namespace Dapplo.Owin.Configuration
     /// <summary>
     ///     A basic implementation of the IOwinConfiguration, not needed when using Dapplo
     /// </summary>
-    public class OwinConfiguration : IOwinConfiguration
+    public class OwinConfigurationImpl : IOwinConfiguration
     {
         /// <inheritdoc />
         public IList<string> ListeningUrls { get; set; } = new List<string>();

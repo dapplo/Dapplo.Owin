@@ -56,7 +56,7 @@ namespace Dapplo.Owin.Tests
         [Fact]
         public async Task TestStartupWithoutBootstrapper()
         {
-            var owinConfiguration = new OwinConfiguration
+            var owinConfiguration = new OwinConfigurationImpl
             {
                 AuthenticationScheme = AuthenticationSchemes.Negotiate
             };

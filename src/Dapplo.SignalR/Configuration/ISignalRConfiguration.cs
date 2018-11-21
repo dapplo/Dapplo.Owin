@@ -27,7 +27,6 @@
 
 using System.ComponentModel;
 using System.Runtime.Serialization;
-using Dapplo.Ini;
 
 #endregion
 
@@ -36,7 +35,7 @@ namespace Dapplo.SignalR.Configuration
     /// <summary>
     ///     Settings for the SignalR configuration
     /// </summary>
-    public interface ISignalRConfiguration : IIniSubSection
+    public interface ISignalRConfiguration
     {
         /// <summary>
         ///     Allows to control the generation of Signal-R JavaScript proxies

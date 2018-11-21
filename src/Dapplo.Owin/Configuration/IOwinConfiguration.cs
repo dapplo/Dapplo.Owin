@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.Serialization;
-using Dapplo.Ini;
 
 #endregion
 
@@ -34,7 +33,7 @@ namespace Dapplo.Owin.Configuration
     /// <summary>
     ///     The Owin configuration container, this can be stored with Dapplo.Config
     /// </summary>
-    public interface IOwinConfiguration : IIniSubSection
+    public interface IOwinConfiguration
     {
         /// <summary>
         /// Passed to the startoptions of the Owin webapp as urls to listen on
