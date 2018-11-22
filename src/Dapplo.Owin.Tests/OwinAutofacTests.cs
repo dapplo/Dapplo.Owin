@@ -28,7 +28,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Autofac;
 using Dapplo.Addons.Bootstrapper;
-using Dapplo.Addons.Config;
 using Dapplo.HttpExtensions;
 using Dapplo.Log;
 using Xunit;
@@ -60,8 +59,6 @@ namespace Dapplo.Owin.Tests
             var applicationConfig = ApplicationConfigBuilder
                 .Create()
                 .WithApplicationName(ApplicationName)
-                .WithConfigSupport()
-                .WithIniSectionResolving()
                 // Normally one would add Dapplo.Owin and Dapplo.SignalR dlls somewhere in a components or addons directory.
                 // This would prevent to have a direct reference.
                 .WithAssemblyPatterns("Dapplo*")
