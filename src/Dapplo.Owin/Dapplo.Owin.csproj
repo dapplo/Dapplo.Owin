@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net471</TargetFrameworks>
 	<Description>A library with code to use Owin with multiple configurations (as modules) in your application.</Description>
     <AssemblyTitle>Dapplo.Owin</AssemblyTitle>
     <AssemblyName>Dapplo.Owin</AssemblyName>
@@ -14,15 +14,15 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac.Owin" Version="4.2.0" />
-    <PackageReference Include="Dapplo.Addons" Version="1.2.1" />
-    <PackageReference Include="Dapplo.Config.Ini" Version="1.0.8" />
-    <PackageReference Include="Microsoft.AspNet.Cors" Version="5.2.6" />
-    <PackageReference Include="Microsoft.Owin.Cors" Version="4.0.0" />
-    <PackageReference Include="Microsoft.Owin.Diagnostics" Version="4.0.0" />
-    <PackageReference Include="Microsoft.Owin.Hosting" Version="4.0.0" />
+    <PackageReference Include="Dapplo.Addons" Version="1.2.4" />
+    <PackageReference Include="Dapplo.Config.Ini" Version="1.0.11" />
+    <PackageReference Include="Microsoft.AspNet.Cors" Version="5.2.7" />
+    <PackageReference Include="Microsoft.Owin.Cors" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Owin.Diagnostics" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Owin.Hosting" Version="4.0.1" />
   </ItemGroup>
   
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
@@ -34,5 +34,5 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
-  
+ 
 </Project>

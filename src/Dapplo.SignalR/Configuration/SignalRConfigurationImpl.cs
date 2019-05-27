@@ -21,12 +21,20 @@
 
 namespace Dapplo.SignalR.Configuration
 {
+    /// <summary>
+    /// This is the configuration for SignalR
+    /// </summary>
     public class SignalRConfigurationImpl : ISignalRConfiguration
     {
+        /// <inheritdoc />
         public bool EnableJavaEnableJavaScriptProxies { get; set; }
+        /// <inheritdoc />
         public bool EnableDetailedErrors { get; set; }
+        /// <inheritdoc />
         public bool FixCamelCase { get; set; }
+        /// <inheritdoc />
         public bool UseDummyPerformanceCounter { get; set; }
+        /// <inheritdoc />
         public bool EnableExceptionLogger { get; set; }
     }
 }
