@@ -1,7 +1,7 @@
 ﻿#region Dapplo License
 
 //  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2018 Dapplo
+//  Copyright (C) 2015-2019 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -23,8 +23,6 @@
 
 #endregion
 
-#region Usings
-
 using System.Collections.Generic;
 using Autofac;
 using Autofac.Integration.SignalR;
@@ -38,8 +36,6 @@ using Microsoft.AspNet.SignalR.Hubs;
 using Microsoft.AspNet.SignalR.Infrastructure;
 using Newtonsoft.Json;
 using Owin;
-
-#endregion
 
 namespace Dapplo.SignalR.Owin
 {
