@@ -9,6 +9,6 @@
         d:DataContext="{d:DesignInstance impl:MyVueModel,IsDesignTimeCreatable=True}">
     <StackPanel>
         <TextBlock Text="Hallo"/>
-        <TextBox Text="{Binding Name}"/>
+        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
     </StackPanel>
 </Window>

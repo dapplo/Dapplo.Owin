@@ -12,6 +12,47 @@
     <link href="css/vuedemo.css" rel="stylesheet" />
 </head>
 <body>
-    The demo should come here...
+    Demo:
+    <div id="app">
+        Hello {{ myVueModel.name }}!
+    </div>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="scripts/jquery.signalR-2.4.1.min.js"></script>
+<script src="/signalr/hubs"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+    var vueHub;
+    var app = new Vue({
+        el: '#app',
+        data: {
+            myVueModel: {
+            }
+        },
+        watch: {
+            myVueModel: {
+                handler: function(val, oldVal) {
+                    vueHub.server.storeModelChange(val);
+                },
+                immediate: false,
+                deep: true
+            }
+        }
+    });
+    // stop the connection when the page is unloaded
+    window.onbeforeunload = function (ev) {
+        $.connection.hub.stop();
+    };
+    $(document).ready(function() {
+        //$.connection.hub.url = "http://localhost:8380/signalr";
+        vueHub = $.connection.vueHub;
+        vueHub.client.UpdateModel = function(myVueModel) {
+            app._data.myVueModel = myVueModel;
+        };
+        $.connection.hub.start()
+            .fail(function (e) {
+                alert(e.toString());
+            });
+    });
+</script>
 </body>
 </html>

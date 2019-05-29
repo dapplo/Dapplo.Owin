@@ -19,12 +19,13 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System.Threading.Tasks;
 using Dapplo.SignalR.Test.VueDemo.Model;
 
 namespace Dapplo.SignalR.Test.VueDemo.Hubs
 {
 	public interface IVueHubClient
 	{
-		void UpdateModel(IMyVueModel myVueModel);
+		Task UpdateModel(IMyVueModel myVueModel);
 	}
 }

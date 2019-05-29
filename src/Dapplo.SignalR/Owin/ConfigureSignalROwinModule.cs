@@ -110,7 +110,7 @@ namespace Dapplo.SignalR.Owin
             // Register the SignalRContractResolver, which solves camelCase issues
             var settings = new JsonSerializerSettings
             {
-                ContractResolver = new SignalRContractResolver()
+                ContractResolver = new SignalRContractResolver(SignalRConfiguration.FixCamelCase)
             };
             var serializer = JsonSerializer.Create(settings);
             GlobalHost.DependencyResolver.Register(typeof(JsonSerializer), () => serializer);

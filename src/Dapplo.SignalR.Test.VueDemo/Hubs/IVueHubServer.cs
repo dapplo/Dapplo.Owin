@@ -19,6 +19,9 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System.Threading.Tasks;
+using Dapplo.SignalR.Test.VueDemo.Model.Impl;
+
 namespace Dapplo.SignalR.Test.VueDemo.Hubs
 {
     /// <summary>
@@ -26,5 +29,12 @@ namespace Dapplo.SignalR.Test.VueDemo.Hubs
     /// </summary>
     public interface IVueHubServer
     {
+        /// <summary>
+        /// Method for the client to call
+        /// TODO: Clients can't work with interfaces!
+        /// </summary>
+        /// <param name="myVueModel">MyVueModel</param>
+        /// <returns></returns>
+        Task StoreModelChange(MyVueModel myVueModel);
     }
 }

@@ -49,7 +49,7 @@ namespace Dapplo.SignalR.Configuration
         bool EnableDetailedErrors { get; set; }
 
         /// <summary>
-        ///     Enable detailed error information for SignalR
+        ///     Fix camel casing for SignalR
         /// </summary>
         [Description("Fix camel casing for SignalR")]
         [DefaultValue(true)]

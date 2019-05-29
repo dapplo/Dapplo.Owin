@@ -95,7 +95,8 @@ namespace Dapplo.SignalR.Test.VueDemo
             builder
                 .RegisterType<VueHub>()
                 .AsSelf()
-                .SingleInstance();
+                .SingleInstance()
+                .AutoActivate();
         }
     }
 }
