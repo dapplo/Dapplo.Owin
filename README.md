@@ -14,7 +14,7 @@ An example OwinModule
 	/// <summary>
     /// A simple Owin module
     /// </summary>
-	[Service(nameof(TestMiddlewareOwinModule))]
+	[Service(nameof(TestMiddlewareOwinModule),nameof(PrerequisitOwinModule))]
     public class TestMiddlewareOwinModule : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
