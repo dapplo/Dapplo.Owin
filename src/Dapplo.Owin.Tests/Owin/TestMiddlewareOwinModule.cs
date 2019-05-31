@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2018 Dapplo
+//  Copyright (C) 2015-2019 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -19,14 +19,10 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#region using
-
 using Dapplo.Addons;
 using Dapplo.Log;
 using Dapplo.Owin.Tests.Configuration;
 using Owin;
-
-#endregion
 
 namespace Dapplo.Owin.Tests.Owin
 {
@@ -36,6 +32,7 @@ namespace Dapplo.Owin.Tests.Owin
     [Service(nameof(TestMiddlewareOwinModule))]
     public class TestMiddlewareOwinModule : BaseOwinModule
 	{
+		private readonly IMyTestConfiguration _myTestConfiguration;
 		private static readonly LogSource Log = new LogSource();
 
         /// <summary>
@@ -44,9 +41,9 @@ namespace Dapplo.Owin.Tests.Owin
         /// <param name="myTestConfiguration">IMyTestConfiguration</param>
         // ReSharper disable once UnusedParameter.Local
         public TestMiddlewareOwinModule(IMyTestConfiguration myTestConfiguration)
-		{
-
-		}
+        {
+	        _myTestConfiguration = myTestConfiguration;
+        }
 
         /// <summary>
         /// Configure the IAppBuilder
@@ -55,7 +52,7 @@ namespace Dapplo.Owin.Tests.Owin
         /// <param name="appBuilder">IAppBuilder</param>
         public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 		{
-			Log.Debug().WriteLine("Configuring test middleware in the Owin pipeline");
+			Log.Debug().WriteLine("Configuring test middleware in the Owin pipeline, should start on: {0}",string.Join(",", _myTestConfiguration.ListeningUrls));
 			appBuilder.Use(typeof (TestMiddleware));
 		}
 	}

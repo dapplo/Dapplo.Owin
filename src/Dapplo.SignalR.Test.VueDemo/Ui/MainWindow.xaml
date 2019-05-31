@@ -1,0 +1,14 @@
+﻿<Window x:Class="Dapplo.SignalR.Test.VueDemo.Ui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:impl="clr-namespace:Dapplo.SignalR.Test.VueDemo.Model.Impl"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800"
+        d:DataContext="{d:DesignInstance impl:MyVueModel,IsDesignTimeCreatable=True}">
+    <StackPanel>
+        <TextBlock Text="Hallo"/>
+        <TextBox Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+    </StackPanel>
+</Window>

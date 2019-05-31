@@ -1,7 +1,7 @@
 ﻿#region Dapplo License
 
 //  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2018 Dapplo
+//  Copyright (C) 2015-2019 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -23,19 +23,15 @@
 
 #endregion
 
-#region Usings
-
 using System;
 using System.Reflection;
 using Microsoft.AspNet.SignalR.Infrastructure;
 using Newtonsoft.Json.Serialization;
 
-#endregion
-
 namespace Dapplo.SignalR.Utils
 {
 	/// <summary>
-	///     This solves the problem that signalr communication is made with PascalCase instead of camelCase
+	///     This solves the problem that signalR communication is made with PascalCase instead of camelCase
 	///     For more information, see <a href="http://stackoverflow.com/a/30019100/1886251">here</a>
 	/// </summary>
 	internal class SignalRContractResolver : IContractResolver
@@ -47,16 +43,19 @@ namespace Dapplo.SignalR.Utils
 		/// <summary>
 		///     Constructor
 		/// </summary>
-		public SignalRContractResolver()
+		public SignalRContractResolver(bool fixCamelCase = true)
 		{
 			_defaultContractSerializer = new DefaultContractResolver();
-			_camelCaseContractResolver = new CamelCaseContractResolver();
-			_assembly = typeof(Connection).Assembly;
+			if (fixCamelCase)
+			{
+				_camelCaseContractResolver = new CamelCaseContractResolver();
+            }
+            _assembly = typeof(Connection).Assembly;
 		}
 
 		JsonContract IContractResolver.ResolveContract(Type type)
 		{
-			if (type.Assembly.Equals(_assembly))
+			if (type.Assembly.Equals(_assembly) || _camelCaseContractResolver is null)
 			{
 				return _defaultContractSerializer.ResolveContract(type);
 			}

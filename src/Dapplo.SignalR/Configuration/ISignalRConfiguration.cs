@@ -1,7 +1,7 @@
 ﻿#region Dapplo License
 
 //  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2018 Dapplo
+//  Copyright (C) 2015-2019 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -23,12 +23,8 @@
 
 #endregion
 
-#region Usings
-
 using System.ComponentModel;
 using System.Runtime.Serialization;
-
-#endregion
 
 namespace Dapplo.SignalR.Configuration
 {
@@ -53,7 +49,7 @@ namespace Dapplo.SignalR.Configuration
         bool EnableDetailedErrors { get; set; }
 
         /// <summary>
-        ///     Enable detailed error information for SignalR
+        ///     Fix camel casing for SignalR
         /// </summary>
         [Description("Fix camel casing for SignalR")]
         [DefaultValue(true)]
