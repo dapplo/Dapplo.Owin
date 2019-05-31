@@ -22,12 +22,13 @@
 using Dapplo.Addons;
 using Dapplo.Log;
 using Dapplo.Owin;
+using Dapplo.SignalR.Owin;
 using Owin;
 
 namespace Dapplo.SignalR.Tests.Owin
 {
     /// <inheritdoc />
-    [Service(nameof(TestMiddlewareOwinModule))]
+    [Service(nameof(TestMiddlewareOwinModule), nameof(ConfigureSignalROwinModule))]
     public class TestMiddlewareOwinModule : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();

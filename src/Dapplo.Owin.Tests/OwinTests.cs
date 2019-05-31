@@ -58,9 +58,10 @@ namespace Dapplo.Owin.Tests
             };
 
             var owinModule = new TestMiddlewareOwinModule(null);
-            var configureOwinModule = new ConfigureOwinAuthentication();
+            var configureOwinCorsModule = new ConfigureOwinCors();
+            var configureOwinAuthenticationModule = new ConfigureOwinAuthentication();
 
-            var testModules = new IOwinModule[] {configureOwinModule, owinModule}.Select(module =>
+            var testModules = new IOwinModule[] { configureOwinCorsModule, configureOwinAuthenticationModule, owinModule}.Select(module =>
                 new Meta<IOwinModule, ServiceAttribute>(module, new ServiceAttribute(module.GetType().Name)));
 
             owinConfiguration.AddListenerUri();

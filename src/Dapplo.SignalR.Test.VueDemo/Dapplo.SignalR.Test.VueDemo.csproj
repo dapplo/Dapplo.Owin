@@ -35,9 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapplo.Log.Loggers">
-      <HintPath>..\..\..\..\..\Users\05018085\.nuget\packages\dapplo.log.loggers\1.3.11\lib\net45\Dapplo.Log.Loggers.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -138,12 +135,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="FodyWeavers.xml" />
-    <EmbeddedResource Include="VueDemoSite\error\404.html" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VueDemoSite\index.html" />
-  </ItemGroup>
-  <ItemGroup>
+    <EmbeddedResource Include="VueDemoSite\error\404.html" />
     <EmbeddedResource Include="VueDemoSite\css\vuedemo.css" />
     <EmbeddedResource Include="VueDemoSite\scripts\jquery.signalR-2.4.1.min.js" />
   </ItemGroup>

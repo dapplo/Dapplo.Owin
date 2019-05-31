@@ -28,7 +28,7 @@ namespace Dapplo.Owin.OwinModules
     /// <summary>
     ///     An Owin Module which configures the error page
     /// </summary>
-    [Service(nameof(ConfigureOwinErrorPage))]
+    [Service(nameof(ConfigureOwinErrorPage), nameof(ConfigureOwinCors))]
     public class ConfigureOwinErrorPage : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();

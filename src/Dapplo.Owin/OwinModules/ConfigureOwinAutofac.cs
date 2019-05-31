@@ -28,7 +28,7 @@ namespace Dapplo.Owin.OwinModules
     /// <summary>
     ///     An Owin Module which configures Autofac
     /// </summary>
-    [Service(nameof(ConfigureOwinAutofac))]
+    [Service(nameof(ConfigureOwinAutofac), nameof(ConfigureOwinCors))]
     public class ConfigureOwinAutofac : BaseOwinModule
 	{
 		private readonly ILifetimeScope _lifetimeScope;

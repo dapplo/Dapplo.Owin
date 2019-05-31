@@ -78,7 +78,7 @@ namespace Dapplo.Owin.Implementation
         /// <param name="cancellationToken">CancellationToken</param>
         public async Task ShutdownAsync(CancellationToken cancellationToken = default)
         {
-            Log.Verbose().WriteLine("Stopping the Owin Server on {0}", ListeningOn);
+            Log.Verbose().WriteLine("Stopping the Owin Server on {0}", string.Join(",", ListeningOn));
             if (!ServiceNodes.Any())
             {
                 Log.Info().WriteLine("No OwinModules to stop.");

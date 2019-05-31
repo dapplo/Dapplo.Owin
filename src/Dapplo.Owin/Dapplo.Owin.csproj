@@ -16,7 +16,6 @@
     <PackageReference Include="Autofac.Owin" Version="4.2.0" />
     <PackageReference Include="Dapplo.Addons" Version="1.2.14" />
     <PackageReference Include="Dapplo.Config.Ini" Version="1.0.16" />
-    <PackageReference Include="Microsoft.AspNet.Cors" Version="5.2.7" />
     <PackageReference Include="Microsoft.Owin.Cors" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Diagnostics" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Hosting" Version="4.0.1" />

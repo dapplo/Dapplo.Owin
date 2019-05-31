@@ -39,7 +39,6 @@ namespace Dapplo.Owin.Tests.Owin
         public override async Task Invoke(IOwinContext owinContext)
         {
             Log.Debug().WriteLine("Http method: {0}, path: {1}", owinContext.Request.Method, owinContext.Request.Path);
-
             var user = owinContext.Authentication?.User;
             Log.Debug().WriteLine("User: {0}", user?.Identity?.Name ?? "not available");
             owinContext.Response.StatusCode = 200;

@@ -23,6 +23,7 @@ using System;
 using System.Reflection;
 using Dapplo.Addons;
 using Dapplo.Owin;
+using Dapplo.Owin.OwinModules;
 using Dapplo.SignalR.Test.VueDemo.Utils;
 using Microsoft.Owin;
 using Microsoft.Owin.StaticFiles;
@@ -34,7 +35,7 @@ namespace Dapplo.SignalR.Test.VueDemo.Modules
     ///     Configure the VueDemo OWIN site
     ///     This will be automatically picked up by Dapplo.Owin
     /// </summary>
-    [Service(nameof(VueDemoOwinModule))]
+    [Service(nameof(VueDemoOwinModule), nameof(ConfigureOwinCors))]
     public class VueDemoOwinModule : BaseOwinModule
     {
         private readonly Func<Assembly, string, ExtendableEmbeddedResourceFileSystem> _fileSystemFactory;

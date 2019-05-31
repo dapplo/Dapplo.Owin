@@ -21,6 +21,7 @@
 
 using Dapplo.Addons;
 using Dapplo.Log;
+using Dapplo.Owin.OwinModules;
 using Dapplo.Owin.Tests.Configuration;
 using Owin;
 
@@ -29,7 +30,7 @@ namespace Dapplo.Owin.Tests.Owin
     /// <summary>
     /// A simple Owin module
     /// </summary>
-    [Service(nameof(TestMiddlewareOwinModule))]
+    [Service(nameof(TestMiddlewareOwinModule), nameof(ConfigureOwinCors))]
     public class TestMiddlewareOwinModule : BaseOwinModule
 	{
 		private readonly IMyTestConfiguration _myTestConfiguration;
@@ -52,7 +53,7 @@ namespace Dapplo.Owin.Tests.Owin
         /// <param name="appBuilder">IAppBuilder</param>
         public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 		{
-			Log.Debug().WriteLine("Configuring test middleware in the Owin pipeline, should start on: {0}",string.Join(",", _myTestConfiguration.ListeningUrls));
+			Log.Debug().WriteLine("Configuring test middleware in the Owin pipeline");
 			appBuilder.Use(typeof (TestMiddleware));
 		}
 	}

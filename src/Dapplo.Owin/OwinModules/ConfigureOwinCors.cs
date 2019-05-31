@@ -41,13 +41,14 @@ namespace Dapplo.Owin.OwinModules
 		/// <param name="appBuilder">IAppBuilder</param>
 		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 		{
-			Log.Verbose().WriteLine("Enabling Cors: {0}", server.OwinConfiguration.EnableCors);
 			if (!server.OwinConfiguration.EnableCors)
 			{
-				return;
+				Log.Verbose().WriteLine("Cors is disabled.");
+                return;
 			}
+			Log.Verbose().WriteLine("Enabling Cors");
 			// Enable CORS (allow cross domain requests)
-			appBuilder.UseCors(CorsOptions.AllowAll);
+            appBuilder.UseCors(CorsOptions.AllowAll);
 		}
 	}
 }

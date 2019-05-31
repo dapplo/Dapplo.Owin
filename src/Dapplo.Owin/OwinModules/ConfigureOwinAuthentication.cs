@@ -29,7 +29,7 @@ namespace Dapplo.Owin.OwinModules
 	/// <summary>
 	///     An Owin Module which configures the Authentication
 	/// </summary>
-	[Service(nameof(ConfigureOwinAuthentication))]
+	[Service(nameof(ConfigureOwinAuthentication), nameof(ConfigureOwinCors))]
 	public class ConfigureOwinAuthentication : BaseOwinModule
 	{
 		private static readonly LogSource Log = new LogSource();
