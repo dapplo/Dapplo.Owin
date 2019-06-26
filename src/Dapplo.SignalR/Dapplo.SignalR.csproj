@@ -15,8 +15,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Owin\Dapplo.Owin.csproj" />
     <PackageReference Include="Autofac.SignalR2" Version="4.0.0" />
-    <PackageReference Include="Dapplo.Addons" Version="1.2.16" />
-    <PackageReference Include="Dapplo.Config.Ini" Version="1.0.16" />
+    <PackageReference Include="Dapplo.Addons" Version="1.2.17" />
+    <PackageReference Include="Dapplo.Config.Ini" Version="1.0.17" />
     <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.1" />
     <PackageReference Include="Microsoft.Owin.Host.HttpListener" Version="4.0.1" />
     <PackageReference Include="Microsoft.Owin.Hosting" Version="4.0.1" />
