@@ -21,6 +21,7 @@
 
 using Autofac;
 using Dapplo.Addons;
+using Dapplo.Config;
 using Dapplo.Owin.Tests.Configuration;
 using Dapplo.Owin.Tests.Owin;
 
@@ -35,9 +36,10 @@ namespace Dapplo.Owin.Tests
         protected override void Load(ContainerBuilder builder)
         {
             builder
-                .RegisterType<MyTestConfigurationImpl>()
+                .Register(c => DictionaryConfiguration<IMyTestConfiguration>.Create())
                 .IfNotRegistered(typeof(IMyTestConfiguration))
-                .As<IMyTestConfiguration>();
+                .As<IMyTestConfiguration>()
+                .SingleInstance();
 
             builder
                 .RegisterType<OwinService>()

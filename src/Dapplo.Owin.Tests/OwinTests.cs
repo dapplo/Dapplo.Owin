@@ -27,6 +27,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Autofac.Features.Metadata;
 using Dapplo.Addons;
+using Dapplo.Config;
 using Dapplo.HttpExtensions;
 using Dapplo.Log;
 using Xunit;
@@ -52,10 +53,8 @@ namespace Dapplo.Owin.Tests
         [Fact]
         public async Task TestStartupWithoutBootstrapper()
         {
-            var owinConfiguration = new OwinConfigurationImpl
-            {
-                AuthenticationScheme = AuthenticationSchemes.Negotiate
-            };
+            var owinConfiguration = DictionaryConfiguration<IOwinConfiguration>.Create();
+            owinConfiguration.AuthenticationScheme = AuthenticationSchemes.Negotiate;
 
             var owinModule = new TestMiddlewareOwinModule(null);
             var configureOwinCorsModule = new ConfigureOwinCors();

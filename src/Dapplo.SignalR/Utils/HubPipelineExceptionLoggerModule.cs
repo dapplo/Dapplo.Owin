@@ -1,6 +1,4 @@
-﻿#region Dapplo License
-
-//  Dapplo - building blocks for desktop applications
+﻿//  Dapplo - building blocks for desktop applications
 //  Copyright (C) 2015-2019 Dapplo
 // 
 //  For more information see: http://dapplo.net/
@@ -20,8 +18,6 @@
 // 
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.SignalR. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
-
-#endregion
 
 using Dapplo.Log;
 using Microsoft.AspNet.SignalR.Hubs;

@@ -21,12 +21,12 @@
 
 using Autofac;
 using Dapplo.Addons;
+using Dapplo.Config;
 using Dapplo.Config.Ini;
 using Dapplo.Owin;
 using Dapplo.Owin.Configuration;
 using Dapplo.SignalR.Configuration;
 using Dapplo.SignalR.Test.VueDemo.Configuration;
-using Dapplo.SignalR.Test.VueDemo.Configuration.Impl;
 using Dapplo.SignalR.Test.VueDemo.Hubs;
 using Dapplo.SignalR.Test.VueDemo.Model;
 using Dapplo.SignalR.Test.VueDemo.Model.Impl;
@@ -77,7 +77,8 @@ namespace Dapplo.SignalR.Test.VueDemo
                 .SingleInstance();
 
             builder
-                .RegisterType<WebserverConfiguration>()
+                .Register(c => DictionaryConfiguration<IWebserverConfiguration>.Create())
+                .IfNotRegistered(typeof(IWebserverConfiguration))
                 .As<IWebserverConfiguration>()
                 .As<IOwinConfiguration>()
                 .As<ISignalRConfiguration>()

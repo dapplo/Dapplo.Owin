@@ -1,6 +1,4 @@
-﻿#region Dapplo License
-
-//  Dapplo - building blocks for desktop applications
+﻿//  Dapplo - building blocks for desktop applications
 //  Copyright (C) 2015-2019 Dapplo
 // 
 //  For more information see: http://dapplo.net/
@@ -21,10 +19,9 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.SignalR. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-#endregion
-
 using Autofac;
 using Dapplo.Addons;
+using Dapplo.Config;
 using Dapplo.Owin;
 using Dapplo.SignalR.Configuration;
 using Dapplo.SignalR.Owin;
@@ -42,9 +39,11 @@ namespace Dapplo.SignalR
         protected override void Load(ContainerBuilder builder)
         {
             builder
-                .RegisterType<SignalRConfigurationImpl>()
+                .Register(c => DictionaryConfiguration<ISignalRConfiguration>.Create())
                 .IfNotRegistered(typeof(ISignalRConfiguration))
-                .As<ISignalRConfiguration>();
+                .As<ISignalRConfiguration>()
+                .SingleInstance();
+
             builder
                 .RegisterType<ConfigureSignalROwinModule>()
                 .As<IOwinModule>()

@@ -23,7 +23,7 @@ using Dapplo.Config;
 
 namespace Dapplo.SignalR.Test.VueDemo.Model.Impl
 {
-    public class MyVueModel : DictionaryConfigurationBase<IMyVueModel>, IMyVueModel
+    public class MyVueModel : DictionaryConfiguration<IMyVueModel>, IMyVueModel
     {
         public string Name { get; set; }
     }
