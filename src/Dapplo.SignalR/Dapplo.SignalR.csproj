@@ -1,14 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFrameworks>net471</TargetFrameworks>
+    <TargetFramework>net471</TargetFramework>
     <Description>Dapplo.SignalR takes care of bootstrapping SignalR, based on Dapplo.Owin</Description>
     <AssemblyTitle>Dapplo.SignalR</AssemblyTitle>
-    <AssemblyName>Dapplo.SignalR</AssemblyName>
     <PackageId>Dapplo.SignalR</PackageId>
     <PackageTags>dapplo SignalR</PackageTags>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Owin\Dapplo.Owin.csproj" />
     <PackageReference Include="Autofac.SignalR2" Version="4.0.0" />
@@ -20,7 +17,6 @@
     <PackageReference Include="Microsoft.Owin.Security" Version="4.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
-  
   <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualBasic" />
@@ -33,5 +29,4 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
- 
 </Project>

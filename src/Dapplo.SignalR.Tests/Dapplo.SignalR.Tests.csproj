@@ -1,13 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFrameworks>net471</TargetFrameworks>
+    <TargetFramework>net471</TargetFramework>
     <AssemblyTitle>Dapplo.SignalR.Tests</AssemblyTitle>
-    <AssemblyName>Dapplo.SignalR.Tests</AssemblyName>
     <PackageId>Dapplo.SignalR.Tests</PackageId>
     <PackageTags>dapplo SignalR.Tests</PackageTags>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Owin\Dapplo.Owin.csproj" />
     <ProjectReference Include="..\Dapplo.SignalR\Dapplo.SignalR.csproj" />
@@ -26,11 +23,9 @@
     <PackageReference Include="xunit.analyzers" Version="0.10.0" />
     <PackageReference Include="xunit.core" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-  
   <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualBasic" />
@@ -55,5 +50,4 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
-  
 </Project>

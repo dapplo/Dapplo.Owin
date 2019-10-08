@@ -1,13 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFrameworks>net471</TargetFrameworks>
+    <TargetFramework>net471</TargetFramework>
     <AssemblyTitle>Dapplo.Owin.Tests</AssemblyTitle>
-    <AssemblyName>Dapplo.Owin.Tests</AssemblyName>
     <PackageId>Dapplo.Owin.Tests</PackageId>
     <PackageTags>dapplo Owin.Tests</PackageTags>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Owin\Dapplo.Owin.csproj" />
     <PackageReference Include="Dapplo.Addons.Bootstrapper" Version="1.3.3" />
@@ -22,11 +19,9 @@
     <PackageReference Include="xunit.analyzers" Version="0.10.0" />
     <PackageReference Include="xunit.core" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-  
   <ItemGroup Condition=" '$(TargetFramework)' == 'net471' ">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualBasic" />
@@ -50,5 +45,4 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
-  
 </Project>
