@@ -90,20 +90,23 @@ namespace Dapplo.SignalR.Tests
                 var result = await testUri.GetAsAsync<string>();
                 Assert.Equal("Dapplo", result);
 
-                var hubConnection = new HubConnection(baseUri, true);
-                IHubProxy testHubProxy = hubConnection.CreateHubProxy("TestHub");
-                await hubConnection.Start();
+                using (var hubConnection = new HubConnection(baseUri, true))
+                {
+                    IHubProxy testHubProxy = hubConnection.CreateHubProxy("TestHub");
+                    await hubConnection.Start();
+                    // Test HubPipelineModules
+                    await Assert.ThrowsAsync<InvalidOperationException>(async () => await testHubProxy.Invoke<string>("CreateException"));
 
-                // Test HubPipelineModules
-                await Assert.ThrowsAsync<InvalidOperationException>(async () => await testHubProxy.Invoke<string>("CreateException"));
-
-                var hubPipelineTestModule = bootstrapper.Container.Resolve<HubPipelineTestModule>();
-                Assert.NotNull(hubPipelineTestModule.LatestException);
-                Assert.Equal(typeof(NotSupportedException),hubPipelineTestModule.LatestException.GetType());
+                    var hubPipelineTestModule = bootstrapper.Container.Resolve<HubPipelineTestModule>();
+                    Assert.NotNull(hubPipelineTestModule.LatestException);
+                    Assert.Equal(typeof(NotSupportedException), hubPipelineTestModule.LatestException.GetType());
 
 
-                var signalrRresult = await testHubProxy.Invoke<string>("Hello", new TestType {Message = "World"});
-                Assert.Equal("Hello World", signalrRresult);
+                    var signalRResult = await testHubProxy.Invoke<string>("Hello", new TestType { Message = "World" });
+                    Assert.Equal("Hello World", signalRResult);
+                }
+
+
 
                 Log.Debug().WriteLine("Shutdown");
                 await owinServer.ShutdownAsync();

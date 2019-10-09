@@ -24,13 +24,14 @@ stages:
         packageType: sdk
         version: 3.0.100
 
-    - task: DotNetCoreCLI@2
+    - task: VSTest@2
       displayName: Test
       inputs:
-        command: test
-        projects: '$(solution)'
-        arguments: '--configuration Debug /p:Platform="$(buildPlatform)" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
-
+        platform: $(buildPlatform)
+        configuration: Debug
+        codeCoverageEnabled: True
+        runInParallel: False
+  
     - task: DotNetCoreCLI@2
       displayName: Build
       inputs:
@@ -47,12 +48,6 @@ stages:
           **\coverage.*
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
         flattenFolders: true
-
-    - task: PublishCodeCoverageResults@1
-      inputs:
-        codeCoverageTool: Cobertura
-        summaryFileLocation: 'src/**/coverage.cobertura.xml'
-        failIfCoverageEmpty: true
 
     - task: PublishPipelineArtifact@1
       displayName: 'Publish Artifacts'
