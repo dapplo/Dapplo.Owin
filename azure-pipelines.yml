@@ -24,6 +24,13 @@ stages:
         packageType: sdk
         version: 3.0.100
 
+    - task: DotNetCoreCLI@2
+      displayName: Build
+      inputs:
+        command: build
+        projects: '$(solution)'
+        arguments: '--configuration Debug /p:Platform="$(buildPlatform)"'
+
     - task: VSTest@2
       displayName: Test
       inputs:
