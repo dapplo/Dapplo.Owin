@@ -33,9 +33,9 @@ stages:
         runInParallel: False
         testSelector: 'testAssemblies'
         testAssemblyVer2: | # Required when testSelector == TestAssemblies
-        #  **\*Tests.dll
-        #  !**\*TestAdapter.dll
-        #  !**\obj\** 
+          **\*Tests.dll
+          !**\*TestAdapter.dll
+          !**\obj\** 
   
     - task: DotNetCoreCLI@2
       displayName: Build
