@@ -31,6 +31,11 @@ stages:
         configuration: Debug
         codeCoverageEnabled: True
         runInParallel: False
+        testSelector: 'testAssemblies'
+        testAssemblyVer2: | # Required when testSelector == TestAssemblies
+        #  **\*Tests.dll
+        #  !**\*TestAdapter.dll
+        #  !**\obj\** 
   
     - task: DotNetCoreCLI@2
       displayName: Build
