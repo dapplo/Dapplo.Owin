@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net471</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <AssemblyTitle>Dapplo.SignalR.Test.VueDemo</AssemblyTitle>
     <Company>Dapplo</Company>
     <Product>Dapplo.SignalR.Test.VueDemo</Product>
-    <Copyright>Copyright © Dapplo 2019</Copyright>
+    <Copyright>Copyright © Dapplo 2021</Copyright>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -31,10 +31,10 @@
     <ProjectReference Include="..\Dapplo.SignalR\Dapplo.SignalR.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Dapplo.Addons.Bootstrapper" Version="1.3.3" />
-    <PackageReference Include="Dapplo.Config" Version="2.1.0" />
-    <PackageReference Include="Dapplo.Log.Loggers" Version="1.3.26" />
-    <PackageReference Include="Microsoft.Owin.StaticFiles" Version="4.1.0" />
+    <PackageReference Include="Dapplo.Addons.Bootstrapper" Version="1.3.9" />
+    <PackageReference Include="Dapplo.Config" Version="2.2.0" />
+    <PackageReference Include="Dapplo.Log.Loggers" Version="1.4.1" />
+    <PackageReference Include="Microsoft.Owin.StaticFiles" Version="4.1.1" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VueDemoSite\index.html" />
