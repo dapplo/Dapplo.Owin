@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <AssemblyTitle>Dapplo.SignalR.Tests</AssemblyTitle>
-    <PackageId>Dapplo.SignalR.Tests</PackageId>
     <PackageTags>dapplo SignalR.Tests</PackageTags>
   </PropertyGroup>
   <ItemGroup>
@@ -11,8 +9,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Owin\Dapplo.Owin.csproj" />
     <ProjectReference Include="..\Dapplo.SignalR\Dapplo.SignalR.csproj" />
-    <PackageReference Include="Dapplo.Addons.Bootstrapper" Version="1.3.9" />
-    <PackageReference Include="Dapplo.HttpExtensions" Version="1.0.8" />
+    <PackageReference Include="Dapplo.Addons.Bootstrapper" Version="1.3.11" />
+    <PackageReference Include="Dapplo.HttpExtensions" Version="1.0.10" />
     <PackageReference Include="Dapplo.Log.XUnit" Version="1.4.1" />
     <PackageReference Include="Microsoft.AspNet.SignalR.Client" Version="2.4.1" />
     <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.1" />
@@ -36,7 +34,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="PresentationCore" />

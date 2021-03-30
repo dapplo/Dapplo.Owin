@@ -2,22 +2,20 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <Description>Dapplo.SignalR takes care of bootstrapping SignalR, based on Dapplo.Owin</Description>
-    <AssemblyTitle>Dapplo.SignalR</AssemblyTitle>
-    <PackageId>Dapplo.SignalR</PackageId>
     <PackageTags>dapplo SignalR</PackageTags>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Owin\Dapplo.Owin.csproj" />
     <PackageReference Include="Autofac.SignalR2" Version="6.0.0" />
-    <PackageReference Include="Dapplo.Addons" Version="1.3.9" />
-    <PackageReference Include="Dapplo.Config.Ini" Version="2.2.0" />
+    <PackageReference Include="Dapplo.Addons" Version="1.3.11" />
+    <PackageReference Include="Dapplo.Config.Ini" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.1" />
     <PackageReference Include="Microsoft.Owin.Host.HttpListener" Version="4.1.1" />
     <PackageReference Include="Microsoft.Owin.Hosting" Version="4.1.1" />
     <PackageReference Include="Microsoft.Owin.Security" Version="4.1.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="[11.0.2,)" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />

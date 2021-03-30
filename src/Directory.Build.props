@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Copyright>Copyright © Dapplo 2016-2021</Copyright>
     <Authors>Dapplo</Authors>
-    <PackageIconUrl>http://www.dapplo.net/favicon.ico</PackageIconUrl>
+    <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/dapplo/Dapplo.Owin</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>http://www.dapplo.net/blocks/Dapplo.Owin/</PackageProjectUrl>
@@ -52,5 +52,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
+    <None Include="$(SolutionDir)\icon.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
 </Project>
