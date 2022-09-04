@@ -7,21 +7,21 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dapplo.Owin\Dapplo.Owin.csproj" />
-    <PackageReference Include="Dapplo.Addons.Bootstrapper" Version="1.3.11" />
-    <PackageReference Include="Dapplo.HttpExtensions" Version="1.0.10" />
-    <PackageReference Include="Dapplo.Log.Loggers" Version="1.4.1" />
-    <PackageReference Include="Dapplo.Log.XUnit" Version="1.4.1" />
-    <PackageReference Include="Microsoft.Owin.Cors" Version="4.1.1" />
-    <PackageReference Include="Microsoft.Owin.Diagnostics" Version="4.1.1" />
-    <PackageReference Include="Microsoft.Owin.Host.HttpListener" Version="4.1.1" />
-    <PackageReference Include="Microsoft.Owin.Hosting" Version="4.1.1" />
+    <PackageReference Include="Dapplo.Addons.Bootstrapper" Version="2.0.4" />
+    <PackageReference Include="Dapplo.HttpExtensions" Version="1.1.2" />
+    <PackageReference Include="Dapplo.Log.Loggers" Version="2.0.1" />
+    <PackageReference Include="Dapplo.Log.XUnit" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Owin.Cors" Version="4.2.2" />
+    <PackageReference Include="Microsoft.Owin.Diagnostics" Version="4.2.2" />
+    <PackageReference Include="Microsoft.Owin.Host.HttpListener" Version="4.2.2" />
+    <PackageReference Include="Microsoft.Owin.Hosting" Version="4.2.2" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
-    <PackageReference Include="xunit.analyzers" Version="0.10.0" />
-    <PackageReference Include="xunit.core" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+    <PackageReference Include="xunit.analyzers" Version="1.0.0" />
+    <PackageReference Include="xunit.core" Version="2.4.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.msbuild" Version="3.0.3">
+    <PackageReference Include="coverlet.msbuild" Version="3.1.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
