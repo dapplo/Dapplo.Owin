@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -22,10 +22,9 @@
 using Dapplo.Owin.Configuration;
 using Dapplo.SignalR.Configuration;
 
-namespace Dapplo.SignalR.Tests.Configuration
+namespace Dapplo.SignalR.Tests.Configuration;
+
+public interface IMyTestConfiguration : IOwinConfiguration, ISignalRConfiguration
 {
-	public interface IMyTestConfiguration : IOwinConfiguration, ISignalRConfiguration
-	{
         
-	}
 }

@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -25,31 +25,30 @@ using Dapplo.Config;
 using Dapplo.Owin.Tests.Configuration;
 using Dapplo.Owin.Tests.Owin;
 
-namespace Dapplo.Owin.Tests
+namespace Dapplo.Owin.Tests;
+
+/// <summary>
+/// Configure Autofac with OWIN for the test
+/// </summary>
+public class OwinStartupAddonModule : AddonModule
 {
-    /// <summary>
-    /// Configure Autofac with OWIN for the test
-    /// </summary>
-    public class OwinStartupAddonModule : AddonModule
+    /// <inheritdoc />
+    protected override void Load(ContainerBuilder builder)
     {
-        /// <inheritdoc />
-        protected override void Load(ContainerBuilder builder)
-        {
-            builder
-                .Register(c => DictionaryConfiguration<IMyTestConfiguration>.Create())
-                .IfNotRegistered(typeof(IMyTestConfiguration))
-                .As<IMyTestConfiguration>()
-                .SingleInstance();
+        builder
+            .Register(c => DictionaryConfiguration<IMyTestConfiguration>.Create())
+            .IfNotRegistered(typeof(IMyTestConfiguration))
+            .As<IMyTestConfiguration>()
+            .SingleInstance();
 
-            builder
-                .RegisterType<OwinService>()
-                .As<IService>()
-                .SingleInstance();
+        builder
+            .RegisterType<OwinService>()
+            .As<IService>()
+            .SingleInstance();
 
-            builder
-                .RegisterType<TestMiddlewareOwinModule>()
-                .As<IOwinModule>()
-                .SingleInstance();
-        }
+        builder
+            .RegisterType<TestMiddlewareOwinModule>()
+            .As<IOwinModule>()
+            .SingleInstance();
     }
 }

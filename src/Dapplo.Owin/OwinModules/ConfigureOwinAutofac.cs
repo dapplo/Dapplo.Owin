@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -23,30 +23,29 @@ using Autofac;
 using Dapplo.Addons;
 using Owin;
 
-namespace Dapplo.Owin.OwinModules
+namespace Dapplo.Owin.OwinModules;
+
+/// <summary>
+///     An Owin Module which configures Autofac
+/// </summary>
+[Service(nameof(ConfigureOwinAutofac), nameof(ConfigureOwinCors))]
+public class ConfigureOwinAutofac : BaseOwinModule
 {
-    /// <summary>
-    ///     An Owin Module which configures Autofac
-    /// </summary>
-    [Service(nameof(ConfigureOwinAutofac), nameof(ConfigureOwinCors))]
-    public class ConfigureOwinAutofac : BaseOwinModule
+	private readonly ILifetimeScope _lifetimeScope;
+
+	/// <inheritdoc />
+	public ConfigureOwinAutofac(ILifetimeScope lifetimeScope)
 	{
-		private readonly ILifetimeScope _lifetimeScope;
+		_lifetimeScope = lifetimeScope;
+	}
 
-		/// <inheritdoc />
-		public ConfigureOwinAutofac(ILifetimeScope lifetimeScope)
-		{
-			_lifetimeScope = lifetimeScope;
-		}
-
-		/// <summary>
-		///     Configure the authentication scheme for Owin
-		/// </summary>
-		/// <param name="server">IOwinServer</param>
-		/// <param name="appBuilder">IAppBuilder</param>
-		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
-		{
-			appBuilder.UseAutofacMiddleware(_lifetimeScope);
-        }
+	/// <summary>
+	///     Configure the authentication scheme for Owin
+	/// </summary>
+	/// <param name="server">IOwinServer</param>
+	/// <param name="appBuilder">IAppBuilder</param>
+	public override void Configure(IOwinServer server, IAppBuilder appBuilder)
+	{
+		appBuilder.UseAutofacMiddleware(_lifetimeScope);
 	}
 }

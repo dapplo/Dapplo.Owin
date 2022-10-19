@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -32,180 +32,179 @@ using Dapplo.Owin.Configuration;
 using Microsoft.Owin.Hosting;
 using Owin;
 
-namespace Dapplo.Owin.Implementation
+namespace Dapplo.Owin.Implementation;
+
+/// <summary>
+///     This class will can start an Owin server.
+///  as a Startup-Action and will shut it down when the shutdown action is called.
+/// </summary>
+// ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
+public class OwinServer : ServiceNodeContainer<IOwinModule>, IOwinServer
 {
+    private static readonly LogSource Log = new LogSource();
+    private IDisposable _webApp;
+
     /// <summary>
-    ///     This class will can start an Owin server.
-    ///  as a Startup-Action and will shut it down when the shutdown action is called.
+    /// The Owin configuration
     /// </summary>
-    // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
-    public class OwinServer : ServiceNodeContainer<IOwinModule>, IOwinServer
+    public IOwinConfiguration OwinConfiguration { get; }
+
+    /// <summary>
+    /// Create an Owin Server
+    /// </summary>
+    /// <param name="owinConfiguration">IOwinConfiguration with the hostname and port to listen on, and some other parameters</param>
+    /// <param name="owinModules">IEnumerable of Lazy IOwinModule and IOwinModuleMetadata</param>
+    public OwinServer(
+        IOwinConfiguration owinConfiguration,
+        IEnumerable<Meta<IOwinModule, ServiceAttribute>> owinModules
+    ) : base(owinModules)
     {
-        private static readonly LogSource Log = new LogSource();
-        private IDisposable _webApp;
+        OwinConfiguration = owinConfiguration;
+    }
 
-        /// <summary>
-        /// The Owin configuration
-        /// </summary>
-        public IOwinConfiguration OwinConfiguration { get; }
+    /// <summary>
+    ///     The server is listening on the following Uri
+    /// </summary>
+    public IEnumerable<string> ListeningOn { get; private set; }
 
-        /// <summary>
-        /// Create an Owin Server
-        /// </summary>
-        /// <param name="owinConfiguration">IOwinConfiguration with the hostname and port to listen on, and some other parameters</param>
-        /// <param name="owinModules">IEnumerable of Lazy IOwinModule and IOwinModuleMetadata</param>
-        public OwinServer(
-            IOwinConfiguration owinConfiguration,
-            IEnumerable<Meta<IOwinModule, ServiceAttribute>> owinModules
-            ) : base(owinModules)
+    /// <summary>
+    ///     Is the server running?
+    /// </summary>
+    public bool IsListening { get; private set; }
+
+    /// <summary>
+    ///     Stop the WebApp
+    /// </summary>
+    /// <param name="cancellationToken">CancellationToken</param>
+    public async Task ShutdownAsync(CancellationToken cancellationToken = default)
+    {
+        Log.Verbose().WriteLine("Stopping the Owin Server on {0}", string.Join(",", ListeningOn));
+        if (!ServiceNodes.Any())
         {
-            OwinConfiguration = owinConfiguration;
+            Log.Info().WriteLine("No OwinModules to stop.");
+            return;
         }
 
-        /// <summary>
-        ///     The server is listening on the following Uri
-        /// </summary>
-        public IEnumerable<string> ListeningOn { get; private set; }
+        await DeinitializeModules(ServiceNodes.Values.Where(node => !node.HasDependencies), cancellationToken).ConfigureAwait(false);
+        IsListening = false;
+        _webApp?.Dispose();
+        _webApp = null;
+    }
 
-        /// <summary>
-        ///     Is the server running?
-        /// </summary>
-        public bool IsListening { get; private set; }
-
-        /// <summary>
-        ///     Stop the WebApp
-        /// </summary>
-        /// <param name="cancellationToken">CancellationToken</param>
-        public async Task ShutdownAsync(CancellationToken cancellationToken = default)
+    /// <summary>
+    ///     Start the WebApp
+    /// </summary>
+    /// <param name="cancellationToken">CancellationToken</param>
+    public async Task StartupAsync(CancellationToken cancellationToken = default)
+    {
+        if (!ServiceNodes.Any())
         {
-            Log.Verbose().WriteLine("Stopping the Owin Server on {0}", string.Join(",", ListeningOn));
-            if (!ServiceNodes.Any())
-            {
-                Log.Info().WriteLine("No OwinModules to stop.");
-                return;
-            }
-
-            await DeinitializeModules(ServiceNodes.Values.Where(node => !node.HasDependencies), cancellationToken).ConfigureAwait(false);
-            IsListening = false;
-            _webApp?.Dispose();
-            _webApp = null;
+            Log.Info().WriteLine("No OwinModules to start.");
+            return;
         }
 
-        /// <summary>
-        ///     Start the WebApp
-        /// </summary>
-        /// <param name="cancellationToken">CancellationToken</param>
-        public async Task StartupAsync(CancellationToken cancellationToken = default)
+        // Logic to find the port to use, first take the one from the configuration
+        // build the uri to listen on
+        ListeningOn = OwinConfiguration.ListeningUrls;
+        Log.Info().WriteLine("Starting WebApp on {0}", string.Join(", " , ListeningOn));
+
+        var rootModules = ServiceNodes.Values.Where(serviceNode => !serviceNode.HasPrerequisites).ToList();
+        await InitializeModules(rootModules, cancellationToken).ConfigureAwait(false);
+
+        var startOptions = new StartOptions();
+        foreach (var url in ListeningOn)
         {
-            if (!ServiceNodes.Any())
+            if (string.IsNullOrEmpty(url))
             {
-                Log.Info().WriteLine("No OwinModules to start.");
-                return;
+                continue;
             }
-
-            // Logic to find the port to use, first take the one from the configuration
-            // build the uri to listen on
-            ListeningOn = OwinConfiguration.ListeningUrls;
-            Log.Info().WriteLine("Starting WebApp on {0}", string.Join(", " , ListeningOn));
-
-            var rootModules = ServiceNodes.Values.Where(serviceNode => !serviceNode.HasPrerequisites).ToList();
-            await InitializeModules(rootModules, cancellationToken).ConfigureAwait(false);
-
-            var startOptions = new StartOptions();
-            foreach (var url in ListeningOn)
-            {
-                if (string.IsNullOrEmpty(url))
-                {
-                    continue;
-                }
-                startOptions.Urls.Add(url);
-            }
-
-            if (startOptions.Urls.Count == 0)
-            {
-                throw new NotSupportedException("Can't start WebApp without Listening URLs.");
-            }
-            _webApp = WebApp.Start(startOptions, appBuilder =>
-            {
-                Log.Verbose().WriteLine("Starting WebApp.");
-                ConfigureModules(appBuilder, rootModules);
-            });
-            IsListening = true;
+            startOptions.Urls.Add(url);
         }
 
-        /// <summary>
-        /// Create a task for the InitializeAsync
-        /// </summary>
-        /// <param name="serviceNodes">IEnumerable with ServiceNode</param>
-        /// <param name="cancellationToken">CancellationToken</param>
-        /// <returns>Task</returns>
-        private Task InitializeModules(IEnumerable<ServiceNode<IOwinModule>> serviceNodes, CancellationToken cancellationToken = default)
+        if (startOptions.Urls.Count == 0)
         {
-            var tasks = new List<Task>();
-            foreach (var serviceNode in serviceNodes)
+            throw new NotSupportedException("Can't start WebApp without Listening URLs.");
+        }
+        _webApp = WebApp.Start(startOptions, appBuilder =>
+        {
+            Log.Verbose().WriteLine("Starting WebApp.");
+            ConfigureModules(appBuilder, rootModules);
+        });
+        IsListening = true;
+    }
+
+    /// <summary>
+    /// Create a task for the InitializeAsync
+    /// </summary>
+    /// <param name="serviceNodes">IEnumerable with ServiceNode</param>
+    /// <param name="cancellationToken">CancellationToken</param>
+    /// <returns>Task</returns>
+    private Task InitializeModules(IEnumerable<ServiceNode<IOwinModule>> serviceNodes, CancellationToken cancellationToken = default)
+    {
+        var tasks = new List<Task>();
+        foreach (var serviceNode in serviceNodes)
+        {
+            Log.Debug().WriteLine("Initializing {0} ({1})", serviceNode.Details.Name, serviceNode.Service.GetType());
+
+            var initializeTask = Task.Run(() => serviceNode.Service.InitializeAsync(this, cancellationToken), cancellationToken);
+
+            if (serviceNode.Dependencies.Count > 0)
             {
-                Log.Debug().WriteLine("Initializing {0} ({1})", serviceNode.Details.Name, serviceNode.Service.GetType());
-
-                var initializeTask = Task.Run(() => serviceNode.Service.InitializeAsync(this, cancellationToken), cancellationToken);
-
-                if (serviceNode.Dependencies.Count > 0)
-                {
-                    // Recurse into InitializeModules
-                    initializeTask = initializeTask.ContinueWith(task => InitializeModules(serviceNode.Dependencies, cancellationToken), cancellationToken).Unwrap();
-                }
-                if (!serviceNode.Details.SkipAwait)
-                {
-                    tasks.Add(initializeTask);
-                }
+                // Recurse into InitializeModules
+                initializeTask = initializeTask.ContinueWith(task => InitializeModules(serviceNode.Dependencies, cancellationToken), cancellationToken).Unwrap();
             }
-
-            return tasks.Count > 0 ? Task.WhenAll(tasks) : Task.CompletedTask;
+            if (!serviceNode.Details.SkipAwait)
+            {
+                tasks.Add(initializeTask);
+            }
         }
 
-        /// <summary>
-        /// Create a task for the InitializeAsync
-        /// </summary>
-        /// <param name="serviceNodes">IEnumerable with ServiceNode</param>
-        /// <param name="cancellationToken">CancellationToken</param>
-        /// <returns>Task</returns>
-        private Task DeinitializeModules(IEnumerable<ServiceNode<IOwinModule>> serviceNodes, CancellationToken cancellationToken = default)
+        return tasks.Count > 0 ? Task.WhenAll(tasks) : Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Create a task for the InitializeAsync
+    /// </summary>
+    /// <param name="serviceNodes">IEnumerable with ServiceNode</param>
+    /// <param name="cancellationToken">CancellationToken</param>
+    /// <returns>Task</returns>
+    private Task DeinitializeModules(IEnumerable<ServiceNode<IOwinModule>> serviceNodes, CancellationToken cancellationToken = default)
+    {
+        var tasks = new List<Task>();
+        foreach (var serviceNode in serviceNodes)
         {
-            var tasks = new List<Task>();
-            foreach (var serviceNode in serviceNodes)
+            Log.Debug().WriteLine("Deinitializing {0} ({1})", serviceNode.Details.Name, serviceNode.Service.GetType());
+
+            var deinitializeTask = Task.Run(() => serviceNode.Service.DeinitializeAsync(this, cancellationToken), cancellationToken);
+
+            if (serviceNode.Prerequisites.Count > 0)
             {
-                Log.Debug().WriteLine("Deinitializing {0} ({1})", serviceNode.Details.Name, serviceNode.Service.GetType());
-
-                var deinitializeTask = Task.Run(() => serviceNode.Service.DeinitializeAsync(this, cancellationToken), cancellationToken);
-
-                if (serviceNode.Prerequisites.Count > 0)
-                {
-                    // Recurse into DeinitializeModules
-                    deinitializeTask = deinitializeTask.ContinueWith(task => DeinitializeModules(serviceNode.Prerequisites, cancellationToken), cancellationToken).Unwrap();
-                }
-
-                if (!serviceNode.Details.SkipAwait)
-                {
-                    tasks.Add(deinitializeTask);
-                }
+                // Recurse into DeinitializeModules
+                deinitializeTask = deinitializeTask.ContinueWith(task => DeinitializeModules(serviceNode.Prerequisites, cancellationToken), cancellationToken).Unwrap();
             }
 
-            return tasks.Count > 0 ? Task.WhenAll(tasks) : Task.CompletedTask;
+            if (!serviceNode.Details.SkipAwait)
+            {
+                tasks.Add(deinitializeTask);
+            }
         }
 
-        /// <summary>
-        /// Call Configure recursively
-        /// </summary>
-        /// <param name="appBuilder">IAppBuilder</param>
-        /// <param name="serviceNodes">IEnumerable with ServiceNode</param>
-        private void ConfigureModules(IAppBuilder appBuilder, IEnumerable<ServiceNode<IOwinModule>> serviceNodes)
-        {
-            foreach (var serviceNode in serviceNodes)
-            {
-                Log.Debug().WriteLine("Configuring {0} ({1})", serviceNode.Details.Name, serviceNode.Service.GetType());
+        return tasks.Count > 0 ? Task.WhenAll(tasks) : Task.CompletedTask;
+    }
 
-                serviceNode.Service.Configure(this, appBuilder);
-                ConfigureModules(appBuilder, serviceNode.Dependencies);
-            }
+    /// <summary>
+    /// Call Configure recursively
+    /// </summary>
+    /// <param name="appBuilder">IAppBuilder</param>
+    /// <param name="serviceNodes">IEnumerable with ServiceNode</param>
+    private void ConfigureModules(IAppBuilder appBuilder, IEnumerable<ServiceNode<IOwinModule>> serviceNodes)
+    {
+        foreach (var serviceNode in serviceNodes)
+        {
+            Log.Debug().WriteLine("Configuring {0} ({1})", serviceNode.Details.Name, serviceNode.Service.GetType());
+
+            serviceNode.Service.Configure(this, appBuilder);
+            ConfigureModules(appBuilder, serviceNode.Dependencies);
         }
     }
 }

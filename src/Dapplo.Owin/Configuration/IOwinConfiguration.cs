@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -24,36 +24,35 @@ using System.ComponentModel;
 using System.Net;
 using System.Runtime.Serialization;
 
-namespace Dapplo.Owin.Configuration
+namespace Dapplo.Owin.Configuration;
+
+/// <summary>
+///     The Owin configuration container, this can be stored with Dapplo.Config
+/// </summary>
+public interface IOwinConfiguration
 {
     /// <summary>
-    ///     The Owin configuration container, this can be stored with Dapplo.Config
+    /// Passed to the startoptions of the Owin webapp as urls to listen on
     /// </summary>
-    public interface IOwinConfiguration
-    {
-        /// <summary>
-        /// Passed to the startoptions of the Owin webapp as urls to listen on
-        /// </summary>
-        [Description("Urls for the Owin server to listen on.")]
-        IList<string> ListeningUrls { get; set; }
+    [Description("Urls for the Owin server to listen on.")]
+    IList<string> ListeningUrls { get; set; }
 
-        /// <summary>
-        /// Specify if an error page should be shown
-        /// </summary>
-        [Description("Show an error page when something happens"), DefaultValue(false), DataMember(EmitDefaultValue = true)]
-        bool UseErrorPage { get; set; }
+    /// <summary>
+    /// Specify if an error page should be shown
+    /// </summary>
+    [Description("Show an error page when something happens"), DefaultValue(false), DataMember(EmitDefaultValue = true)]
+    bool UseErrorPage { get; set; }
 
-        /// <summary>
-        /// Enable Cross Origin calls
-        /// </summary>
-        [Description("Set this to true to allow cross origin calls, this is needed when a site is not served by the owin server, but uses this.")]
-        [DefaultValue(true)]
-        bool EnableCors { get; set; }
+    /// <summary>
+    /// Enable Cross Origin calls
+    /// </summary>
+    [Description("Set this to true to allow cross origin calls, this is needed when a site is not served by the owin server, but uses this.")]
+    [DefaultValue(true)]
+    bool EnableCors { get; set; }
 
-        /// <summary>
-        /// Specify what AuthenticationScheme is used, default is none
-        /// </summary>
-        [Description("The Authentication scheme for Owin"), DefaultValue(AuthenticationSchemes.None), DataMember(EmitDefaultValue = true)]
-        AuthenticationSchemes AuthenticationScheme { get; set; }
-    }
+    /// <summary>
+    /// Specify what AuthenticationScheme is used, default is none
+    /// </summary>
+    [Description("The Authentication scheme for Owin"), DefaultValue(AuthenticationSchemes.None), DataMember(EmitDefaultValue = true)]
+    AuthenticationSchemes AuthenticationScheme { get; set; }
 }

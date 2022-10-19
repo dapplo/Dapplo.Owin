@@ -1,16 +1,17 @@
-﻿using Dapplo.SignalR.Test.VueDemo.Model;
+﻿using System;
+using System.Windows;
+using Dapplo.SignalR.Test.VueDemo.Model;
 
-namespace Dapplo.SignalR.Test.VueDemo.Ui
+namespace Dapplo.SignalR.Test.VueDemo.Ui;
+
+/// <summary>
+/// Interaction logic for MainWindow.xaml
+/// </summary>
+public partial class MainWindow
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow
+    public MainWindow(MyVueModel myVueModel)
     {
-        public MainWindow(IMyVueModel myVueModel)
-        {
-            DataContext = myVueModel;
-            InitializeComponent();
-        }
+        DataContext = myVueModel;
+        InitializeComponent();
     }
 }

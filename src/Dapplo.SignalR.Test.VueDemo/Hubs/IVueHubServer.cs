@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -20,21 +20,19 @@
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System.Threading.Tasks;
-using Dapplo.SignalR.Test.VueDemo.Model.Impl;
+using Dapplo.SignalR.Test.VueDemo.Model;
 
-namespace Dapplo.SignalR.Test.VueDemo.Hubs
+namespace Dapplo.SignalR.Test.VueDemo.Hubs;
+
+/// <summary>
+/// Interface for the server
+/// </summary>
+public interface IVueHubServer
 {
     /// <summary>
-    /// Interface for the server
+    /// Method for the client to call
+    /// TODO: Clients can't work with interfaces!
     /// </summary>
-    public interface IVueHubServer
-    {
-        /// <summary>
-        /// Method for the client to call
-        /// TODO: Clients can't work with interfaces!
-        /// </summary>
-        /// <param name="myVueModel">MyVueModel</param>
-        /// <returns></returns>
-        Task StoreModelChange(MyVueModel myVueModel);
-    }
+    /// <param name="myVueModel">MyVueModel</param>
+    Task StoreModelChange(MyVueModel myVueModel);
 }

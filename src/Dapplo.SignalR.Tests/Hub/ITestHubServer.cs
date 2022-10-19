@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -19,23 +19,22 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
-namespace Dapplo.SignalR.Tests.Hub
+namespace Dapplo.SignalR.Tests.Hub;
+
+/// <summary>
+/// Interface for the server
+/// </summary>
+public interface ITestHubServer
 {
     /// <summary>
-    /// Interface for the server
+    /// Return a string when called
     /// </summary>
-    public interface ITestHubServer
-    {
-        /// <summary>
-        /// Return a string when called
-        /// </summary>
-        /// <param name="testValue">TestType</param>
-        /// <returns>string</returns>
-        string Hello(TestType testValue);
+    /// <param name="testValue">TestType</param>
+    /// <returns>string</returns>
+    string Hello(TestType testValue);
 
-        /// <summary>
-        /// This just throws an exception.
-        /// </summary>
-        void CreateException();
-    }
+    /// <summary>
+    /// This just throws an exception.
+    /// </summary>
+    void CreateException();
 }

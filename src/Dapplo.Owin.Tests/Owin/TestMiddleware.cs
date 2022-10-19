@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -23,28 +23,27 @@ using System.Threading.Tasks;
 using Dapplo.Log;
 using Microsoft.Owin;
 
-namespace Dapplo.Owin.Tests.Owin
+namespace Dapplo.Owin.Tests.Owin;
+
+/// <summary>
+///     The "test" Middleware, it returns "Dapplo" for EVERY request
+/// </summary>
+public class TestMiddleware : OwinMiddleware
 {
-    /// <summary>
-    ///     The "test" Middleware, it returns "Dapplo" for EVERY request
-    /// </summary>
-    public class TestMiddleware : OwinMiddleware
+    private static readonly LogSource Log = new LogSource();
+
+    public TestMiddleware(OwinMiddleware next) : base(next)
     {
-        private static readonly LogSource Log = new LogSource();
+    }
 
-        public TestMiddleware(OwinMiddleware next) : base(next)
-        {
-        }
-
-        public override async Task Invoke(IOwinContext owinContext)
-        {
-            Log.Debug().WriteLine("Http method: {0}, path: {1}", owinContext.Request.Method, owinContext.Request.Path);
-            var user = owinContext.Authentication?.User;
-            Log.Debug().WriteLine("User: {0}", user?.Identity?.Name ?? "not available");
-            owinContext.Response.StatusCode = 200;
-            owinContext.Response.ContentType = "text/plain";
-            await owinContext.Response.WriteAsync("Dapplo").ConfigureAwait(false);
-            await Next.Invoke(owinContext).ConfigureAwait(false);
-        }
+    public override async Task Invoke(IOwinContext owinContext)
+    {
+        Log.Debug().WriteLine("Http method: {0}, path: {1}", owinContext.Request.Method, owinContext.Request.Path);
+        var user = owinContext.Authentication?.User;
+        Log.Debug().WriteLine("User: {0}", user?.Identity?.Name ?? "not available");
+        owinContext.Response.StatusCode = 200;
+        owinContext.Response.ContentType = "text/plain";
+        await owinContext.Response.WriteAsync("Dapplo").ConfigureAwait(false);
+        await Next.Invoke(owinContext).ConfigureAwait(false);
     }
 }

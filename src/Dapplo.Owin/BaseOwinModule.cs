@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -23,31 +23,30 @@ using System.Threading;
 using System.Threading.Tasks;
 using Owin;
 
-namespace Dapplo.Owin
+namespace Dapplo.Owin;
+
+/// <summary>
+/// A base implementation for an Owin module, don't forget to mark you
+/// </summary>
+public abstract class BaseOwinModule : IOwinModule
 {
 	/// <summary>
-	/// A base implementation for an Owin module, don't forget to mark you
+	/// This is a default implementation, which does nothing
 	/// </summary>
-	public abstract class BaseOwinModule : IOwinModule
+	public virtual Task InitializeAsync(IOwinServer server, CancellationToken cancellationToken = default)
 	{
-		/// <summary>
-		/// This is a default implementation, which does nothing
-		/// </summary>
-		public virtual Task InitializeAsync(IOwinServer server, CancellationToken cancellationToken = default)
-		{
-			return Task.FromResult(true);
-		}
+		return Task.FromResult(true);
+	}
 
-		/// <inheritdoc />
-		public abstract void Configure(IOwinServer server, IAppBuilder appBuilder);
+	/// <inheritdoc />
+	public abstract void Configure(IOwinServer server, IAppBuilder appBuilder);
 
-		/// <inheritdoc />
-		/// <summary>
-		/// A default implementation, which does nothing
-		/// </summary>
-		public virtual Task DeinitializeAsync(IOwinServer server, CancellationToken cancellationToken = default)
-		{
-			return Task.FromResult(true);
-		}
+	/// <inheritdoc />
+	/// <summary>
+	/// A default implementation, which does nothing
+	/// </summary>
+	public virtual Task DeinitializeAsync(IOwinServer server, CancellationToken cancellationToken = default)
+	{
+		return Task.FromResult(true);
 	}
 }

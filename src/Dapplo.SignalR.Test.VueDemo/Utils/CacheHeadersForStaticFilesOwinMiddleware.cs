@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -23,38 +23,37 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Owin;
 
-namespace Dapplo.SignalR.Test.VueDemo.Utils
+namespace Dapplo.SignalR.Test.VueDemo.Utils;
+
+/// <inheritdoc />
+public class CacheHeadersForStaticFilesOwinMiddleware : OwinMiddleware
 {
+    private static readonly Regex StaticFilesRegex = new Regex(@".*(\.js|\.ts|\.map|\.html|\.css)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     /// <inheritdoc />
-    public class CacheHeadersForStaticFilesOwinMiddleware : OwinMiddleware
+    public CacheHeadersForStaticFilesOwinMiddleware(OwinMiddleware next) : base(next)
     {
-        private static readonly Regex StaticFilesRegex = new Regex(@".*(\.js|\.ts|\.map|\.html|\.css)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        /// <inheritdoc />
-        public CacheHeadersForStaticFilesOwinMiddleware(OwinMiddleware next) : base(next)
-        {
-        }
+    }
 
-        /// <inheritdoc />
-        public override Task Invoke(IOwinContext context)
+    /// <inheritdoc />
+    public override Task Invoke(IOwinContext context)
+    {
+        if (!context.Request.Path.HasValue)
         {
-            if (!context.Request.Path.HasValue)
-            {
-                return Next.Invoke(context);
-            }
-
-            var path = context.Request.Path.Value;
-            if (StaticFilesRegex.IsMatch(path))
-            {
-                context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
-                context.Response.Headers["Pragma"] = "no-cache";
-                context.Response.Headers["Expires"] = "0";
-            }
-            else
-            {
-                // Keep files max 1 working day (9 hours)
-                context.Response.Headers.Add("Cache-Control", new[] { "public", "max-age=32400" });
-            }
             return Next.Invoke(context);
         }
+
+        var path = context.Request.Path.Value;
+        if (StaticFilesRegex.IsMatch(path))
+        {
+            context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            context.Response.Headers["Pragma"] = "no-cache";
+            context.Response.Headers["Expires"] = "0";
+        }
+        else
+        {
+            // Keep files max 1 working day (9 hours)
+            context.Response.Headers.Add("Cache-Control", new[] { "public", "max-age=32400" });
+        }
+        return Next.Invoke(context);
     }
 }

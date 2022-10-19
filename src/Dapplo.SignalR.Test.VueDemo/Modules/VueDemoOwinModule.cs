@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -29,61 +29,60 @@ using Microsoft.Owin;
 using Microsoft.Owin.StaticFiles;
 using Owin;
 
-namespace Dapplo.SignalR.Test.VueDemo.Modules
+namespace Dapplo.SignalR.Test.VueDemo.Modules;
+
+/// <summary>
+///     Configure the VueDemo OWIN site
+///     This will be automatically picked up by Dapplo.Owin
+/// </summary>
+[Service(nameof(VueDemoOwinModule), nameof(ConfigureOwinCors))]
+public class VueDemoOwinModule : BaseOwinModule
 {
+    private readonly Func<Assembly, string, ExtendableEmbeddedResourceFileSystem> _fileSystemFactory;
+
     /// <summary>
-    ///     Configure the VueDemo OWIN site
-    ///     This will be automatically picked up by Dapplo.Owin
+    /// The constructor use for dependency injection
     /// </summary>
-    [Service(nameof(VueDemoOwinModule), nameof(ConfigureOwinCors))]
-    public class VueDemoOwinModule : BaseOwinModule
+    /// <param name="fileSystemFactory">ExtendableEmbeddedResourceFileSystem</param>
+    public VueDemoOwinModule(Func<Assembly, string, ExtendableEmbeddedResourceFileSystem> fileSystemFactory)
     {
-        private readonly Func<Assembly, string, ExtendableEmbeddedResourceFileSystem> _fileSystemFactory;
+        _fileSystemFactory = fileSystemFactory;
+    }
 
-        /// <summary>
-        /// The constructor use for dependency injection
-        /// </summary>
-        /// <param name="fileSystemFactory">ExtendableEmbeddedResourceFileSystem</param>
-        public VueDemoOwinModule(Func<Assembly, string, ExtendableEmbeddedResourceFileSystem> fileSystemFactory)
+    /// <summary>
+    ///     Create a File-Server for the Vue-Demo files
+    /// </summary>
+    /// <param name="server">IOwinServer</param>
+    /// <param name="appBuilder">IAppBuilder</param>
+    public override void Configure(IOwinServer server, IAppBuilder appBuilder)
+    {
+        // Enable file server for the Call-ING files
+        var vueDemoFileServerOption = new FileServerOptions
         {
-            _fileSystemFactory = fileSystemFactory;
-        }
-
-        /// <summary>
-        ///     Create a File-Server for the Vue-Demo files
-        /// </summary>
-        /// <param name="server">IOwinServer</param>
-        /// <param name="appBuilder">IAppBuilder</param>
-        public override void Configure(IOwinServer server, IAppBuilder appBuilder)
-        {
-            // Enable file server for the Call-ING files
-            var vueDemoFileServerOption = new FileServerOptions
+            EnableDefaultFiles = false,
+            RequestPath = new PathString("/vuedemo"),
+            FileSystem = _fileSystemFactory(GetType().Assembly, $"{typeof(Startup).Namespace}.VueDemoSite"),
+            EnableDirectoryBrowsing = false,
+            DefaultFilesOptions =
             {
-                EnableDefaultFiles = false,
-                RequestPath = new PathString("/vuedemo"),
-                FileSystem = _fileSystemFactory(GetType().Assembly, $"{typeof(Startup).Namespace}.VueDemoSite"),
-                EnableDirectoryBrowsing = false,
-                DefaultFilesOptions =
+                DefaultFileNames =new[] {"index.html"}
+            }
+        };
+        appBuilder.Use<CacheHeadersForStaticFilesOwinMiddleware>();
+        appBuilder.UseFileServer(vueDemoFileServerOption);
+        appBuilder.Use((owinContext, next) =>
+        {
+            return next().ContinueWith(x =>
+            {
+                var statusCode = owinContext.Response.StatusCode;
+                if (statusCode < 300)
                 {
-                    DefaultFileNames =new[] {"index.html"}
+                    return;
                 }
-            };
-            appBuilder.Use<CacheHeadersForStaticFilesOwinMiddleware>();
-            appBuilder.UseFileServer(vueDemoFileServerOption);
-            appBuilder.Use((owinContext, next) =>
-            {
-                return next().ContinueWith(x =>
-                {
-                    var statusCode = owinContext.Response.StatusCode;
-                    if (statusCode < 300)
-                    {
-                        return;
-                    }
-                    var request = owinContext.Request;
-                    var redirectUri = request.Uri.AbsoluteUri.Replace(request.Uri.PathAndQuery, $"{vueDemoFileServerOption.RequestPath}/error/{statusCode}.html");
-                    owinContext.Response.Redirect(redirectUri);
-                });
+                var request = owinContext.Request;
+                var redirectUri = request.Uri.AbsoluteUri.Replace(request.Uri.PathAndQuery, $"{vueDemoFileServerOption.RequestPath}/error/{statusCode}.html");
+                owinContext.Response.Redirect(redirectUri);
             });
-        }
+        });
     }
 }

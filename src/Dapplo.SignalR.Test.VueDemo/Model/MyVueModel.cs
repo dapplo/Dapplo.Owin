@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -19,14 +19,30 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System;
 using System.ComponentModel;
-using Dapplo.Config.Interfaces;
 
-namespace Dapplo.SignalR.Test.VueDemo.Model
+namespace Dapplo.SignalR.Test.VueDemo.Model;
+
+public class MyVueModel : INotifyPropertyChanged
 {
-    public interface IMyVueModel : IDefaultValue, INotifyPropertyChanged
+    private string _name = Environment.UserName;
+        
+    public string Name
     {
-        [DefaultValue("Dapplo")]
-        string Name { get; set; }
+        get => _name;
+        set
+        {
+            _name = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+        }
     }
+
+    public string Source
+    {
+        get;
+        set;
+    } = "Hub";
+        
+    public event PropertyChangedEventHandler PropertyChanged;
 }

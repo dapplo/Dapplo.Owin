@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -25,34 +25,39 @@ using System.Threading.Tasks;
 using System.Windows;
 using Autofac;
 using Dapplo.Addons.Bootstrapper;
+using Dapplo.Log;
+using Dapplo.Log.Loggers;
 using Dapplo.SignalR.Test.VueDemo.Ui;
 
-namespace Dapplo.SignalR.Test.VueDemo
+namespace Dapplo.SignalR.Test.VueDemo;
+
+public class Startup
 {
-    public class Startup
+    [STAThread]
+    public static void Main(string[] args)
     {
-        [STAThread]
-        public static void Main(string[] args)
+#if DEBUG
+        LogSettings.RegisterDefaultLogger<DebugLogger>(LogLevels.Debug);
+#endif
+        var applicationConfig = ApplicationConfigBuilder.
+            Create()
+            .WithApplicationName("VueDemo")
+            .WithoutCopyOfEmbeddedAssemblies()
+            .WithAssemblyPatterns("Dapplo.*")
+            .BuildApplicationConfig();
+        using (var bootstrapper = new ApplicationBootstrapper(applicationConfig))
         {
-            var applicationConfig = ApplicationConfigBuilder.
-                Create()
-                .WithApplicationName("VueDemo")
-                .WithAssemblyPatterns("Dapplo*")
-                .BuildApplicationConfig();
-            using (var bootstrapper = new ApplicationBootstrapper(applicationConfig))
-            {
-                bootstrapper.Configure();
+            bootstrapper.Configure();
 
-                bootstrapper.StartupAsync().Wait();
+            bootstrapper.StartupAsync().Wait();
 
-                Task.Delay(1000).Wait();
-                Process.Start("http://localhost:8380/vuedemo/index.html");
+            Task.Delay(1000).Wait();
+            Process.Start("http://localhost:8380/vuedemo/index.html");
 
-                var application = new Application();
-                var mainWindow = bootstrapper.Container.Resolve<MainWindow>();
-                application.Run(mainWindow);
-                bootstrapper.ShutdownAsync().Wait();
-            }
+            var application = new Application();
+            var mainWindow = bootstrapper.Container.Resolve<MainWindow>();
+            application.Run(mainWindow);
+            bootstrapper.ShutdownAsync().Wait();
         }
     }
 }

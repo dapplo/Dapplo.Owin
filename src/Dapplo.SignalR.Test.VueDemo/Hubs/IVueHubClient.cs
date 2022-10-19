@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -22,10 +22,9 @@
 using System.Threading.Tasks;
 using Dapplo.SignalR.Test.VueDemo.Model;
 
-namespace Dapplo.SignalR.Test.VueDemo.Hubs
+namespace Dapplo.SignalR.Test.VueDemo.Hubs;
+
+public interface IVueHubClient
 {
-	public interface IVueHubClient
-	{
-		Task UpdateModel(IMyVueModel myVueModel);
-	}
+	Task UpdateModel(MyVueModel myVueModel);
 }

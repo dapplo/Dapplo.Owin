@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -26,28 +26,27 @@ using Dapplo.Config.Ini;
 using Dapplo.Owin.Configuration;
 using Dapplo.SignalR.Configuration;
 
-namespace Dapplo.SignalR.Test.VueDemo.Configuration
+namespace Dapplo.SignalR.Test.VueDemo.Configuration;
+
+/// <summary>
+/// The configuration for the web-server (owin)
+/// </summary>
+[IniSection("Webserver")]
+[Description("The configuration for the web-server (owin)")]
+public interface IWebserverConfiguration : IIniSection, IOwinConfiguration, ISignalRConfiguration
 {
     /// <summary>
-    /// The configuration for the web-server (owin)
+    /// Force the listening uri
     /// </summary>
-    [IniSection("Webserver")]
-    [Description("The configuration for the web-server (owin)")]
-    public interface IWebserverConfiguration : IIniSection, IOwinConfiguration, ISignalRConfiguration
-    {
-        /// <summary>
-        /// Force the listening uri
-        /// </summary>
-        [DefaultValue("http://localhost:8380")]
-        [Description("Urls for the Owin server to listen on.")]
-        new IList<string> ListeningUrls { get; set; }
+    [DefaultValue("http://localhost:8380")]
+    [Description("Urls for the Owin server to listen on.")]
+    new IList<string> ListeningUrls { get; set; }
 
-        /// <summary>
-        /// Force AuthenticationScheme to have Negotiate as default
-        /// </summary>
-        [Description("The Authentication scheme for Owin")]
-        [DefaultValue(AuthenticationSchemes.Negotiate)]
-        [IniPropertyBehavior(Read = false, Write = false)]
-        new AuthenticationSchemes AuthenticationScheme { get; set; }
-    }
+    /// <summary>
+    /// Force AuthenticationScheme to have Negotiate as default
+    /// </summary>
+    [Description("The Authentication scheme for Owin")]
+    [DefaultValue(AuthenticationSchemes.Negotiate)]
+    [IniPropertyBehavior(Read = false, Write = false)]
+    new AuthenticationSchemes AuthenticationScheme { get; set; }
 }

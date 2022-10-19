@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -25,97 +25,96 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Owin.FileSystems;
 
-namespace Dapplo.SignalR.Test.VueDemo.Utils
+namespace Dapplo.SignalR.Test.VueDemo.Utils;
+
+/// <summary>
+/// This returns the file info on embedded resources
+/// </summary>
+public class EmbeddedResourceFileInfo : IFileInfo
 {
+    private readonly Assembly _assembly;
+    private readonly IEnumerable<IFileInfoStreamModifier> _fileInfoStreamModifiers;
+    private readonly string _resourcePath;
+
+    private long? _length;
+
     /// <summary>
-    /// This returns the file info on embedded resources
+    /// Constructor
     /// </summary>
-    public class EmbeddedResourceFileInfo : IFileInfo
+    /// <param name="assembly">Assembly</param>
+    /// <param name="resource">Tuple</param>
+    /// <param name="lastModified">DateTime</param>
+    /// <param name="fileInfoStreamModifiers">IEnumerable of IFileInfoStreamModifier</param>
+    public EmbeddedResourceFileInfo(Assembly assembly, Tuple<string, string> resource, DateTime lastModified, IEnumerable<IFileInfoStreamModifier> fileInfoStreamModifiers = null)
     {
-        private readonly Assembly _assembly;
-        private readonly IEnumerable<IFileInfoStreamModifier> _fileInfoStreamModifiers;
-        private readonly string _resourcePath;
+        _assembly = assembly;
+        _fileInfoStreamModifiers = fileInfoStreamModifiers;
+        LastModified = lastModified;
+        _resourcePath = resource.Item1;
+        Name = resource.Item2;
+    }
 
-        private long? _length;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="assembly">Assembly</param>
-        /// <param name="resource">Tuple</param>
-        /// <param name="lastModified">DateTime</param>
-        /// <param name="fileInfoStreamModifiers">IEnumerable of IFileInfoStreamModifier</param>
-        public EmbeddedResourceFileInfo(Assembly assembly, Tuple<string, string> resource, DateTime lastModified, IEnumerable<IFileInfoStreamModifier> fileInfoStreamModifiers = null)
+    /// <summary>
+    /// Length of the resource
+    /// </summary>
+    public long Length
+    {
+        get
         {
-            _assembly = assembly;
-            _fileInfoStreamModifiers = fileInfoStreamModifiers;
-            LastModified = lastModified;
-            _resourcePath = resource.Item1;
-            Name = resource.Item2;
-        }
-
-        /// <summary>
-        /// Length of the resource
-        /// </summary>
-        public long Length
-        {
-            get
+            if (_length.HasValue)
             {
-                if (_length.HasValue)
-                {
-                    return _length.Value;
-                }
-
-                using (var stream = _assembly.GetManifestResourceStream(_resourcePath))
-                {
-                    _length = stream?.Length ?? 0;
-                }
-
                 return _length.Value;
             }
-        }
 
-        /// <summary>
-        /// As this is an embedded Resource, the file does not have a PhysicalPath
-        /// </summary>
-        public string PhysicalPath => null;
-
-        /// <inheritdoc />
-        public string Name { get; }
-
-        /// <inheritdoc />
-        public DateTime LastModified { get; }
-
-        /// <summary>
-        ///  As this is an embedded Resource, there is no directory
-        /// </summary>
-        public bool IsDirectory => false;
-
-        /// <summary>
-        /// Return the read stream of the resource
-        /// </summary>
-        /// <returns>Stream</returns>
-        public Stream CreateReadStream()
-        {
-            var stream = _assembly.GetManifestResourceStream(_resourcePath);
-            if (!_length.HasValue)
+            using (var stream = _assembly.GetManifestResourceStream(_resourcePath))
             {
                 _length = stream?.Length ?? 0;
             }
 
-            if (_fileInfoStreamModifiers != null)
-            {
-                foreach (var fileInfoStreamModifier in _fileInfoStreamModifiers)
-                {
-                    if (!fileInfoStreamModifier.CanModifyStream(this))
-                    {
-                        continue;
-                    }
-
-                    stream = fileInfoStreamModifier.ModifyStream(this, stream);
-                }
-            }
-            return stream;
+            return _length.Value;
         }
+    }
+
+    /// <summary>
+    /// As this is an embedded Resource, the file does not have a PhysicalPath
+    /// </summary>
+    public string PhysicalPath => null;
+
+    /// <inheritdoc />
+    public string Name { get; }
+
+    /// <inheritdoc />
+    public DateTime LastModified { get; }
+
+    /// <summary>
+    ///  As this is an embedded Resource, there is no directory
+    /// </summary>
+    public bool IsDirectory => false;
+
+    /// <summary>
+    /// Return the read stream of the resource
+    /// </summary>
+    /// <returns>Stream</returns>
+    public Stream CreateReadStream()
+    {
+        var stream = _assembly.GetManifestResourceStream(_resourcePath);
+        if (!_length.HasValue)
+        {
+            _length = stream?.Length ?? 0;
+        }
+
+        if (_fileInfoStreamModifiers != null)
+        {
+            foreach (var fileInfoStreamModifier in _fileInfoStreamModifiers)
+            {
+                if (!fileInfoStreamModifier.CanModifyStream(this))
+                {
+                    continue;
+                }
+
+                stream = fileInfoStreamModifier.ModifyStream(this, stream);
+            }
+        }
+        return stream;
     }
 }

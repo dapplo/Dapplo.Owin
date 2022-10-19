@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -24,37 +24,36 @@ using Dapplo.Addons;
 using Dapplo.Log;
 using Owin;
 
-namespace Dapplo.Owin.OwinModules
+namespace Dapplo.Owin.OwinModules;
+
+/// <summary>
+///     An Owin Module which configures the Authentication
+/// </summary>
+[Service(nameof(ConfigureOwinAuthentication), nameof(ConfigureOwinCors))]
+public class ConfigureOwinAuthentication : BaseOwinModule
 {
+	private static readonly LogSource Log = new LogSource();
+
 	/// <summary>
-	///     An Owin Module which configures the Authentication
+	///     Configure the authentication scheme for Owin
 	/// </summary>
-	[Service(nameof(ConfigureOwinAuthentication), nameof(ConfigureOwinCors))]
-	public class ConfigureOwinAuthentication : BaseOwinModule
+	/// <param name="server">IOwinServer</param>
+	/// <param name="appBuilder">IAppBuilder</param>
+	public override void Configure(IOwinServer server, IAppBuilder appBuilder)
 	{
-		private static readonly LogSource Log = new LogSource();
-
-		/// <summary>
-		///     Configure the authentication scheme for Owin
-		/// </summary>
-		/// <param name="server">IOwinServer</param>
-		/// <param name="appBuilder">IAppBuilder</param>
-		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
+		Log.Verbose().WriteLine("AuthenticationScheme is configured to {0}", server.OwinConfiguration.AuthenticationScheme);
+		// Enable Authentication, if a scheme is set
+		if (server.OwinConfiguration.AuthenticationScheme == AuthenticationSchemes.None)
 		{
-			Log.Verbose().WriteLine("AuthenticationScheme is configured to {0}", server.OwinConfiguration.AuthenticationScheme);
-			// Enable Authentication, if a scheme is set
-			if (server.OwinConfiguration.AuthenticationScheme == AuthenticationSchemes.None)
-			{
-				return;
-			}
-
-			var propertyName = typeof(HttpListener).FullName;
-			if (propertyName == null)
-			{
-				return;
-			}
-            var listener = (HttpListener)appBuilder.Properties[propertyName];
-			listener.AuthenticationSchemes = server.OwinConfiguration.AuthenticationScheme;
+			return;
 		}
+
+		var propertyName = typeof(HttpListener).FullName;
+		if (propertyName == null)
+		{
+			return;
+		}
+		var listener = (HttpListener)appBuilder.Properties[propertyName];
+		listener.AuthenticationSchemes = server.OwinConfiguration.AuthenticationScheme;
 	}
 }

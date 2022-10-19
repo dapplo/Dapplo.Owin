@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -23,42 +23,44 @@ using System.Threading;
 using System.Threading.Tasks;
 using Dapplo.Addons;
 
-namespace Dapplo.Owin
+namespace Dapplo.Owin;
+
+/// <summary>
+/// Basic service implementation to start/stop the owin server, register this with Autofac as  Dapplo.Addons.IService
+/// Or extend to bring your own...
+/// </summary>
+[Service(nameof(OwinService))]
+public class OwinService : IStartupAsync, IShutdownAsync
 {
-    /// <summary>
-    /// Basic service implementation to start/stop the owin server, register this with Autofac as  Dapplo.Addons.IService
-    /// Or extend to bring your own...
-    /// </summary>
-    [Service(nameof(OwinService))]
-    public class OwinService : IStartupAsync, IShutdownAsync
-    {
-		/// <summary>
-		/// The IOwinServer
-		/// </summary>
-		protected IOwinServer OwinServer { get;}
+	/// <summary>
+	/// The IOwinServer
+	/// </summary>
+	protected IOwinServer OwinServer { get;}
 
-	    /// <inheritdoc />
-	    public OwinService(IOwinServer owinServer)
-	    {
-		    OwinServer = owinServer;
-	    }
+	/// <summary>
+	/// Constructor for this service
+	/// </summary>
+	/// <param name="owinServer">IOwinServer</param>
+	public OwinService(IOwinServer owinServer)
+	{
+		OwinServer = owinServer;
+	}
 
-		/// <summary>
-		/// This starts Owin
-		/// </summary>
-		/// <param name="token">CancellationToken</param>
-		public virtual Task StartupAsync(CancellationToken token = new CancellationToken())
-		{
-			return OwinServer.StartupAsync(token);
-		}
+	/// <summary>
+	/// This starts Owin
+	/// </summary>
+	/// <param name="token">CancellationToken</param>
+	public virtual Task StartupAsync(CancellationToken token = new CancellationToken())
+	{
+		return OwinServer.StartupAsync(token);
+	}
 
-		/// <summary>
-		/// This stops Owin
-		/// </summary>
-		/// <param name="token">CancellationToken</param>
-		public virtual Task ShutdownAsync(CancellationToken token = new CancellationToken())
-		{
-			return OwinServer.ShutdownAsync(token);
-		}
+	/// <summary>
+	/// This stops Owin
+	/// </summary>
+	/// <param name="token">CancellationToken</param>
+	public virtual Task ShutdownAsync(CancellationToken token = new CancellationToken())
+	{
+		return OwinServer.ShutdownAsync(token);
 	}
 }

@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -25,37 +25,36 @@ using Dapplo.SignalR.Tests.Configuration;
 using Xunit;
 using Microsoft.AspNet.SignalR;
 
-namespace Dapplo.SignalR.Tests.Hub
+namespace Dapplo.SignalR.Tests.Hub;
+
+/// <summary>
+///     The share context hub
+/// </summary>
+public class TestHub : Hub<ITestHubClient>, ITestHubServer
 {
-    /// <summary>
-    ///     The share context hub
-    /// </summary>
-    public class TestHub : Hub<ITestHubClient>, ITestHubServer
+    private static readonly LogSource Log = new LogSource();
+
+    private readonly IMyTestConfiguration _myTestConfiguration;
+
+    public TestHub(IMyTestConfiguration myTestConfiguration)
     {
-        private static readonly LogSource Log = new LogSource();
+        _myTestConfiguration = myTestConfiguration;
+    }
 
-        private readonly IMyTestConfiguration _myTestConfiguration;
+    /// <inheritdoc />
+    public string Hello(TestType testValue)
+    {
+        Assert.NotNull(_myTestConfiguration);
+        var returnValue = $"Hello {testValue.Message}";
 
-        public TestHub(IMyTestConfiguration myTestConfiguration)
-        {
-            _myTestConfiguration = myTestConfiguration;
-        }
+        Log.Verbose().WriteLine(returnValue);
+        Clients.Others.TestCalled(testValue);
+        return returnValue;
 
-        /// <inheritdoc />
-        public string Hello(TestType testValue)
-        {
-            Assert.NotNull(_myTestConfiguration);
-            var returnValue = $"Hello {testValue.Message}";
+    }
 
-            Log.Verbose().WriteLine(returnValue);
-            Clients.Others.TestCalled(testValue);
-            return returnValue;
-
-        }
-
-        public void CreateException()
-        {
-            throw new NotSupportedException("Doesn't do anything usefull, just throws.");
-        }
+    public void CreateException()
+    {
+        throw new NotSupportedException("Doesn't do anything usefull, just throws.");
     }
 }

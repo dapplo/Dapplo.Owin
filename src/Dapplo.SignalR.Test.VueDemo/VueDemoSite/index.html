@@ -16,8 +16,11 @@
     <div id="app">
         Hello {{ myVueModel.name }}!
     </div>
+    <p>
+        Open the console and change the app.myVueModel.name value, and look at the WPF app. e.g. by typing app.myVueModel.name = "Robin"
+    </p>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-<script src="scripts/jquery.signalR-2.4.1.min.js"></script>
+<script src="scripts/jquery.signalR-2.4.3.min.js"></script>
 <script src="/signalr/hubs"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script>
@@ -25,13 +28,20 @@
     var app = new Vue({
         el: '#app',
         data: {
+            // Placeholder
             myVueModel: {
-            }
+            },
+            source : ""
         },
+        // Define a watch, so changes on the page are propagated towards the app
         watch: {
             myVueModel: {
-                handler: function(val, oldVal) {
-                    vueHub.server.storeModelChange(val);
+                handler: async function (val, oldVal) {
+                    // Make sure we do not store the model back to the server if the change wasn't us
+                    if (app._data.source === vueHub.connectionId) {
+                        await vueHub.server.storeModelChange(val);
+                    }
+                    app._data.source = vueHub.connectionId;
                 },
                 immediate: false,
                 deep: true
@@ -45,10 +55,16 @@
     $(document).ready(function() {
         //$.connection.hub.url = "http://localhost:8380/signalr";
         vueHub = $.connection.vueHub;
+        // Handle changes coming from the app
         vueHub.client.UpdateModel = function(myVueModel) {
+            // Write the mode to the local data
             app._data.myVueModel = myVueModel;
+            app._data.source = myVueModel.source;
         };
         $.connection.hub.start()
+            .done(function () {
+                app._data.source = vueHub.connectionId;
+            })
             .fail(function (e) {
                 alert(e.toString());
             });

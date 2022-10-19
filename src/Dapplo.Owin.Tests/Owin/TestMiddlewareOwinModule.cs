@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -25,36 +25,35 @@ using Dapplo.Owin.OwinModules;
 using Dapplo.Owin.Tests.Configuration;
 using Owin;
 
-namespace Dapplo.Owin.Tests.Owin
+namespace Dapplo.Owin.Tests.Owin;
+
+/// <summary>
+/// A simple Owin module
+/// </summary>
+[Service(nameof(TestMiddlewareOwinModule), nameof(ConfigureOwinCors))]
+public class TestMiddlewareOwinModule : BaseOwinModule
 {
-    /// <summary>
-    /// A simple Owin module
-    /// </summary>
-    [Service(nameof(TestMiddlewareOwinModule), nameof(ConfigureOwinCors))]
-    public class TestMiddlewareOwinModule : BaseOwinModule
+	private readonly IMyTestConfiguration _myTestConfiguration;
+	private static readonly LogSource Log = new LogSource();
+
+	/// <summary>
+	/// Constructor which can take dependencies
+	/// </summary>
+	/// <param name="myTestConfiguration">IMyTestConfiguration</param>
+	// ReSharper disable once UnusedParameter.Local
+	public TestMiddlewareOwinModule(IMyTestConfiguration myTestConfiguration)
 	{
-		private readonly IMyTestConfiguration _myTestConfiguration;
-		private static readonly LogSource Log = new LogSource();
+		_myTestConfiguration = myTestConfiguration;
+	}
 
-        /// <summary>
-        /// Constructor which can take dependencies
-        /// </summary>
-        /// <param name="myTestConfiguration">IMyTestConfiguration</param>
-        // ReSharper disable once UnusedParameter.Local
-        public TestMiddlewareOwinModule(IMyTestConfiguration myTestConfiguration)
-        {
-	        _myTestConfiguration = myTestConfiguration;
-        }
-
-        /// <summary>
-        /// Configure the IAppBuilder
-        /// </summary>
-        /// <param name="server">IOwinServer</param>
-        /// <param name="appBuilder">IAppBuilder</param>
-        public override void Configure(IOwinServer server, IAppBuilder appBuilder)
-		{
-			Log.Debug().WriteLine("Configuring test middleware in the Owin pipeline");
-			appBuilder.Use(typeof (TestMiddleware));
-		}
+	/// <summary>
+	/// Configure the IAppBuilder
+	/// </summary>
+	/// <param name="server">IOwinServer</param>
+	/// <param name="appBuilder">IAppBuilder</param>
+	public override void Configure(IOwinServer server, IAppBuilder appBuilder)
+	{
+		Log.Debug().WriteLine("Configuring test middleware in the Owin pipeline");
+		appBuilder.Use(typeof (TestMiddleware));
 	}
 }

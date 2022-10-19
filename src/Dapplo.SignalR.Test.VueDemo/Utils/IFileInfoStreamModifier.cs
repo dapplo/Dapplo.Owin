@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -22,26 +22,25 @@
 using System.IO;
 using Microsoft.Owin.FileSystems;
 
-namespace Dapplo.SignalR.Test.VueDemo.Utils
+namespace Dapplo.SignalR.Test.VueDemo.Utils;
+
+/// <summary>
+/// 
+/// </summary>
+public interface IFileInfoStreamModifier
 {
     /// <summary>
-    /// 
+    /// This tells the EmbeddedResourceFileInfo if the stream can be modified
     /// </summary>
-    public interface IFileInfoStreamModifier
-    {
-        /// <summary>
-        /// This tells the EmbeddedResourceFileInfo if the stream can be modified
-        /// </summary>
-        /// <param name="fileInfo">IFileInfo</param>
-        /// <returns>bool</returns>
-        bool CanModifyStream(IFileInfo fileInfo);
+    /// <param name="fileInfo">IFileInfo</param>
+    /// <returns>bool</returns>
+    bool CanModifyStream(IFileInfo fileInfo);
 
-        /// <summary>
-        /// This modifies the original stream
-        /// </summary>
-        /// <param name="fileInfo"></param>
-        /// <param name="stream">Stream to modify (or the original if not)</param>
-        /// <returns>Stream</returns>
-        Stream ModifyStream(IFileInfo fileInfo, Stream stream);
-    }
+    /// <summary>
+    /// This modifies the original stream
+    /// </summary>
+    /// <param name="fileInfo"></param>
+    /// <param name="stream">Stream to modify (or the original if not)</param>
+    /// <returns>Stream</returns>
+    Stream ModifyStream(IFileInfo fileInfo, Stream stream);
 }

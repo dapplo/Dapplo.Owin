@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -38,57 +38,56 @@ using Dapplo.Owin.Implementation;
 using Dapplo.Owin.OwinModules;
 using Dapplo.Owin.Tests.Owin;
 
-namespace Dapplo.Owin.Tests
+namespace Dapplo.Owin.Tests;
+
+public sealed class OwinTests
 {
-    public sealed class OwinTests
+    public OwinTests(ITestOutputHelper testOutputHelper)
     {
-        public OwinTests(ITestOutputHelper testOutputHelper)
+        LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+        // Disable cache, otherwise the server seems to respond even if it isn't running
+        HttpExtensionsGlobals.HttpSettings.RequestCacheLevel = RequestCacheLevel.BypassCache;
+    }
+
+
+    [Fact]
+    public async Task TestStartupWithoutBootstrapper()
+    {
+        var owinConfiguration = DictionaryConfiguration<IOwinConfiguration>.Create();
+        owinConfiguration.AuthenticationScheme = AuthenticationSchemes.Negotiate;
+
+        var owinModule = new TestMiddlewareOwinModule(null);
+        var configureOwinCorsModule = new ConfigureOwinCors();
+        var configureOwinAuthenticationModule = new ConfigureOwinAuthentication();
+
+        var testModules = new IOwinModule[] { configureOwinCorsModule, configureOwinAuthenticationModule, owinModule}.Select(module =>
+            new Meta<IOwinModule, ServiceAttribute>(module, new ServiceAttribute(module.GetType().Name)));
+
+        owinConfiguration.AddListenerUri();
+        var owinServer = new OwinServer(owinConfiguration, testModules);
+
+        await owinServer.StartupAsync();
+
+        var baseUri = owinServer.ListeningOn.FirstOrDefault();
+        Assert.NotNull(baseUri);
+        // Test request, we need to build the url
+        var testUri = new Uri(baseUri).AppendSegments("Test");
+
+        var result = await testUri.GetAsAsync<string>();
+        Assert.Equal("Dapplo", result);
+
+        await owinServer.ShutdownAsync();
+        Assert.False(owinServer.IsListening, "Server still running!");
+
+        await Assert.ThrowsAsync<HttpRequestException>(async () =>
         {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-            // Disable cache, otherwise the server seems to respond even if it isn't running
-            HttpExtensionsGlobals.HttpSettings.RequestCacheLevel = RequestCacheLevel.BypassCache;
-        }
+            result = await testUri.GetAsAsync<string>();
+        });
 
+        await owinServer.StartupAsync();
+        Assert.True(owinServer.IsListening, "Server not running!");
 
-        [Fact]
-        public async Task TestStartupWithoutBootstrapper()
-        {
-            var owinConfiguration = DictionaryConfiguration<IOwinConfiguration>.Create();
-            owinConfiguration.AuthenticationScheme = AuthenticationSchemes.Negotiate;
-
-            var owinModule = new TestMiddlewareOwinModule(null);
-            var configureOwinCorsModule = new ConfigureOwinCors();
-            var configureOwinAuthenticationModule = new ConfigureOwinAuthentication();
-
-            var testModules = new IOwinModule[] { configureOwinCorsModule, configureOwinAuthenticationModule, owinModule}.Select(module =>
-                new Meta<IOwinModule, ServiceAttribute>(module, new ServiceAttribute(module.GetType().Name)));
-
-            owinConfiguration.AddListenerUri();
-            var owinServer = new OwinServer(owinConfiguration, testModules);
-
-            await owinServer.StartupAsync();
-
-            var baseUri = owinServer.ListeningOn.FirstOrDefault();
-            Assert.NotNull(baseUri);
-            // Test request, we need to build the url
-            var testUri = new Uri(baseUri).AppendSegments("Test");
-
-            var result = await testUri.GetAsAsync<string>();
-            Assert.Equal("Dapplo", result);
-
-            await owinServer.ShutdownAsync();
-            Assert.False(owinServer.IsListening, "Server still running!");
-
-            await Assert.ThrowsAsync<HttpRequestException>(async () =>
-            {
-                result = await testUri.GetAsAsync<string>();
-            });
-
-            await owinServer.StartupAsync();
-            Assert.True(owinServer.IsListening, "Server not running!");
-
-            await owinServer.ShutdownAsync();
-            Assert.False(owinServer.IsListening, "Server still running!");
-        }
+        await owinServer.ShutdownAsync();
+        Assert.False(owinServer.IsListening, "Server still running!");
     }
 }

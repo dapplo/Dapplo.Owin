@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -23,29 +23,28 @@ using Dapplo.Addons;
 using Dapplo.Log;
 using Owin;
 
-namespace Dapplo.Owin.OwinModules
-{
-    /// <summary>
-    ///     An Owin Module which configures the error page
-    /// </summary>
-    [Service(nameof(ConfigureOwinErrorPage), nameof(ConfigureOwinCors))]
-    public class ConfigureOwinErrorPage : BaseOwinModule
-	{
-		private static readonly LogSource Log = new LogSource();
+namespace Dapplo.Owin.OwinModules;
 
-		/// <summary>
-		///     Configure the error page for Owin
-		/// </summary>
-		/// <param name="server">IOwinServer</param>
-		/// <param name="appBuilder">IAppBuilder</param>
-		public override void Configure(IOwinServer server, IAppBuilder appBuilder)
+/// <summary>
+///     An Owin Module which configures the error page
+/// </summary>
+[Service(nameof(ConfigureOwinErrorPage), nameof(ConfigureOwinCors))]
+public class ConfigureOwinErrorPage : BaseOwinModule
+{
+	private static readonly LogSource Log = new LogSource();
+
+	/// <summary>
+	///     Configure the error page for Owin
+	/// </summary>
+	/// <param name="server">IOwinServer</param>
+	/// <param name="appBuilder">IAppBuilder</param>
+	public override void Configure(IOwinServer server, IAppBuilder appBuilder)
+	{
+		Log.Verbose().WriteLine("Enabling error page: {0}", server.OwinConfiguration.UseErrorPage);
+		if (!server.OwinConfiguration.UseErrorPage)
 		{
-			Log.Verbose().WriteLine("Enabling error page: {0}", server.OwinConfiguration.UseErrorPage);
-			if (!server.OwinConfiguration.UseErrorPage)
-			{
-				return;
-			}
-			appBuilder.UseErrorPage();
+			return;
 		}
+		appBuilder.UseErrorPage();
 	}
 }

@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -22,18 +22,17 @@
 using System.Collections.Generic;
 using System.Net;
 
-namespace Dapplo.SignalR.Tests.Configuration
+namespace Dapplo.SignalR.Tests.Configuration;
+
+public class MyTestConfigurationImpl : IMyTestConfiguration
 {
-    public class MyTestConfigurationImpl : IMyTestConfiguration
-    {
-        public IList<string> ListeningUrls { get; set; }
-        public bool UseErrorPage { get; set; }
-        public bool EnableCors { get; set; }
-        public AuthenticationSchemes AuthenticationScheme { get; set; }
-        public bool EnableJavaEnableJavaScriptProxies { get; set; }
-        public bool EnableDetailedErrors { get; set; }
-        public bool FixCamelCase { get; set; }
-        public bool UseDummyPerformanceCounter { get; set; }
-        public bool EnableExceptionLogger { get; set; }
-    }
+    public IList<string> ListeningUrls { get; set; }
+    public bool UseErrorPage { get; set; }
+    public bool EnableCors { get; set; }
+    public AuthenticationSchemes AuthenticationScheme { get; set; }
+    public bool EnableJavaEnableJavaScriptProxies { get; set; }
+    public bool EnableDetailedErrors { get; set; }
+    public bool FixCamelCase { get; set; }
+    public bool UseDummyPerformanceCounter { get; set; }
+    public bool EnableExceptionLogger { get; set; }
 }

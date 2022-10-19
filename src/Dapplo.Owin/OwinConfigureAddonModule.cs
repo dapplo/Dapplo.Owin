@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -26,40 +26,39 @@ using Dapplo.Owin.Configuration;
 using Dapplo.Owin.Implementation;
 using Dapplo.Owin.OwinModules;
 
-namespace Dapplo.Owin
+namespace Dapplo.Owin;
+
+/// <summary>
+/// Adds an IOwinModule to configure Owin in Autofac
+/// </summary>
+public class OwinConfigureAddonModule : AddonModule
 {
-    /// <summary>
-    /// Adds an IOwinModule to configure Owin in Autofac
-    /// </summary>
-    public class OwinConfigureAddonModule : AddonModule
+    /// <inheritdoc />
+    protected override void Load(ContainerBuilder builder)
     {
-        /// <inheritdoc />
-        protected override void Load(ContainerBuilder builder)
-        {
-            builder
-                .Register(c => DictionaryConfiguration<IOwinConfiguration>.Create())
-                .IfNotRegistered(typeof(IOwinConfiguration))
-                .As<IOwinConfiguration>();
-            builder
-                .RegisterType<OwinServer>()
-                .As<IOwinServer>()
-                .SingleInstance();
-            builder
-                .RegisterType<ConfigureOwinAuthentication>()
-                .As<IOwinModule>()
-                .SingleInstance();
-            builder
-                .RegisterType<ConfigureOwinAutofac>()
-                .As<IOwinModule>()
-                .SingleInstance();
-            builder
-                .RegisterType<ConfigureOwinCors>()
-                .As<IOwinModule>()
-                .SingleInstance();
-            builder
-                .RegisterType<ConfigureOwinErrorPage>()
-                .As<IOwinModule>()
-                .SingleInstance();
-        }
+        builder
+            .Register(_ => DictionaryConfiguration<IOwinConfiguration>.Create())
+            .IfNotRegistered(typeof(IOwinConfiguration))
+            .As<IOwinConfiguration>();
+        builder
+            .RegisterType<OwinServer>()
+            .As<IOwinServer>()
+            .SingleInstance();
+        builder
+            .RegisterType<ConfigureOwinAuthentication>()
+            .As<IOwinModule>()
+            .SingleInstance();
+        builder
+            .RegisterType<ConfigureOwinAutofac>()
+            .As<IOwinModule>()
+            .SingleInstance();
+        builder
+            .RegisterType<ConfigureOwinCors>()
+            .As<IOwinModule>()
+            .SingleInstance();
+        builder
+            .RegisterType<ConfigureOwinErrorPage>()
+            .As<IOwinModule>()
+            .SingleInstance();
     }
 }

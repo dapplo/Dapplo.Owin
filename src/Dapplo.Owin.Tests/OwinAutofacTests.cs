@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -33,73 +33,72 @@ using Xunit.Abstractions;
 using Dapplo.Log.XUnit;
 using Dapplo.Owin.Tests.Configuration;
 
-namespace Dapplo.Owin.Tests
+namespace Dapplo.Owin.Tests;
+
+/// <summary>
+/// Test case for OWIN with Autofac
+/// </summary>
+public sealed class OwinAutofacTests
 {
-    /// <summary>
-    /// Test case for OWIN with Autofac
-    /// </summary>
-    public sealed class OwinAutofacTests
+    private const string ApplicationName = "DapploOwin";
+
+    public OwinAutofacTests(ITestOutputHelper testOutputHelper)
     {
-        private const string ApplicationName = "DapploOwin";
+        LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+        // Disable cache, otherwise the server seems to respond even if it isn't running
+        HttpExtensionsGlobals.HttpSettings.RequestCacheLevel = RequestCacheLevel.BypassCache;
+    }
 
-        public OwinAutofacTests(ITestOutputHelper testOutputHelper)
+    [Fact]
+    public async Task TestStartupShutdownAsync()
+    {
+        var applicationConfig = ApplicationConfigBuilder
+            .Create()
+            .WithApplicationName(ApplicationName)
+            // Normally one would add Dapplo.Owin and Dapplo.SignalR dlls somewhere in a components or addons directory.
+            // This would prevent to have a direct reference.
+            .WithAssemblyPatterns("Dapplo*")
+            .BuildApplicationConfig();
+
+        using (var bootstrapper = new ApplicationBootstrapper(applicationConfig))
         {
-            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-            // Disable cache, otherwise the server seems to respond even if it isn't running
-            HttpExtensionsGlobals.HttpSettings.RequestCacheLevel = RequestCacheLevel.BypassCache;
-        }
+            bootstrapper.Configure();
 
-        [Fact]
-        public async Task TestStartupShutdownAsync()
-        {
-            var applicationConfig = ApplicationConfigBuilder
-                .Create()
-                .WithApplicationName(ApplicationName)
-                // Normally one would add Dapplo.Owin and Dapplo.SignalR dlls somewhere in a components or addons directory.
-                // This would prevent to have a direct reference.
-                .WithAssemblyPatterns("Dapplo*")
-                .BuildApplicationConfig();
+            await bootstrapper.InitializeAsync();
 
-            using (var bootstrapper = new ApplicationBootstrapper(applicationConfig))
+            // Force mapping of IIniSubSection to IIniSection
+            bootstrapper.Container.Resolve<IMyTestConfiguration>();
+
+            var owinServer = bootstrapper.Container.Resolve<IOwinServer>();
+            // Resetting the port to random
+            owinServer.OwinConfiguration.AddListenerUri();
+
+            await bootstrapper.StartupAsync();
+
+            Assert.True(owinServer.IsListening, "Server not running!");
+
+            var baseUri = owinServer.ListeningOn.FirstOrDefault();
+            Assert.NotNull(baseUri);
+
+            // Test request, we need to build the url
+            var testUri = new Uri(baseUri).AppendSegments("Test");
+
+            var result = await testUri.GetAsAsync<string>();
+            Assert.Equal("Dapplo", result);
+
+            await owinServer.ShutdownAsync();
+            Assert.False(owinServer.IsListening, "Server still running!");
+
+            await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
-                bootstrapper.Configure();
+                result = await testUri.GetAsAsync<string>();
+            });
 
-                await bootstrapper.InitializeAsync();
+            await owinServer.StartupAsync();
+            Assert.True(owinServer.IsListening, "Server not running!");
 
-                // Force mapping of IIniSubSection to IIniSection
-                bootstrapper.Container.Resolve<IMyTestConfiguration>();
-
-                var owinServer = bootstrapper.Container.Resolve<IOwinServer>();
-                // Resetting the port to random
-                owinServer.OwinConfiguration.AddListenerUri();
-
-                await bootstrapper.StartupAsync();
-
-                Assert.True(owinServer.IsListening, "Server not running!");
-
-                var baseUri = owinServer.ListeningOn.FirstOrDefault();
-                Assert.NotNull(baseUri);
-
-                // Test request, we need to build the url
-                var testUri = new Uri(baseUri).AppendSegments("Test");
-
-                var result = await testUri.GetAsAsync<string>();
-                Assert.Equal("Dapplo", result);
-
-                await owinServer.ShutdownAsync();
-                Assert.False(owinServer.IsListening, "Server still running!");
-
-                await Assert.ThrowsAsync<HttpRequestException>(async () =>
-                {
-                    result = await testUri.GetAsAsync<string>();
-                });
-
-                await owinServer.StartupAsync();
-                Assert.True(owinServer.IsListening, "Server not running!");
-
-                await owinServer.ShutdownAsync();
-                Assert.False(owinServer.IsListening, "Server still running!");
-            }
+            await owinServer.ShutdownAsync();
+            Assert.False(owinServer.IsListening, "Server still running!");
         }
     }
 }

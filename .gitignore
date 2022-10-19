@@ -226,3 +226,6 @@ doc/api/.manifest
 CoverageReport
 coverage.xml
 xunit.xml
+
+# Rider
+.idea

@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -19,56 +19,72 @@
 //  You should have a copy of the GNU Lesser General Public License
 //  along with Dapplo.Owin. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
+using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Windows;
+using Dapplo.Log;
 using Dapplo.SignalR.Test.VueDemo.Model;
-using Dapplo.SignalR.Test.VueDemo.Model.Impl;
 using Microsoft.AspNet.SignalR;
 
-namespace Dapplo.SignalR.Test.VueDemo.Hubs
+namespace Dapplo.SignalR.Test.VueDemo.Hubs;
+
+/// <summary>
+///     The Vue demo Hub
+/// </summary>
+public class VueHub : Hub<IVueHubClient>, IVueHubServer
 {
+    private static readonly LogSource Log = new LogSource();
+    private readonly MyVueModel _myVueModel;
+
     /// <summary>
-    ///     The share context hub
+    /// Constructor taking the global singleton IMyVueModel
     /// </summary>
-    public class VueHub : Hub<IVueHubClient>, IVueHubServer
+    /// <param name="myVueModel">IMyVueModel</param>
+    public VueHub(MyVueModel myVueModel)
     {
-        private readonly IMyVueModel _myVueModel;
+        _myVueModel = myVueModel;
+        _myVueModel.PropertyChanged += MyVueModelOnPropertyChanged;
+    }
 
-        /// <summary>
-        /// Constructor taking the global singleton IMyVueModel
-        /// </summary>
-        /// <param name="myVueModel">IMyVueModel</param>
-        public VueHub(IMyVueModel myVueModel)
+    /// <inheritdoc />
+    public override async Task OnConnected()
+    {
+        await base.OnConnected().ConfigureAwait(false);
+            
+        Log.Debug().WriteLine("Connect from {0}", Context.User?.Identity?.Name);
+        await Clients.Caller.UpdateModel(_myVueModel);
+    }
+
+    /// <summary>
+    /// The server calls all clients when something changes
+    /// </summary>
+    /// <param name="sender">object</param>
+    /// <param name="e">PropertyChangedEventArgs</param>
+    private async void MyVueModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        // Skip propagation when the change came from the web page
+        if ("Hub".Equals(_myVueModel.Source))
         {
-            _myVueModel = myVueModel;
-            _myVueModel.PropertyChanged += MyVueModelOnPropertyChanged;
+            await Clients.All.UpdateModel(_myVueModel);
+            return;
         }
+        _myVueModel.Source = "Hub";
+    }
 
-        /// <inheritdoc />
-        public override async Task OnConnected()
+    /// <summary>
+    /// Called from (one of) the client(s)
+    /// </summary>
+    /// <param name="myVueModel">MyVueModel</param>
+    public async Task StoreModelChange(MyVueModel myVueModel)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
         {
-            await base.OnConnected().ConfigureAwait(false);
-            await Clients.Caller.UpdateModel(_myVueModel);
-        }
-
-        /// <summary>
-        /// The server calls all clients when something changes
-        /// </summary>
-        /// <param name="sender">object</param>
-        /// <param name="e">PropertyChangedEventArgs</param>
-        private void MyVueModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            Clients.All.UpdateModel(_myVueModel);
-        }
-
-        /// <summary>
-        /// Called from the client
-        /// </summary>
-        /// <param name="myVueModel">IMyVueModel</param>
-        public Task StoreModelChange(MyVueModel myVueModel)
-        {
+            _myVueModel.Source = myVueModel.Source;
             _myVueModel.Name = myVueModel.Name;
-            return Task.CompletedTask;
-        }
+        });
+
+        // Update all other clients
+        await Clients.Others.UpdateModel(_myVueModel);
     }
 }

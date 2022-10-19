@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -22,10 +22,9 @@
 using Dapplo.Config.Ini;
 using Dapplo.Owin.Configuration;
 
-namespace Dapplo.Owin.Tests.Configuration
+namespace Dapplo.Owin.Tests.Configuration;
+
+[IniSection("Core")]
+public interface IMyTestConfiguration : IIniSection, IOwinConfiguration
 {
-	[IniSection("Core")]
-	public interface IMyTestConfiguration : IIniSection, IOwinConfiguration
-	{
-	}
 }

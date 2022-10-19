@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -24,32 +24,31 @@ using System.Threading.Tasks;
 using Dapplo.Addons;
 using Dapplo.Config.Ini;
 
-namespace Dapplo.SignalR.Test.VueDemo.Modules
+namespace Dapplo.SignalR.Test.VueDemo.Modules;
+
+/// <summary>
+/// Start the configuration
+/// </summary>
+[Service(nameof(ConfigService))]
+public class ConfigService : IStartupAsync, IShutdownAsync
 {
-    /// <summary>
-    /// Start the configuration
-    /// </summary>
-    [Service(nameof(ConfigService))]
-    public class ConfigService : IStartupAsync, IShutdownAsync
+    private readonly IniFileContainer _iniFileContainer;
+
+    /// <inheritdoc />
+    public ConfigService(IniFileContainer iniFileContainer)
     {
-        private readonly IniFileContainer _iniFileContainer;
+        _iniFileContainer = iniFileContainer;
+    }
 
-        /// <inheritdoc />
-        public ConfigService(IniFileContainer iniFileContainer)
-        {
-            _iniFileContainer = iniFileContainer;
-        }
+    /// <inheritdoc />
+    public Task StartupAsync(CancellationToken cancellationToken = default)
+    {
+        return _iniFileContainer.ReloadAsync(true, cancellationToken);
+    }
 
-        /// <inheritdoc />
-        public Task StartupAsync(CancellationToken cancellationToken = default)
-        {
-            return _iniFileContainer.ReloadAsync(true, cancellationToken);
-        }
-
-        /// <inheritdoc />
-        public Task ShutdownAsync(CancellationToken cancellationToken = default)
-        {
-            return _iniFileContainer.WriteAsync(cancellationToken);
-        }
+    /// <inheritdoc />
+    public Task ShutdownAsync(CancellationToken cancellationToken = default)
+    {
+        return _iniFileContainer.WriteAsync(cancellationToken);
     }
 }

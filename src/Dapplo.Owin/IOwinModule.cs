@@ -1,5 +1,5 @@
 ﻿//  Dapplo - building blocks for desktop applications
-//  Copyright (C) 2015-2019 Dapplo
+//  Copyright (C) 2015-2022 Dapplo
 // 
 //  For more information see: http://dapplo.net/
 //  Dapplo repositories are hosted on GitHub: https://github.com/dapplo
@@ -23,32 +23,31 @@ using System.Threading;
 using System.Threading.Tasks;
 using Owin;
 
-namespace Dapplo.Owin
+namespace Dapplo.Owin;
+
+/// <summary>
+///     The IOwinStartup describes Owin modules that add functionality to an Owin server, like SignalR or a file-servers
+/// </summary>
+public interface IOwinModule
 {
 	/// <summary>
-	///     The IOwinStartup describes Owin modules that add functionality to an Owin server, like SignalR or a file-servers
+	/// If you need to initialize something, do it here
 	/// </summary>
-	public interface IOwinModule
-	{
-		/// <summary>
-		/// If you need to initialize something, do it here
-		/// </summary>
-		/// <param name="server">IOwinServer</param>
-		/// <param name="cancellationToken">CancellationToken</param>
-		Task InitializeAsync(IOwinServer server, CancellationToken cancellationToken = default);
+	/// <param name="server">IOwinServer</param>
+	/// <param name="cancellationToken">CancellationToken</param>
+	Task InitializeAsync(IOwinServer server, CancellationToken cancellationToken = default);
 
-		/// <summary>
-		/// Implement this to make sure you can configure the pipeline, like add a middleware
-		/// </summary>
-		/// <param name="server">IOwinServer</param>
-		/// <param name="appBuilder">IAppBuilder</param>
-		void Configure(IOwinServer server, IAppBuilder appBuilder);
+	/// <summary>
+	/// Implement this to make sure you can configure the pipeline, like add a middleware
+	/// </summary>
+	/// <param name="server">IOwinServer</param>
+	/// <param name="appBuilder">IAppBuilder</param>
+	void Configure(IOwinServer server, IAppBuilder appBuilder);
 
-		/// <summary>
-		/// Optionally implement code here to make sure you shutdown any running services or cleanup resources.
-		/// </summary>
-		/// <param name="server">IOwinServer</param>
-		/// <param name="cancellationToken">CancellationToken</param>
-		Task DeinitializeAsync(IOwinServer server, CancellationToken cancellationToken = default);
-	}
+	/// <summary>
+	/// Optionally implement code here to make sure you shutdown any running services or cleanup resources.
+	/// </summary>
+	/// <param name="server">IOwinServer</param>
+	/// <param name="cancellationToken">CancellationToken</param>
+	Task DeinitializeAsync(IOwinServer server, CancellationToken cancellationToken = default);
 }
